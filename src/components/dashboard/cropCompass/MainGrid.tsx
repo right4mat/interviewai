@@ -1,195 +1,276 @@
 "use client";
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
-import NutrientInput from "./NutrientInput";
-import AnalysisView from "./AnalysisView";
-import Recommendations from "./Recommendations";
-import { calculateNetChargeBalance, calculateWhiltRiskValue } from "./utils";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { GridRowsProp, GridValidRowModel } from "@mui/x-data-grid";
-
-// Define steps directly in this file
-const steps = ["Input Data", "Analysis", "Recommendations"];
-
-// Define Row interface to match the expected type in utility functions
-interface Row {
-  id: number;
-  element: string;
-  ppm: string | number | null;
-  percent: string | number | null;
-}
+import IconButton from "@mui/material/IconButton";
+import Avatar from "@mui/material/Avatar";
+import Card from "@mui/material/Card";
+import Stack from "@mui/material/Stack";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import ScreenShareIcon from "@mui/icons-material/ScreenShare";
+import ChatIcon from "@mui/icons-material/Chat";
+import CallEndIcon from "@mui/icons-material/CallEnd";
+import PeopleIcon from "@mui/icons-material/People";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Webcam from "react-webcam";
+import { useOpenAIRealtime } from "@/services/openAI";
 
 export default function MainGrid(): React.ReactElement {
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const [nutrientData, setNutrientData] = useState<Record<string, number>>({});
-  const [netChargeBalance, setNetChargeBalance] = useState<number>(0);
-  const [whiltRisk, setWhiltRisk] = useState<number>(0);
-  const [inputValues, setInputValues] = useState<Record<number, { ppm: string | null; percent: string | null }>>({});
-  const [isDryTissue, setIsDryTissue] = useState<boolean>(false);
-  const [rows, setRows] = useState<GridRowsProp>([
-    { id: 1, element: "Nitrate", ppm: "", percent: "" },
-    { id: 2, element: "Ammonium", ppm: "", percent: "" },
-    { id: 3, element: "Phosphate", ppm: "", percent: "" },
-    { id: 4, element: "Potassium", ppm: "", percent: "" },
-    { id: 5, element: "Calcium", ppm: "", percent: "" },
-    { id: 6, element: "Magnesium", ppm: "", percent: "" },
-    { id: 7, element: "Sulphate", ppm: "", percent: "" },
-    { id: 8, element: "Zinc", ppm: "", percent: "" },
-    { id: 9, element: "Copper", ppm: "", percent: "" },
-    { id: 10, element: "Manganese", ppm: "", percent: "" },
-    { id: 11, element: "Iron", ppm: "", percent: "" },
-    { id: 12, element: "Boron", ppm: "", percent: "" },
-    { id: 13, element: "Molybdenum", ppm: "", percent: "" },
-    { id: 14, element: "Chloride", ppm: "", percent: "" },
-    { id: 15, element: "Sodium", ppm: "", percent: "" },
-    { id: 16, element: "Silicon", ppm: "", percent: "" },
-    { id: 17, element: "Aluminium", ppm: "", percent: "" }
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isVideoOn, setIsVideoOn] = useState<boolean>(true);
+  const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  const [participants, setParticipants] = useState<string[]>([
+    "John Doe",
+    "Jane Smith",
+    "Robert Johnson",
+    "Emily Davis",
+    "Michael Wilson"
   ]);
+  const webcamRef = useRef<Webcam>(null);
+  const { mutate: initRealtime, isPending: isConnecting, isSuccess: isConnected } = useOpenAIRealtime();
+  const [rtcConnection, setRtcConnection] = useState<{ pc: RTCPeerConnection, dc: RTCDataChannel, cleanup: () => void } | null>(null);
+  const [isRealtimeCalled, setIsRealtimeCalled] = useState<boolean>(false);
 
-  // Calculate values whenever rows change
   useEffect(() => {
-    // Calculate net charge balance and whilt risk
-
-    setNetChargeBalance(calculateNetChargeBalance([...rows as Row[]]));
-    setWhiltRisk(calculateWhiltRiskValue([...rows as Row[]]));
-  }, [rows]);
-
-  const handleNext = (): void => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = (): void => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = (): void => {
-    setActiveStep(0);
-    setNutrientData({});
-    setNetChargeBalance(0);
-    setWhiltRisk(0);
-    setInputValues({});
-    setRows(rows.map((row) => ({ ...row, ppm: "", percent: "" })));
-  };
-
-  const handleInputValuesChange = (newValue: { id: number; ppm: number | ""; percent: number | "" }): void => {
-    setRows(
-      rows.map((value) => {
-        if (newValue.id === value.id) {
-          return { ...value, ppm: newValue.ppm, percent: newValue.percent };
-        } else {
-          return value;
+    // Initialize OpenAI Realtime connection when component mounts
+    if (!rtcConnection && !isRealtimeCalled) {
+      setIsRealtimeCalled(true);
+      initRealtime(undefined, {
+        onSuccess: (connection) => {
+          setRtcConnection(connection);
+          console.log("OpenAI Realtime connection established");
+        },
+        onError: (error) => {
+          console.error("Failed to connect to OpenAI Realtime:", error);
         }
-      })
-    );
+      });
+    }
+
+    // Cleanup function to close connection when component unmounts
+    return () => {
+      if (rtcConnection) {
+        rtcConnection.cleanup();
+        console.log("OpenAI Realtime connection closed");
+      }
+    };
+  }, []); // Empty dependency array to ensure it only runs once on mount
+
+  const toggleMute = (): void => {
+    setIsMuted(!isMuted);
+    if (rtcConnection) {
+      // Update audio track enabled state
+      rtcConnection.pc.getSenders().forEach(sender => {
+        if (sender.track && sender.track.kind === 'audio') {
+          sender.track.enabled = isMuted; // Toggle from current state
+        }
+      });
+    }
+  };
+
+  const toggleVideo = (): void => {
+    setIsVideoOn(!isVideoOn);
+  };
+
+  const toggleScreenShare = (): void => {
+    setIsScreenSharing(!isScreenSharing);
+  };
+
+  const toggleChat = (): void => {
+    setIsChatOpen(!isChatOpen);
+  };
+
+  const endCall = (): void => {
+    if (rtcConnection) {
+      rtcConnection.pc.close();
+      setRtcConnection(null);
+    }
+    alert("Call ended");
   };
 
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       <Typography component="h2" variant="h5" sx={{ mb: 4 }}>
-        Crop Compass
+        {isConnected ? "AI Interview Session" : "Starting Interview..."}
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 2 }}>
-          <Stepper activeStep={activeStep} orientation="vertical" sx={{ mb: 4 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          <Button
-            color="primary"
+        <Grid size={{ xs: 12, md: 9 }}>
+          <Card 
             variant="outlined"
-            size="large"
-            disabled={activeStep === 0}
-            onClick={handleBack}
-            startIcon={<ArrowBackIcon />}
-            sx={{
-              mr: 1,
-              px: 2,
-              py: 1.5,
-              fontSize: "1rem",
-              color: 'text.secondary'
+            sx={{ 
+              height: "70vh", 
+              display: "flex", 
+              flexDirection: "column",
+              position: "relative",
+              bgcolor: "#000"
             }}
           >
-            Back
-          </Button>
-          {activeStep === steps.length - 1 ? (
-            <Button
-              onClick={handleReset}
-              variant="outlined"
-              color="primary"
-              size="large"
-              startIcon={<RestartAltIcon />}
-              sx={{
-                px: 2,
-                py: 1.5,
-                fontSize: "1rem",
-                color: 'text.secondary'
-              }}
-            >
-              Reset
-            </Button>
-          ) : (
-            <Button
-              onClick={handleNext}
-              variant="outlined"
-              color="primary"
-              size="large"
-              endIcon={<ArrowForwardIcon />}
-              sx={{
-                px: 2,
-                py: 1.5,
-                fontSize: "1rem",
-                color: 'text.secondary'
-              }}
-            >
-              Next
-            </Button>
-          )}
-        </Grid>
-        <Grid size={{ xs: 12, md: 10 }}>
-          <Box>
-            {activeStep === 0 ? (
-              <NutrientInput
-                onNext={handleNext}
-                onInputValuesChange={handleInputValuesChange}
-                onUpload={setRows}
-                rows1={rows.slice(0, 9)}
-                rows2={rows.slice(9, 17)}
-                isDryTissue={isDryTissue}
-                onDryTissueChange={setIsDryTissue}
-              />
-            ) : activeStep === 1 ? (
-              <AnalysisView 
-                onNext={handleNext} 
-                netChargeBalance={netChargeBalance} 
-                whiltRisk={whiltRisk}
-                isDryTissue={isDryTissue}
+            {isVideoOn ? (
+              <Webcam
+                ref={webcamRef}
+                audio={!isMuted}
+                muted={true}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                screenshotFormat="image/jpeg"
               />
             ) : (
-              <Recommendations 
-                onReset={handleReset} 
-                netChargeBalance={netChargeBalance} 
-                whiltRisk={whiltRisk}
-                isDryTissue={isDryTissue}
-              />
+              <Box 
+                sx={{ 
+                  width: "100%", 
+                  height: "100%", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center",
+                  bgcolor: "#333"
+                }}
+              >
+                <Avatar 
+                  sx={{ width: 120, height: 120, fontSize: "3rem" }}
+                >
+                  {participants[0].charAt(0)}
+                </Avatar>
+              </Box>
             )}
-          </Box>
-
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Box sx={{ flex: "1 1 auto" }} />
-          </Box>
+            
+            <Box 
+              sx={{ 
+                position: "absolute", 
+                bottom: 20, 
+                left: "50%", 
+                transform: "translateX(-50%)",
+                display: "flex",
+                gap: 2,
+                bgcolor: "rgba(0,0,0,0.5)",
+                borderRadius: 4,
+                padding: 1
+              }}
+            >
+              <IconButton 
+                onClick={toggleMute} 
+                sx={{ 
+                  bgcolor: isMuted ? "error.main" : "rgba(255,255,255,0.2)",
+                  color: "white",
+                  "&:hover": { bgcolor: isMuted ? "error.dark" : "rgba(255,255,255,0.3)" }
+                }}
+              >
+                {isMuted ? <MicOffIcon /> : <MicIcon />}
+              </IconButton>
+              
+              <IconButton 
+                onClick={toggleVideo}
+                sx={{ 
+                  bgcolor: !isVideoOn ? "error.main" : "rgba(255,255,255,0.2)",
+                  color: "white",
+                  "&:hover": { bgcolor: !isVideoOn ? "error.dark" : "rgba(255,255,255,0.3)" }
+                }}
+              >
+                {isVideoOn ? <VideocamIcon /> : <VideocamOffIcon />}
+              </IconButton>
+              
+              <IconButton 
+                onClick={toggleScreenShare}
+                sx={{ 
+                  bgcolor: isScreenSharing ? "primary.main" : "rgba(255,255,255,0.2)",
+                  color: "white",
+                  "&:hover": { bgcolor: isScreenSharing ? "primary.dark" : "rgba(255,255,255,0.3)" }
+                }}
+              >
+                <ScreenShareIcon />
+              </IconButton>
+              
+              <IconButton 
+                onClick={toggleChat}
+                sx={{ 
+                  bgcolor: isChatOpen ? "primary.main" : "rgba(255,255,255,0.2)",
+                  color: "white",
+                  "&:hover": { bgcolor: isChatOpen ? "primary.dark" : "rgba(255,255,255,0.3)" }
+                }}
+              >
+                <ChatIcon />
+              </IconButton>
+              
+              <IconButton 
+                onClick={endCall}
+                sx={{ 
+                  bgcolor: "error.main",
+                  color: "white",
+                  "&:hover": { bgcolor: "error.dark" }
+                }}
+              >
+                <CallEndIcon />
+              </IconButton>
+            </Box>
+            
+            <Typography 
+              sx={{ 
+                position: "absolute", 
+                bottom: 10, 
+                left: 10,
+                color: "white",
+                bgcolor: "rgba(0,0,0,0.5)",
+                padding: "2px 8px",
+                borderRadius: 1
+              }}
+            >
+              {participants[0]} (You) {isConnecting && "- Connecting..."}
+              {isConnected && "- Connected"}
+            </Typography>
+          </Card>
+        </Grid>
+        
+        <Grid size={{ xs: 12, md: 3 }}>
+          <Card variant='outlined' sx={{ height: "70vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <Box sx={{ p: 2, borderBottom: "1px solid #eee", display: "flex", alignItems: "center" }}>
+              <PeopleIcon sx={{ mr: 1 }} />
+              <Typography variant="h6">Participants ({participants.length})</Typography>
+            </Box>
+            
+            <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+              <Stack spacing={2}>
+                {participants.map((name, index) => (
+                  <Box 
+                    key={index}
+                    sx={{ 
+                      display: "flex", 
+                      alignItems: "center",
+                      p: 1,
+                      borderRadius: 1,
+                      bgcolor: index === 0 ? "rgba(0,0,0,0.05)" : "transparent"
+                    }}
+                  >
+                    <Avatar sx={{ mr: 2 }}>{name.charAt(0)}</Avatar>
+                    <Typography>
+                      {name} {index === 0 && "(You)"}
+                    </Typography>
+                    {index === 0 && (
+                      <Box sx={{ ml: "auto", display: "flex" }}>
+                        {isMuted && <MicOffIcon fontSize="small" sx={{ color: "error.main" }} />}
+                        {!isVideoOn && <VideocamOffIcon fontSize="small" sx={{ color: "error.main", ml: 0.5 }} />}
+                      </Box>
+                    )}
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+            
+            <Box sx={{ p: 2, borderTop: "1px solid #eee" }}>
+              <Button 
+                fullWidth 
+                variant="contained" 
+                startIcon={<ChatIcon />}
+                onClick={toggleChat}
+              >
+                Open Chat
+              </Button>
+            </Box>
+          </Card>
         </Grid>
       </Grid>
     </Box>

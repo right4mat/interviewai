@@ -1,16 +1,16 @@
 /** @type {import('next').NextConfig} */
 const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live https://va.vercel-scripts.com https://js.stripe.com/acacia/stripe.js https://js.stripe.com https://client.crisp.chat;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live https://va.vercel-scripts.com https://js.stripe.com/acacia/stripe.js https://js.stripe.com https://client.crisp.chat https://api.openai.com;
     style-src 'self' 'unsafe-inline' *;
-    img-src 'self' blob: data: https://www.googletagmanager.com https://flagcdn.com https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;
+    img-src 'self' blob: data: https://www.googletagmanager.com https://flagcdn.com https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://api.openai.com;
     font-src 'self';
     object-src 'self';
     base-uri 'self';
     form-action 'self';
-    frame-src 'self' https://js.stripe.com https://client.crisp.chat;
-    media-src 'self' https://*.cloudfront.net;
-    connect-src 'self' wss://client.relay.crisp.chat https://www.googletagmanager.com https://raw.githubusercontent.com ${process.env.NEXT_PUBLIC_SUPABASE_URL} https://js.stripe.com/acacia/stripe.js https://js.stripe.com https://client.crisp.chat;
+    frame-src 'self' https://js.stripe.com https://client.crisp.chat https://api.openai.com;
+    media-src 'self' https://*.cloudfront.net https://api.openai.com;
+    connect-src 'self' wss://client.relay.crisp.chat https://www.googletagmanager.com https://raw.githubusercontent.com ${process.env.NEXT_PUBLIC_SUPABASE_URL} https://js.stripe.com/acacia/stripe.js https://js.stripe.com https://client.crisp.chat https://api.openai.com;
 `;
 
 const nextConfig = {

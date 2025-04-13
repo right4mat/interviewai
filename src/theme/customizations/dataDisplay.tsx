@@ -23,8 +23,8 @@ export const dataDisplayCustomizations: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         [`& .${svgIconClasses.root}`]: {
-          width: '1rem',
-          height: '1rem',
+         // width: '1rem',
+          //height: '1rem',
           color: (theme.vars || theme).palette.text.secondary,
         },
         [`& .${typographyClasses.root}`]: {
@@ -214,7 +214,7 @@ export const dataDisplayCustomizations: Components<Theme> = {
   },
   MuiIcon: {
     defaultProps: {
-      fontSize: 'small',
+      //fontSize: 'small',
     },
     styleOverrides: {
       root: {

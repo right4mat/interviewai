@@ -10,12 +10,12 @@ import { PAGE_PATH } from '@/path';
 
 const StyledBox = styled('div')(({ theme }) => ({
   zIndex: -1,
-  marginTop: -220,
+  marginTop: -120,
   alignSelf: 'center',
-  width: '100vw',
+  width: '90vw',
   height: 500, // Reduced height for mobile
   backgroundImage: `url(/assets/images/graphics/hero.png)`,
-  backgroundSize: 'cover',
+  backgroundSize: 'contain',
   [theme.breakpoints.up('sm')]: {
     height: 600, // Reduced height for tablet
   },

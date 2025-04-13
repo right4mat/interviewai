@@ -28,7 +28,7 @@ const LogoIcon: React.FC<LogoProps> = ({
         }}
       >
           <Image 
-            src="/assets/images/icons/icon3.png" 
+            src="/assets/images/icons/icon1.png" 
             alt="Logo Icon"
             style={{ objectFit: "contain" }}
             width={width || 80}
