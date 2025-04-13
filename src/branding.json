@@ -1,0 +1,24 @@
+{
+  "brandName": "intervue.ai",
+  "title": "intervue.ai",
+  "company": {
+    "name": "intervue.ai",
+    "url": "https://intervue.ai",
+    "socialLink": {
+      "linkedin": "https://in.linkedin.com/company/intervueai",
+      "instagram": "#",
+      "facebook": "https://www.facebook.com/intervueai/",
+      "youtube": "https://www.youtube.com/@intervueai",
+      "github": "https://github.com/intervueai",
+      "dribble": "https://dribbble.com/intervueai",
+      "discord": "https://discord.com/invite/intervueai",
+      "support": "https://support.intervue.ai"
+    }
+  },
+  "logo": {
+    "main": "/assets/images/icons/icon.png",
+    "logoIcon": "/assets/images/icons/icon.png",
+    "logoFab": "/assets/images/icons/icon.png",
+    "logoWatermark": "/assets/images/icons/icon.png"
+  }
+}

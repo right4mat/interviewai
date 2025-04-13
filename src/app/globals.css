@@ -1,0 +1,13 @@
+
+/* to remove default browser focus-visible */
+body * {
+  &:focus-visible,
+  &:focus {
+    outline: none;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
