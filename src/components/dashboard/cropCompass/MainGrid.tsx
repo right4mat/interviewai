@@ -19,7 +19,7 @@ import CallEndIcon from "@mui/icons-material/CallEnd";
 import PeopleIcon from "@mui/icons-material/People";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Webcam from "react-webcam";
-import { useOpenAIRealtime } from "@/services/openAI";
+import { initOpenAIRealtime } from "@/services/openAI";
 
 export default function MainGrid(): React.ReactElement {
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -34,23 +34,25 @@ export default function MainGrid(): React.ReactElement {
     "Michael Wilson"
   ]);
   const webcamRef = useRef<Webcam>(null);
-  const { mutate: initRealtime, isPending: isConnecting, isSuccess: isConnected } = useOpenAIRealtime();
   const [rtcConnection, setRtcConnection] = useState<{ pc: RTCPeerConnection, dc: RTCDataChannel, cleanup: () => void } | null>(null);
-  const [isRealtimeCalled, setIsRealtimeCalled] = useState<boolean>(false);
+  const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
 
   useEffect(() => {
     // Initialize OpenAI Realtime connection when component mounts
-    if (!rtcConnection && !isRealtimeCalled) {
-      setIsRealtimeCalled(true);
-      initRealtime(undefined, {
-        onSuccess: (connection) => {
+    if (!rtcConnection && !isConnecting) {
+      setIsConnecting(true);
+      initOpenAIRealtime()
+        .then((connection) => {
           setRtcConnection(connection);
+          setIsConnected(true);
+          setIsConnecting(false);
           console.log("OpenAI Realtime connection established");
-        },
-        onError: (error) => {
+        })
+        .catch((error) => {
           console.error("Failed to connect to OpenAI Realtime:", error);
-        }
-      });
+          setIsConnecting(false);
+        });
     }
 
     // Cleanup function to close connection when component unmounts
@@ -60,7 +62,7 @@ export default function MainGrid(): React.ReactElement {
         console.log("OpenAI Realtime connection closed");
       }
     };
-  }, []); // Empty dependency array to ensure it only runs once on mount
+  }, [rtcConnection, isConnecting]);
 
   const toggleMute = (): void => {
     setIsMuted(!isMuted);
@@ -88,10 +90,11 @@ export default function MainGrid(): React.ReactElement {
 
   const endCall = (): void => {
     if (rtcConnection) {
-      rtcConnection.pc.close();
+      rtcConnection.cleanup();
       setRtcConnection(null);
+      setIsConnected(false);
+      setIsConnecting(false);
     }
-    alert("Call ended");
   };
 
   return (
