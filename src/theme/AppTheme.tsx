@@ -39,7 +39,7 @@ export default function AppTheme(props: AppThemeProps) {
             ...inputsCustomizations,
             ...dataDisplayCustomizations,
             ...feedbackCustomizations,
-            ...navigationCustomizations,
+            //...navigationCustomizations,
             ...surfacesCustomizations,
             ...themeComponents
           }

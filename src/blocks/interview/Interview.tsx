@@ -11,7 +11,7 @@ import ParticipantsList from "@/components/interview/ParticipantsList";
 import Button from "@mui/material/Button";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 interface InterviewProps {
   jobDescription: string;
   pdfFile?: File;
@@ -19,9 +19,10 @@ interface InterviewProps {
     name: string;
     role: string;
   }>;
+  onBackToSetup: () => void;
 }
 
-export default function Interview({ jobDescription, pdfFile, interviewers }: InterviewProps): React.ReactElement {
+export default function Interview({ jobDescription, pdfFile, interviewers, onBackToSetup }: InterviewProps): React.ReactElement {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isVideoOn, setIsVideoOn] = useState<boolean>(true);
   const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
@@ -37,7 +38,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers }: Int
     // Only initialize connection when interview is started
     if (interviewStarted && !rtcConnection && !isConnecting) {
       setIsConnecting(true);
-      initOpenAIRealtime()
+      initOpenAIRealtime(jobDescription, interviewers)
         .then((connection) => {
           setRtcConnection(connection);
           setIsConnected(true);
@@ -57,7 +58,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers }: Int
         console.log("OpenAI Realtime connection closed");
       }
     };
-  }, [rtcConnection, isConnecting, interviewStarted]);
+  }, [rtcConnection, isConnecting, interviewStarted, jobDescription, interviewers]);
 
   const startInterview = (): void => {
     setInterviewStarted(true);
@@ -109,9 +110,11 @@ export default function Interview({ jobDescription, pdfFile, interviewers }: Int
 
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
-      <Typography component="h2" variant="h5" sx={{ mb: 4 }}>
-        {isConnected ? "AI Interview Session" : "Interview Setup"}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography component="h2" variant="h5">
+          {isConnected ? "AI Interview Session" : "Interview Setup"}
+        </Typography>
+      </Box>
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 9 }}>
@@ -131,7 +134,15 @@ export default function Interview({ jobDescription, pdfFile, interviewers }: Int
             onEndCall={endCall}
           />
           
-          <Box sx={{ mt: 2, textAlign: 'center' }}>
+          <Box sx={{ mt: 2, textAlign: 'center', display: 'flex', justifyContent: 'center', gap: 2 }}>
+          <Button
+              variant="outlined"
+              onClick={onBackToSetup}
+              startIcon={<ArrowBackIcon />}
+              sx={{ mt: 2 }}
+            >
+              Back to Setup
+            </Button>
             {!interviewStarted ? (
               <Button 
                 variant="outlined" 
@@ -156,6 +167,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers }: Int
                 Stop Interview
               </Button>
             )}
+   
           </Box>
         </Grid>
         

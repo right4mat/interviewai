@@ -8,6 +8,8 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Alert from '@mui/material/Alert';
+import CustomInput from '@/components/shared/CustomizedInput';
 
 interface Interviewer {
   name: string;
@@ -28,8 +30,11 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
     role: '',
   });
 
+  const MAX_INTERVIEWERS = 5;
+  const isMaxInterviewersReached = interviewers.length >= MAX_INTERVIEWERS;
+
   const handleAddInterviewer = () => {
-    if (newInterviewer.name && newInterviewer.role) {
+    if (newInterviewer.name && newInterviewer.role && !isMaxInterviewersReached) {
       setInterviewers([...interviewers, newInterviewer]);
       setNewInterviewer({ name: '', role: '' });
     }
@@ -42,9 +47,6 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Typography variant="h6" color="text.primary">
-        Interviewers
-      </Typography>
       
       <Stack spacing={2}>
         {interviewers.map((interviewer, index) => (
@@ -66,37 +68,57 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
         ))}
       </Stack>
 
+      {isMaxInterviewersReached && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Maximum of {MAX_INTERVIEWERS} interviewers reached.
+        </Alert>
+      )}
+
       <Paper variant="outlined" sx={{ p: 3 }}>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
+            <CustomInput
               fullWidth
-              label="Name"
+              placeholder="Name"
               value={newInterviewer.name}
               onChange={(e) =>
                 setNewInterviewer({ ...newInterviewer, name: e.target.value })
               }
               size="small"
+              disabled={isMaxInterviewersReached}
+              InputProps={{
+                sx: { borderRadius: 1.5 }
+              }}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
+            <CustomInput
               fullWidth
-              label="Role"
+              placeholder="Role"
               value={newInterviewer.role}
               onChange={(e) =>
                 setNewInterviewer({ ...newInterviewer, role: e.target.value })
               }
               size="small"
+              disabled={isMaxInterviewersReached}
+              InputProps={{
+                sx: { borderRadius: 1.5 }
+              }}
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Button
               fullWidth
-              variant="contained"
+              variant={!newInterviewer.name || !newInterviewer.role || isMaxInterviewersReached ? "outlined" : "contained"}
               color="primary"
               onClick={handleAddInterviewer}
-              disabled={!newInterviewer.name || !newInterviewer.role}
+              disabled={!newInterviewer.name || !newInterviewer.role || isMaxInterviewersReached}
+              sx={{ 
+                borderRadius: 1.5,
+                textTransform: 'none',
+                fontWeight: 500,
+                py: 1
+              }}
             >
               Add Interviewer
             </Button>

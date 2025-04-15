@@ -19,8 +19,12 @@ const InterviewStepper: React.FC = () => {
     setInterviewData(data);
   };
 
+  const handleBackToSetup = () => {
+    setInterviewData(null);
+  };
+
   return (
-    <Box>
+    <>
       {!interviewData ? (
         <SetupInterview onComplete={handleSetupComplete} />
       ) : (
@@ -28,9 +32,10 @@ const InterviewStepper: React.FC = () => {
           jobDescription={interviewData.jobDescription}
           pdfFile={interviewData.pdfFile}
           interviewers={interviewData.interviewers}
+          onBackToSetup={handleBackToSetup}
         />
       )}
-    </Box>
+    </>
   );
 };
 
