@@ -2,11 +2,10 @@
 
 // @project
 
-import MainGrid from "@/components/dashboard/MainGrid";
-import CropCompass from "@/components/dashboard/cropCompass/MainGrid";
+import Interview from "@/components/dashboard/interview/MainGrid";
 
 /***************************  PAGE - AUTH  ***************************/
 
 export default function DashboardPage() {
-  return <><CropCompass/></>;
+  return <><Interview/></>;
 };
