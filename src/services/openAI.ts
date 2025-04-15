@@ -1,9 +1,34 @@
 import { apiRequest } from "@/utils/util";
+import { useMutation } from "@tanstack/react-query";
 
 interface Interviewer {
   name: string;
   role: string;
 }
+
+interface ScoreAnswerResponse {
+  score: number;
+}
+
+interface ScoreAnswerRequest {
+  question: string;
+  answer: string;
+  jobDescription: string;
+}
+
+export const useScoreAnswer = () => {
+  return useMutation<ScoreAnswerResponse, Error, ScoreAnswerRequest>({
+    mutationFn: async ({ question, answer, jobDescription }) => {
+      const response = await apiRequest('interview/score-answer', 'POST', {
+        question,
+        answer,
+        jobDescription
+      });
+
+      return response;
+    },
+  });
+};
 
 // Initialize WebRTC connection with OpenAI
 export async function initOpenAIRealtime(jobDescription: string, interviewers: Interviewer[]) {
@@ -73,7 +98,8 @@ Please conduct a professional interview following these guidelines:
 2. Ask relevant questions based on the job description
 3. Maintain a professional and engaging conversation
 4. Allow the candidate to ask questions at the end
-5. Conclude the interview appropriately`
+5. Conclude the interview appropriately`,
+        input_audio_transcription: true
       },
     };
     

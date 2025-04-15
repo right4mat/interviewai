@@ -6,12 +6,16 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
 import { initOpenAIRealtime } from "@/services/openAI";
+import { useScoreAnswerHook } from "@/hooks/useScoreAnswerHook";
 import VideoDisplay from "@/components/interview/VideoDisplay";
 import ParticipantsList from "@/components/interview/ParticipantsList";
 import Button from "@mui/material/Button";
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import StopIcon from '@mui/icons-material/Stop';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import StopIcon from "@mui/icons-material/Stop";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+
 interface InterviewProps {
   jobDescription: string;
   pdfFile?: File;
@@ -27,12 +31,20 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
   const [isVideoOn, setIsVideoOn] = useState<boolean>(true);
   const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-  const [participants, setParticipants] = useState<string[]>(interviewers.map(i => i.name));
+  const [participants, setParticipants] = useState<string[]>(interviewers.map((i) => i.name));
   const webcamRef = useRef<Webcam>(null);
-  const [rtcConnection, setRtcConnection] = useState<{ pc: RTCPeerConnection, dc: RTCDataChannel, cleanup: () => void } | null>(null);
+  const [rtcConnection, setRtcConnection] = useState<{ pc: RTCPeerConnection; dc: RTCDataChannel; cleanup: () => void } | null>(null);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [interviewStarted, setInterviewStarted] = useState<boolean>(false);
+
+  const { 
+    questionAnswers, 
+    error, 
+    isScoring, 
+    currentQuestion, 
+    currentAnswer 
+  } = useScoreAnswerHook({ rtcConnection, jobDescription });
 
   useEffect(() => {
     // Only initialize connection when interview is started
@@ -78,8 +90,8 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
     setIsMuted(!isMuted);
     if (rtcConnection) {
       // Update audio track enabled state
-      rtcConnection.pc.getSenders().forEach(sender => {
-        if (sender.track && sender.track.kind === 'audio') {
+      rtcConnection.pc.getSenders().forEach((sender) => {
+        if (sender.track && sender.track.kind === "audio") {
           sender.track.enabled = isMuted; // Toggle from current state
         }
       });
@@ -110,11 +122,20 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
 
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
         <Typography component="h2" variant="h5">
           {isConnected ? "AI Interview Session" : "Interview Setup"}
         </Typography>
+        <Button variant="outlined" onClick={onBackToSetup} startIcon={<ArrowBackIcon />} sx={{ ml: 2 }}>
+          Back to Setup
+        </Button>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 9 }}>
@@ -133,21 +154,13 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
             onToggleChat={toggleChat}
             onEndCall={endCall}
           />
-          
-          <Box sx={{ mt: 2, textAlign: 'center', display: 'flex', justifyContent: 'center', gap: 2 }}>
-          <Button
-              variant="outlined"
-              onClick={onBackToSetup}
-              startIcon={<ArrowBackIcon />}
-              sx={{ mt: 2 }}
-            >
-              Back to Setup
-            </Button>
+
+          <Box sx={{ mt: 2, textAlign: "center", display: "flex", justifyContent: "center", gap: 2 }}>
             {!interviewStarted ? (
-              <Button 
-                variant="outlined" 
-                color="primary" 
-                size="large" 
+              <Button
+                variant="outlined"
+                color="primary"
+                size="large"
                 onClick={startInterview}
                 disabled={isConnecting}
                 startIcon={<PlayArrowIcon />}
@@ -156,21 +169,57 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                 Start Interview
               </Button>
             ) : (
-              <Button 
-                variant="outlined" 
-                color="error" 
-                size="large" 
-                onClick={stopInterview}
-                startIcon={<StopIcon />}
-                sx={{ mt: 2 }}
-              >
+              <Button variant="outlined" color="error" size="large" onClick={stopInterview} startIcon={<StopIcon />} sx={{ mt: 2 }}>
                 Stop Interview
               </Button>
             )}
-   
           </Box>
+
+          {/* Question and Answer Display */}
+          {currentQuestion && (
+            <Box sx={{ mt: 4, p: 2, bgcolor: "background.paper", borderRadius: 1 }}>
+              <Typography variant="h6" gutterBottom>
+                Current Question:
+              </Typography>
+              <Typography paragraph>{currentQuestion}</Typography>
+              {currentAnswer && (
+                <>
+                  <Typography variant="h6" gutterBottom>
+                    Your Answer:
+                  </Typography>
+                  <Typography paragraph>{currentAnswer}</Typography>
+                </>
+              )}
+            </Box>
+          )}
+
+          {/* Previous Questions and Scores */}
+          {questionAnswers.length > 0 && (
+            <Box sx={{ mt: 4, p: 2, bgcolor: "background.paper", borderRadius: 1 }}>
+              <Typography variant="h6" gutterBottom>
+                Previous Questions and Scores:
+              </Typography>
+              {questionAnswers.map((qa, index) => (
+                <Box key={index} sx={{ mb: 2 }}>
+                  <Typography variant="subtitle1">Question: {qa.question}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Your Answer: {qa.answer}
+                  </Typography>
+                  <Typography variant="body1" color="primary">
+                    Score: {qa.score}/100
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {isScoring && (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+              <CircularProgress />
+            </Box>
+          )}
         </Grid>
-        
+
         <Grid size={{ xs: 12, md: 3 }}>
           <ParticipantsList participants={participants} />
         </Grid>
