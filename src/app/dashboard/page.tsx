@@ -3,14 +3,14 @@ import dynamic from "next/dynamic";
 
 // @project
 const ScrollFab = dynamic(() => import("@/components/shared/ScrollFab"));
-const Dashboard = dynamic(() => import("@/views/dashboard/dashboard"));
+const Interview = dynamic(() => import("@/views/dashboard/interview"));
 
 /***************************  PAGE - ROOT  ***************************/
 
 export default function DashboardPage() {
   return (
     <>
-      <Dashboard />
+      <Interview />
       {/* scroll to top section */}
       <ScrollFab />
     </>
