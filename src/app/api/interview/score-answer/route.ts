@@ -30,11 +30,18 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
 
     const { question, answer, jobDescription } = result.data;
 
-    const prompt = `
-You are an interview evaluator. You need to score how well the candidate answered the interview question.
+    // Process everything in a single API call
+    const evaluationPrompt = `
+You are an interview evaluator. You need to:
+
+1. Clean up the transcribed answer from speech recognition:
+"${answer}"
+
+2. Summarize the interview question into a concise one-line description:
+"${question}"
+
+3. Evaluate how well the candidate answered the interview question.
 Job Description: ${jobDescription}
-Question: ${question}
-Answer: ${answer}
 
 Evaluate the answer based on:
 - Relevance to the question
@@ -46,8 +53,10 @@ Evaluate the answer based on:
 
 Provide your response as a valid JSON object with the following structure:
 {
+  "cleanedAnswer": [the cleaned up transcription with proper punctuation and formatting],
+  "questionSummary": [a concise one-line description of the question],
   "score": [a single integer from 0 to 100],
-  "reasoning": [brief explanation of your score in 100 words or less]
+  "reasoning": [brief explanation of your score in 50 words or less]
 }
 
 Do not include any text outside of this JSON object.
@@ -56,22 +65,27 @@ Do not include any text outside of this JSON object.
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: "You are an interview evaluator that scores answers on a scale of 0-100. You always respond with valid JSON." },
-        { role: "user", content: prompt }
+        { role: "system", content: "You are an interview evaluator that cleans transcriptions, summarizes questions, and scores answers. You always respond with valid JSON." },
+        { role: "user", content: evaluationPrompt }
       ],
       temperature: 0.3,
-      max_tokens: 200,
+      max_tokens: 1000,
       response_format: { type: "json_object" }
     });
 
-    const responseContent = response.choices[0].message.content?.trim() || '{"score": 0, "reasoning": "Unable to evaluate answer"}';
+    const responseContent = response.choices[0].message.content?.trim() || '{"cleanedAnswer": "", "questionSummary": "", "score": 0, "reasoning": "Unable to evaluate answer"}';
     
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(responseContent);
     } catch (e) {
       console.error("Failed to parse OpenAI response as JSON:", e);
-      parsedResponse = { score: 0, reasoning: "Error parsing evaluation" };
+      parsedResponse = { 
+        cleanedAnswer: answer, 
+        questionSummary: question,
+        score: 0, 
+        reasoning: "Error parsing evaluation" 
+      };
     }
     
     // Ensure score is within valid range
@@ -81,7 +95,9 @@ Do not include any text outside of this JSON object.
       status: "success", 
       data: { 
         score: validScore,
-        reasoning: parsedResponse.reasoning || "No reasoning provided"
+        reasoning: parsedResponse.reasoning || "No reasoning provided",
+        cleanedAnswer: parsedResponse.cleanedAnswer || answer,
+        questionSummary: parsedResponse.questionSummary || question
       } 
     });
   } catch (error) {

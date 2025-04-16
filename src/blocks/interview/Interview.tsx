@@ -201,18 +201,44 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
               </Typography>
               {questionAnswers.map((qa, index) => (
                 <Box key={index} sx={{ mb: 2 }}>
-                  <Typography variant="subtitle1">Question: {qa.question}</Typography>
+                  <Typography variant="subtitle1">
+                    {qa.questionSummary || qa.question}
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Your Answer: {qa.answer}
+                    Your Answer: {qa.cleanedAnswer}
                   </Typography>
-                  <Typography variant="body1" color="primary">
-                    Score: {qa.score}/100
-                  </Typography>
-                  {qa.reasoning && (
-                    <Typography variant="body2" sx={{ mt: 1, fontStyle: "italic" }}>
-                      Feedback: {qa.reasoning}
-                    </Typography>
-                  )}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                      <CircularProgress
+                        variant="determinate"
+                        value={qa.score || 0}
+                        size={40}
+                        thickness={4}
+                        sx={{ color: qa.score && qa.score > 70 ? 'success.main' : qa.score && qa.score > 40 ? 'warning.main' : 'error.main' }}
+                      />
+                      <Box
+                        sx={{
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                          right: 0,
+                          position: 'absolute',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Typography variant="caption" component="div" color="text.secondary">
+                          {qa.score}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    {qa.reasoning && (
+                      <Typography variant="body2" sx={{ mt: 1, fontStyle: "italic" }}>
+                        Feedback: {qa.reasoning}
+                      </Typography>
+                    )}
+                  </Box>
                 </Box>
               ))}
             </Box>
@@ -226,7 +252,114 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
         </Grid>
 
         <Grid size={{ xs: 12, md: 3 }}>
-          <ParticipantsList participants={participants} />
+          <Box sx={{ 
+            height: '100%', 
+            display: 'flex', 
+            flexDirection: 'column',
+            bgcolor: 'background.paper',
+            borderRadius: 1,
+            p: 2,
+            overflow: 'auto'
+          }}>
+            <Typography variant="h6" gutterBottom>
+              Interview Chat
+            </Typography>
+            <Box sx={{ 
+              flex: 1, 
+              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2
+            }}>
+              {questionAnswers.map((qa, index) => (
+                <Box 
+                  key={index} 
+                  sx={{ 
+                    p: 2, 
+                    bgcolor: 'background.default',
+                    borderRadius: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1
+                  }}
+                >
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Question {index + 1}:
+                  </Typography>
+                  <Typography variant="body1">
+                    {qa.questionSummary || qa.question}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Your Answer: {qa.cleanedAnswer}
+                  </Typography>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    gap: 1,
+                    mt: 1
+                  }}>
+                    <Box sx={{ position: 'relative', display: 'inline-flex', mr: 1 }}>
+                      <CircularProgress
+                        variant="determinate"
+                        value={qa.score || 0}
+                        size={30}
+                        thickness={4}
+                        sx={{ color: qa.score && qa.score > 70 ? 'success.main' : qa.score && qa.score > 40 ? 'warning.main' : 'error.main' }}
+                      />
+                      <Box
+                        sx={{
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                          right: 0,
+                          position: 'absolute',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Typography variant="caption" component="div" color="text.secondary">
+                          {qa.score}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    {qa.reasoning && (
+                      <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                        {qa.reasoning}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              ))}
+              {currentQuestion && (
+                <Box sx={{ 
+                  p: 2, 
+                  bgcolor: 'background.default',
+                  borderRadius: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1
+                }}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Current Question:
+                  </Typography>
+                  <Typography variant="body1">
+                    {currentQuestion}
+                  </Typography>
+                  {currentAnswer && (
+                    <Typography variant="body2" color="text.secondary">
+                      Your Answer: {currentAnswer}
+                    </Typography>
+                  )}
+                  {isScoring && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                      <CircularProgress size={20} />
+                    </Box>
+                  )}
+                </Box>
+              )}
+            </Box>
+          </Box>
         </Grid>
       </Grid>
     </Box>

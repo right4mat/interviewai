@@ -7,6 +7,7 @@ interface QuestionAnswer {
   answer: string;
   score?: number;
   reasoning?: string;
+  cleanedAnswer?: string;
 }
 
 interface UseScoreAnswerHookProps {
@@ -49,13 +50,13 @@ export const useScoreAnswerHook = ({ rtcConnection, jobDescription }: UseScoreAn
       SpeechRecognition.stopListening();
     } else if (!isAISpeaking && currentQuestion && !listening) {
       // Start listening when AI stops speaking and we have a question
-      resetTranscript();
+     
       SpeechRecognition.startListening({ 
         continuous: true,
         language: 'en-US'
       });
     }
-  }, [isAISpeaking, currentQuestion, browserSupportsSpeechRecognition, resetTranscript, listening]);
+  }, [isAISpeaking, currentQuestion, browserSupportsSpeechRecognition, listening]);
 
   const handleScoreAnswer = useCallback(
     (question: string, answer: string) => {
@@ -65,7 +66,14 @@ export const useScoreAnswerHook = ({ rtcConnection, jobDescription }: UseScoreAn
         { question, answer, jobDescription },
         {
           onSuccess: (data) => {
-            setQuestionAnswers((prev) => [...prev, { question, answer, score: data.score, reasoning: data.reasoning }]);
+            setQuestionAnswers((prev) => [...prev, { 
+              question, 
+              answer, 
+              score: data.score, 
+              reasoning: data.reasoning,
+              cleanedAnswer: data.cleanedAnswer,
+              questionSummary: data.questionSummary
+            }]);
             setError(null);
           },
           onError: (err) => {

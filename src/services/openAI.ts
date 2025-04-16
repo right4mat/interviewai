@@ -1,5 +1,5 @@
 import { apiRequest } from "@/utils/util";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 interface Interviewer {
   name: string;
@@ -8,12 +8,27 @@ interface Interviewer {
 
 interface ScoreAnswerResponse {
   score: number;
+  reasoning: string;
+  cleanedAnswer: string;
+  questionSummary: string;
 }
 
 interface ScoreAnswerRequest {
   question: string;
   answer: string;
   jobDescription: string;
+}
+
+interface GetQuestionsRequest {
+  jobDescription: string;
+  resume: string;
+  interviewType: string;
+  interviewerRole: string;
+  difficulty: string;
+}
+
+interface GetQuestionsResponse {
+  questions: string;
 }
 
 export const useScoreAnswer = () => {
@@ -25,6 +40,16 @@ export const useScoreAnswer = () => {
         jobDescription
       });
 
+      return response;
+    },
+  });
+};
+
+export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
+  return useQuery<GetQuestionsResponse, Error>({
+    queryKey: ['interviewQuestions', params],
+    queryFn: async () => {
+      const response = await apiRequest('interview/get-questions', 'POST', params);
       return response;
     },
   });
