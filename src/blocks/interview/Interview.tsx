@@ -8,7 +8,6 @@ import Webcam from "react-webcam";
 import { initOpenAIRealtime, useGetInterviewQuestions } from "@/services/openAI";
 import { useScoreAnswerHook } from "@/hooks/useScoreAnswerHook";
 import VideoDisplay from "@/components/interview/VideoDisplay";
-import ParticipantsList from "@/components/interview/ParticipantsList";
 import Button from "@mui/material/Button";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
@@ -268,95 +267,105 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                   </Paper>
                 </Fade>
               )}
-              {questionAnswers.map((qa, index) => (
-                <Accordion
-                  key={index}
-                  sx={{
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                    borderRadius: "8px !important",
-                    "&:before": { display: "none" },
-                    mb: 1.5
-                  }}
-                >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls={`chat-panel${index}-content`}
-                    id={`chat-panel${index}-header`}
+              <Box sx={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column-reverse", maxHeight: "60vh" }}>
+                {questionAnswers.map((qa, index) => (
+                  <Accordion
+                    key={index}
                     sx={{
-                      borderRadius: "8px",
-                      "&.Mui-expanded": {
-                        borderBottomLeftRadius: 0,
-                        borderBottomRightRadius: 0
-                      }
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                      borderRadius: "8px !important",
+                      "&:before": { display: "none" },
+                      mb: 1.5
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 500, flex: 1, mr: 1 }}>
-                        {qa.questionSummary || qa.question}
-                      </Typography>
-                      <Box sx={{ position: "relative", display: "inline-flex" }}>
-                        <CircularProgress
-                          variant="determinate"
-                          value={qa.score || 0}
-                          size={50}
-                          thickness={4}
-                          sx={{
-                            color: qa.score && qa.score > 70 ? "success.main" : qa.score && qa.score > 40 ? "warning.main" : "error.main",
-                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            top: 0,
-                            left: 0,
-                            bottom: 0,
-                            right: 0,
-                            position: "absolute",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center"
-                          }}
-                        >
-                          <Typography variant="caption" component="div" sx={{ fontWeight: "bold" }}>
-                            {qa.score}
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={`chat-panel${index}-content`}
+                      id={`chat-panel${index}-header`}
+                      sx={{
+                        borderRadius: "8px",
+                        "&.Mui-expanded": {
+                          borderBottomLeftRadius: 0,
+                          borderBottomRightRadius: 0,
+                          display: "flex",
+                          flexDirection: "column"
+                        }
+                      }}
+                    >
+                      <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700, flex: 1, mr: 1 }}>
+                          Question
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 500, flex: 1, mr: 1 }}>
+                            {qa.questionSummary || qa.question}
                           </Typography>
+                          <Box sx={{ position: "relative", display: "inline-flex" }}>
+                            <CircularProgress
+                              variant="determinate"
+                              value={qa.score || 0}
+                              size={50}
+                              thickness={4}
+                              sx={{
+                                color:
+                                  qa.score && qa.score > 70 ? "success.main" : qa.score && qa.score > 40 ? "warning.main" : "error.main",
+                                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                              }}
+                            />
+                            <Box
+                              sx={{
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                position: "absolute",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}
+                            >
+                              <Typography variant="caption" component="div" sx={{ fontWeight: "bold" }}>
+                                {qa.score}
+                              </Typography>
+                            </Box>
+                          </Box>
                         </Box>
                       </Box>
-                    </Box>
-                  </AccordionSummary>
-                  <AccordionDetails
-                    sx={{ px: 2, py: 1.5, bgcolor: "background.default", borderBottomLeftRadius: "8px", borderBottomRightRadius: "8px" }}
-                  >
-                    <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-                      Your Answer:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 2, pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}
+                    </AccordionSummary>
+                    <AccordionDetails
+                      sx={{ px: 2, py: 1.5, bgcolor: "background.default", borderBottomLeftRadius: "8px", borderBottomRightRadius: "8px" }}
                     >
-                      {qa.cleanedAnswer}
-                    </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+                        Your Answer:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2, pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}
+                      >
+                        {qa.cleanedAnswer}
+                      </Typography>
 
-                    {qa.reasoning && (
-                      <>
-                        <Divider sx={{ my: 1.5 }}>
-                          <Chip
-                            icon={<AssessmentIcon fontSize="small" />}
-                            label="Feedback"
-                            size="small"
-                            color="primary"
-                            variant="outlined"
-                          />
-                        </Divider>
-                        <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.secondary", pl: 1 }}>
-                          {qa.reasoning}
-                        </Typography>
-                      </>
-                    )}
-                  </AccordionDetails>
-                </Accordion>
-              ))}
+                      {qa.reasoning && (
+                        <>
+                          <Divider sx={{ my: 1.5 }}>
+                            <Chip
+                              icon={<AssessmentIcon fontSize="small" />}
+                              label="Feedback"
+                              size="small"
+                              color="primary"
+                              variant="outlined"
+                            />
+                          </Divider>
+                          <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.secondary", pl: 1 }}>
+                            {qa.reasoning}
+                          </Typography>
+                        </>
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </Box>
             </Box>
           </Paper>
         </Grid>

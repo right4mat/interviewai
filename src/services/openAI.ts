@@ -141,7 +141,7 @@ Please conduct a professional interview following these guidelines:
   await pc.setLocalDescription(offer);
 
   const baseUrl = "https://api.openai.com/v1/realtime";
-  const model = "gpt-4o-realtime-preview-2024-12-17";
+  const model = "gpt-4o-mini";
   const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
     method: "POST",
     body: offer.sdp,
