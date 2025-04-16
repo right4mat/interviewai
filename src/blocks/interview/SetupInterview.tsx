@@ -33,7 +33,7 @@ interface SetupInterviewProps {
   onComplete: (data: {
     jobDescription: string;
     pdfFile?: File;
-    interviewers: Interviewer[];
+    interviewers: Interviewer;
   }) => void;
 }
 
@@ -59,7 +59,7 @@ const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
     onComplete({ 
       jobDescription, 
       pdfFile, 
-      interviewers: [interviewer] 
+      interviewers: interviewer 
     });
   };
 

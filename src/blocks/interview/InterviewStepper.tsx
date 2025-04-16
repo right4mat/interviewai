@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import SetupInterview from './SetupInterview';
 import Interview from './Interview';
+import { Interviewer } from '@/types/interview';
 
 interface InterviewData {
   jobDescription: string;
   pdfFile?: File;
-  interviewers: Array<{
-    name: string;
-    role: string;
-  }>;
+  interviewers: Interviewer;
 }
 
 const InterviewStepper: React.FC = () => {

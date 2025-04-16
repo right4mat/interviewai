@@ -22,9 +22,7 @@ interface GetQuestionsRequest {
   difficulty: string;
 }
 
-interface GetQuestionsResponse {
-  questions: string;
-}
+type GetQuestionsResponse = string;
 
 export const useScoreAnswer = () => {
   return useMutation<ScoreAnswerResponse, Error, ScoreAnswerRequest>({
@@ -54,11 +52,11 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
 export async function initOpenAIRealtime({
   jobDescription,
   interviewers,
-  questionList
+  questions
 }: {
   jobDescription: string;
   interviewers: Interviewer;
-  questionList?: string;
+  questions?: string;
 }) {
   // Get an ephemeral key from your server
   const tokenResponse = await apiRequest("open-ai/session", "GET");
@@ -122,7 +120,7 @@ The interview panel consists of:
 ${interviewers.name} (${interviewers.role})
 
 Here are the questions you should ask during the interview:
-${questionList}
+${questions}
 
 Please conduct a professional interview following these guidelines:
 1. Start with a brief introduction of yourself and the interview panel

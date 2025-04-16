@@ -34,8 +34,6 @@ interface InterviewProps {
   onBackToSetup: () => void;
 }
 
-
-
 export default function Interview({ jobDescription, pdfFile, interviewers, onBackToSetup }: InterviewProps): React.ReactElement {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isVideoOn, setIsVideoOn] = useState<boolean>(true);
@@ -48,15 +46,13 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
   const [interviewStarted, setInterviewStarted] = useState<boolean>(false);
 
   const { questionAnswers, error, isScoring, currentQuestion, currentAnswer } = useScoreAnswerHook({ rtcConnection, jobDescription });
-  const {
-    data: questionList,
-  } = useGetInterviewQuestions({ jobDescription, interviewers, pdfFile });
+  const { data: questions } = useGetInterviewQuestions({ jobDescription, interviewers, pdfFile });
 
   useEffect(() => {
     // Only initialize connection when interview is started
-    if (interviewStarted && !rtcConnection && !isConnecting) {
+    if (questions && interviewStarted && !rtcConnection && !isConnecting) {
       setIsConnecting(true);
-      initOpenAIRealtime({questionList, jobDescription, interviewers})
+      initOpenAIRealtime({ questions, jobDescription, interviewers })
         .then((connection) => {
           setRtcConnection(connection);
           setIsConnected(true);
@@ -76,7 +72,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
         console.log("OpenAI Realtime connection closed");
       }
     };
-  }, [rtcConnection, isConnecting, interviewStarted, jobDescription, interviewers]);
+  }, [questions, rtcConnection, isConnecting, interviewStarted, jobDescription, interviewers]);
 
   const startInterview = (): void => {
     setInterviewStarted(true);
@@ -152,7 +148,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
             isChatOpen={isChatOpen}
             isConnecting={isConnecting}
             isConnected={isConnected}
-            participantName={interviewers}
+            participantName={interviewers.name}
             webcamRef={webcamRef as React.RefObject<Webcam>}
             onToggleMute={toggleMute}
             onToggleVideo={toggleVideo}

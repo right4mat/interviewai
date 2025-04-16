@@ -10,10 +10,12 @@ const openai = new OpenAI({
 // Define schema for request validation
 const getQuestionsSchema = z.object({
   jobDescription: z.string().min(1, "Job description is required"),
-  resume: z.string().min(1, "Resume is required"),
-  interviewType: z.string().min(1, "Interview type is required"),
-  interviewerRole: z.string().min(1, "Interviewer role is required"),
-  difficulty: z.string().min(1, "Interview difficulty is required")
+  resume: z.string().optional(),
+  interviewers: z.object({
+    name: z.string().min(1, "Interviewer name is required"),
+    role: z.string().min(1, "Interviewer role is required")
+  }),
+  difficulty: z.string().optional().default("intermediate")
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {
@@ -30,23 +32,23 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       }, { status: 400 });
     }
 
-    const { jobDescription, resume, interviewType, interviewerRole, difficulty } = result.data;
+    const { jobDescription, resume = "", interviewers, difficulty = "intermediate" } = result.data;
 
     const questionsPrompt = `
-Generate a list of interview questions for a 30-minute ${interviewType} interview.
+Generate a list of interview questions for a 30-minute interview.
 
 Job Description: ${jobDescription}
 
-Candidate's Resume: ${resume}
+${resume ? `Candidate's Resume: ${resume}` : ""}
 
-Interviewer Role: ${interviewerRole}
+Interviewer: ${interviewers.name} (${interviewers.role})
 
 Difficulty Level: ${difficulty}
 
 Please create a comprehensive set of questions that:
-- Are appropriate for the specified interview type and difficulty level
+- Are appropriate for the specified difficulty level
 - Assess the candidate's fit for the role based on the job description
-- Consider the candidate's background from their resume
+- ${resume ? "Consider the candidate's background from their resume" : ""}
 - Include a mix of behavioral, technical, and role-specific questions
 - Can be reasonably answered within a 30-minute interview (typically 8-12 questions)
 - Progress in a logical order from introductory to more complex topics
@@ -68,9 +70,7 @@ Return the questions as a numbered list (1. 2. 3. etc.) without any additional f
     
     return NextResponse.json({ 
       status: "success", 
-      data: { 
-        questions: responseContent
-      } 
+      data: responseContent 
     });
   } catch (error) {
     console.error("Error generating interview questions:", error);
