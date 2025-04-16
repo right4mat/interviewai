@@ -36,31 +36,31 @@ const defaultTheme = createTheme();
 
 const customShadows: Shadows = [...defaultTheme.shadows];
 
-// Intervue.ai brand colors - professional, tech-focused palette
+// Intervue.ai brand colors - professional, tech-focused palette based on #8cc6f0 and #194f8d
 export const brand = {
-  50: 'hsl(220, 100%, 95%)',
-  100: 'hsl(220, 100%, 92%)',
-  200: 'hsl(220, 100%, 80%)',
-  300: 'hsl(220, 100%, 65%)',
-  400: 'hsl(220, 98%, 48%)',
-  500: 'hsl(220, 98%, 42%)',
-  600: 'hsl(220, 98%, 35%)',
-  700: 'hsl(220, 100%, 30%)',
-  800: 'hsl(220, 100%, 16%)',
-  900: 'hsl(220, 100%, 12%)',
+  50: 'hsl(207, 80%, 97%)',
+  100: 'hsl(207, 80%, 92%)',
+  200: 'hsl(207, 80%, 85%)', // Lighter version of #8cc6f0
+  300: 'hsl(207, 78%, 75%)',
+  400: 'hsl(207, 76%, 65%)',
+  500: 'hsl(207, 74%, 55%)', // #8cc6f0 (adjusted)
+  600: 'hsl(207, 72%, 45%)',
+  700: 'hsl(207, 70%, 35%)',
+  800: 'hsl(207, 68%, 25%)', // Darker version of #194f8d
+  900: 'hsl(207, 66%, 15%)',
 };
 
 export const gray = {
-  50: 'hsl(220, 35%, 97%)',
-  100: 'hsl(220, 30%, 94%)',
-  200: 'hsl(220, 20%, 88%)',
-  300: 'hsl(220, 20%, 80%)',
-  400: 'hsl(220, 20%, 65%)',
-  500: 'hsl(220, 20%, 42%)',
-  600: 'hsl(220, 20%, 35%)',
-  700: 'hsl(220, 20%, 25%)',
-  800: 'hsl(220, 30%, 6%)',
-  900: 'hsl(220, 35%, 3%)',
+  50: 'hsl(207, 35%, 97%)',
+  100: 'hsl(207, 30%, 94%)',
+  200: 'hsl(207, 20%, 88%)',
+  300: 'hsl(207, 20%, 80%)',
+  400: 'hsl(207, 20%, 65%)',
+  500: 'hsl(207, 20%, 42%)',
+  600: 'hsl(207, 20%, 35%)',
+  700: 'hsl(207, 20%, 25%)',
+  800: 'hsl(207, 30%, 6%)',
+  900: 'hsl(207, 35%, 3%)',
 };
 
 // Success color for positive feedback on interview performance
@@ -107,23 +107,23 @@ export const red = {
 
 // Secondary accent color for Intervue.ai
 export const purple = {
-  50: 'hsl(260, 100%, 97%)',
-  100: 'hsl(260, 92%, 90%)',
-  200: 'hsl(260, 94%, 80%)',
-  300: 'hsl(260, 90%, 65%)',
-  400: 'hsl(260, 90%, 50%)',
-  500: 'hsl(260, 90%, 45%)',
-  600: 'hsl(260, 91%, 40%)',
-  700: 'hsl(260, 94%, 30%)',
-  800: 'hsl(260, 95%, 20%)',
-  900: 'hsl(260, 93%, 12%)',
+  50: 'hsl(220, 100%, 97%)',
+  100: 'hsl(220, 92%, 90%)',
+  200: 'hsl(220, 94%, 80%)',
+  300: 'hsl(220, 90%, 65%)',
+  400: 'hsl(220, 90%, 50%)',
+  500: 'hsl(220, 90%, 45%)',
+  600: 'hsl(220, 91%, 40%)',
+  700: 'hsl(220, 94%, 30%)',
+  800: 'hsl(220, 95%, 20%)',
+  900: 'hsl(220, 93%, 12%)',
 };
 
 export const getDesignTokens = (mode: PaletteMode) => {
   customShadows[1] =
     mode === 'dark'
-      ? 'hsla(220, 30%, 5%, 0.7) 0px 4px 16px 0px, hsla(220, 25%, 10%, 0.8) 0px 8px 16px -5px'
-      : 'hsla(220, 30%, 5%, 0.07) 0px 4px 16px 0px, hsla(220, 25%, 10%, 0.07) 0px 8px 16px -5px';
+      ? 'hsla(207, 30%, 5%, 0.7) 0px 4px 16px 0px, hsla(207, 25%, 10%, 0.8) 0px 8px 16px -5px'
+      : 'hsla(207, 30%, 5%, 0.07) 0px 4px 16px 0px, hsla(207, 25%, 10%, 0.07) 0px 8px 16px -5px';
 
   return {
     palette: {
@@ -131,13 +131,13 @@ export const getDesignTokens = (mode: PaletteMode) => {
       primary: {
         light: brand[200],
         main: brand[500],
-        dark: brand[700],
+        dark: brand[800], // Using #194f8d equivalent
         contrastText: brand[50],
         ...(mode === 'dark' && {
           contrastText: brand[50],
           light: brand[300],
           main: brand[500],
-          dark: brand[700],
+          dark: brand[800],
         }),
       },
       info: {
@@ -187,9 +187,9 @@ export const getDesignTokens = (mode: PaletteMode) => {
       },
       divider: mode === 'dark' ? alpha(gray[700], 0.6) : alpha(gray[300], 0.4),
       background: {
-        default: 'hsl(220, 20%, 99%)',
-        paper: 'hsl(220, 35%, 97%)',
-        ...(mode === 'dark' && { default: gray[900], paper: 'hsl(220, 30%, 7%)' }),
+        default: 'hsl(207, 20%, 99%)',
+        paper: 'hsl(207, 35%, 97%)',
+        ...(mode === 'dark' && { default: gray[900], paper: 'hsl(207, 30%, 7%)' }),
       },
       text: {
         primary: gray[800],
@@ -207,7 +207,7 @@ export const getDesignTokens = (mode: PaletteMode) => {
       },
       // Intervue.ai specific colors
       interview: {
-        primary: mode === 'dark' ? brand[400] : brand[600],
+        primary: mode === 'dark' ? brand[400] : brand[800], // Light: #194f8d equivalent, Dark: lighter blue
         secondary: mode === 'dark' ? purple[400] : purple[600],
         accent: mode === 'dark' ? green[400] : green[500],
       },
@@ -280,8 +280,8 @@ export const colorSchemes = {
     palette: {
       primary: {
         light: brand[200],
-        main: brand[500],
-        dark: brand[700],
+        main: brand[500], // #8cc6f0 equivalent
+        dark: brand[800], // #194f8d equivalent
         contrastText: brand[50],
       },
       info: {
@@ -310,8 +310,8 @@ export const colorSchemes = {
       },
       divider: alpha(gray[300], 0.4),
       background: {
-        default: 'hsl(220, 20%, 99%)',
-        paper: 'hsl(220, 35%, 97%)',
+        default: 'hsl(207, 20%, 99%)',
+        paper: 'hsl(207, 35%, 97%)',
       },
       text: {
         primary: gray[800],
@@ -323,9 +323,9 @@ export const colorSchemes = {
         selected: `${alpha(brand[200], 0.3)}`,
       },
       baseShadow:
-        'hsla(220, 30%, 5%, 0.07) 0px 4px 16px 0px, hsla(220, 25%, 10%, 0.07) 0px 8px 16px -5px',
+        'hsla(207, 30%, 5%, 0.07) 0px 4px 16px 0px, hsla(207, 25%, 10%, 0.07) 0px 8px 16px -5px',
       interview: {
-        primary: brand[600],
+        primary: brand[800], // #194f8d equivalent
         secondary: purple[600],
         accent: green[500],
       },
@@ -336,8 +336,8 @@ export const colorSchemes = {
       primary: {
         contrastText: brand[50],
         light: brand[300],
-        main: brand[500],
-        dark: brand[700],
+        main: brand[500], // #8cc6f0 equivalent
+        dark: brand[800], // #194f8d equivalent
       },
       info: {
         contrastText: brand[300],
@@ -366,7 +366,7 @@ export const colorSchemes = {
       divider: alpha(gray[700], 0.6),
       background: {
         default: gray[900],
-        paper: 'hsl(220, 30%, 7%)',
+        paper: 'hsl(207, 30%, 7%)',
       },
       text: {
         primary: 'hsl(0, 0%, 100%)',
@@ -377,9 +377,9 @@ export const colorSchemes = {
         selected: alpha(brand[600], 0.3),
       },
       baseShadow:
-        'hsla(220, 30%, 5%, 0.7) 0px 4px 16px 0px, hsla(220, 25%, 10%, 0.8) 0px 8px 16px -5px',
+        'hsla(207, 30%, 5%, 0.7) 0px 4px 16px 0px, hsla(207, 25%, 10%, 0.8) 0px 8px 16px -5px',
       interview: {
-        primary: brand[400],
+        primary: brand[400], // Lighter blue for dark mode
         secondary: purple[400],
         accent: green[400],
       },

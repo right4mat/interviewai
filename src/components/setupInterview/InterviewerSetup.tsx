@@ -19,11 +19,8 @@ import Snackbar from '@mui/material/Snackbar';
 import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import { Interviewer } from '@/types/interview';
 
-interface Interviewer {
-  name: string;
-  role: string;
-}
 
 interface InterviewSettings {
   type: 'technical' | 'behavioral' | 'mixed';

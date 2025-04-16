@@ -2,24 +2,21 @@ import React, { useState } from 'react';
 import JobDescriptionInput from './JobDescriptionInput';
 import FileUpload from './FileUpload';
 import InterviewerSetup from './InterviewerSetup';
+import { Interviewer } from '@/types/interview';
 
-interface Interviewer {
-  name: string;
-  role: string;
-}
 
 interface SetupInterviewProps {
   onComplete: (data: {
     jobDescription: string;
     pdfFile?: File;
-    interviewers: Interviewer[];
+    interviewers: Interviewer;
   }) => void;
 }
 
 const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
   const [jobDescription, setJobDescription] = useState('');
   const [pdfFile, setPdfFile] = useState<File | undefined>();
-  const [interviewers, setInterviewers] = useState<Interviewer[]>([]);
+  const [interviewers, setInterviewers] = useState<Interviewer>({name: '', role: ''});
 
   const handleSubmit = () => {
     if (!jobDescription) {
