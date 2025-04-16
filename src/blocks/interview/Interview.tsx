@@ -208,6 +208,11 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                   <Typography variant="body1" color="primary">
                     Score: {qa.score}/100
                   </Typography>
+                  {qa.reasoning && (
+                    <Typography variant="body2" sx={{ mt: 1, fontStyle: "italic" }}>
+                      Feedback: {qa.reasoning}
+                    </Typography>
+                  )}
                 </Box>
               ))}
             </Box>

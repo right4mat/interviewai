@@ -24,6 +24,11 @@ declare module '@mui/material/styles' {
 
   interface Palette {
     baseShadow: string;
+    interview: {
+      primary: string;
+      secondary: string;
+      accent: string;
+    }
   }
 }
 
@@ -31,17 +36,18 @@ const defaultTheme = createTheme();
 
 const customShadows: Shadows = [...defaultTheme.shadows];
 
+// Intervue.ai brand colors - professional, tech-focused palette
 export const brand = {
-  50: 'hsl(210, 100%, 95%)',
-  100: 'hsl(210, 100%, 92%)',
-  200: 'hsl(210, 100%, 80%)',
-  300: 'hsl(210, 100%, 65%)',
-  400: 'hsl(210, 98%, 48%)',
-  500: 'hsl(210, 98%, 42%)',
-  600: 'hsl(210, 98%, 55%)',
-  700: 'hsl(210, 100%, 35%)',
-  800: 'hsl(210, 100%, 16%)',
-  900: 'hsl(210, 100%, 21%)',
+  50: 'hsl(220, 100%, 95%)',
+  100: 'hsl(220, 100%, 92%)',
+  200: 'hsl(220, 100%, 80%)',
+  300: 'hsl(220, 100%, 65%)',
+  400: 'hsl(220, 98%, 48%)',
+  500: 'hsl(220, 98%, 42%)',
+  600: 'hsl(220, 98%, 35%)',
+  700: 'hsl(220, 100%, 30%)',
+  800: 'hsl(220, 100%, 16%)',
+  900: 'hsl(220, 100%, 12%)',
 };
 
 export const gray = {
@@ -57,32 +63,35 @@ export const gray = {
   900: 'hsl(220, 35%, 3%)',
 };
 
+// Success color for positive feedback on interview performance
 export const green = {
-  50: 'hsl(120, 80%, 98%)',
-  100: 'hsl(120, 75%, 94%)',
-  200: 'hsl(120, 75%, 87%)',
-  300: 'hsl(120, 61%, 77%)',
-  400: 'hsl(120, 44%, 53%)',
-  500: 'hsl(120, 59%, 30%)',
-  600: 'hsl(120, 70%, 25%)',
-  700: 'hsl(120, 75%, 16%)',
-  800: 'hsl(120, 84%, 10%)',
-  900: 'hsl(120, 87%, 6%)',
+  50: 'hsl(145, 80%, 98%)',
+  100: 'hsl(145, 75%, 94%)',
+  200: 'hsl(145, 75%, 87%)',
+  300: 'hsl(145, 61%, 77%)',
+  400: 'hsl(145, 44%, 53%)',
+  500: 'hsl(145, 59%, 30%)',
+  600: 'hsl(145, 70%, 25%)',
+  700: 'hsl(145, 75%, 16%)',
+  800: 'hsl(145, 84%, 10%)',
+  900: 'hsl(145, 87%, 6%)',
 };
 
+// Warning color for areas of improvement in interview responses
 export const orange = {
-  50: 'hsl(45, 100%, 97%)',
-  100: 'hsl(45, 92%, 90%)',
-  200: 'hsl(45, 94%, 80%)',
-  300: 'hsl(45, 90%, 65%)',
-  400: 'hsl(45, 90%, 40%)',
-  500: 'hsl(45, 90%, 35%)',
-  600: 'hsl(45, 91%, 25%)',
-  700: 'hsl(45, 94%, 20%)',
-  800: 'hsl(45, 95%, 16%)',
-  900: 'hsl(45, 93%, 12%)',
+  50: 'hsl(35, 100%, 97%)',
+  100: 'hsl(35, 92%, 90%)',
+  200: 'hsl(35, 94%, 80%)',
+  300: 'hsl(35, 90%, 65%)',
+  400: 'hsl(35, 90%, 40%)',
+  500: 'hsl(35, 90%, 35%)',
+  600: 'hsl(35, 91%, 25%)',
+  700: 'hsl(35, 94%, 20%)',
+  800: 'hsl(35, 95%, 16%)',
+  900: 'hsl(35, 93%, 12%)',
 };
 
+// Error color for critical feedback
 export const red = {
   50: 'hsl(0, 100%, 97%)',
   100: 'hsl(0, 92%, 90%)',
@@ -96,6 +105,20 @@ export const red = {
   900: 'hsl(0, 93%, 6%)',
 };
 
+// Secondary accent color for Intervue.ai
+export const purple = {
+  50: 'hsl(260, 100%, 97%)',
+  100: 'hsl(260, 92%, 90%)',
+  200: 'hsl(260, 94%, 80%)',
+  300: 'hsl(260, 90%, 65%)',
+  400: 'hsl(260, 90%, 50%)',
+  500: 'hsl(260, 90%, 45%)',
+  600: 'hsl(260, 91%, 40%)',
+  700: 'hsl(260, 94%, 30%)',
+  800: 'hsl(260, 95%, 20%)',
+  900: 'hsl(260, 93%, 12%)',
+};
+
 export const getDesignTokens = (mode: PaletteMode) => {
   customShadows[1] =
     mode === 'dark'
@@ -107,13 +130,13 @@ export const getDesignTokens = (mode: PaletteMode) => {
       mode,
       primary: {
         light: brand[200],
-        main: brand[400],
+        main: brand[500],
         dark: brand[700],
         contrastText: brand[50],
         ...(mode === 'dark' && {
           contrastText: brand[50],
           light: brand[300],
-          main: brand[400],
+          main: brand[500],
           dark: brand[700],
         }),
       },
@@ -164,7 +187,7 @@ export const getDesignTokens = (mode: PaletteMode) => {
       },
       divider: mode === 'dark' ? alpha(gray[700], 0.6) : alpha(gray[300], 0.4),
       background: {
-        default: 'hsl(0, 0%, 99%)',
+        default: 'hsl(220, 20%, 99%)',
         paper: 'hsl(220, 35%, 97%)',
         ...(mode === 'dark' && { default: gray[900], paper: 'hsl(220, 30%, 7%)' }),
       },
@@ -175,30 +198,37 @@ export const getDesignTokens = (mode: PaletteMode) => {
         ...(mode === 'dark' && { primary: 'hsl(0, 0%, 100%)', secondary: gray[400] }),
       },
       action: {
-        hover: alpha(gray[200], 0.2),
-        selected: `${alpha(gray[200], 0.3)}`,
+        hover: alpha(brand[200], 0.2),
+        selected: `${alpha(brand[200], 0.3)}`,
         ...(mode === 'dark' && {
-          hover: alpha(gray[600], 0.2),
-          selected: alpha(gray[600], 0.3),
+          hover: alpha(brand[600], 0.2),
+          selected: alpha(brand[600], 0.3),
         }),
+      },
+      // Intervue.ai specific colors
+      interview: {
+        primary: mode === 'dark' ? brand[400] : brand[600],
+        secondary: mode === 'dark' ? purple[400] : purple[600],
+        accent: mode === 'dark' ? green[400] : green[500],
       },
     },
     typography: {
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       h1: {
         fontSize: defaultTheme.typography.pxToRem(48),
-        fontWeight: 600,
+        fontWeight: 700,
         lineHeight: 1.2,
         letterSpacing: -0.5,
       },
       h2: {
         fontSize: defaultTheme.typography.pxToRem(36),
-        fontWeight: 600,
+        fontWeight: 700,
         lineHeight: 1.2,
       },
       h3: {
         fontSize: defaultTheme.typography.pxToRem(30),
         lineHeight: 1.2,
+        fontWeight: 600,
       },
       h4: {
         fontSize: defaultTheme.typography.pxToRem(24),
@@ -215,13 +245,14 @@ export const getDesignTokens = (mode: PaletteMode) => {
       },
       subtitle1: {
         fontSize: defaultTheme.typography.pxToRem(18),
+        fontWeight: 500,
       },
       subtitle2: {
         fontSize: defaultTheme.typography.pxToRem(14),
         fontWeight: 500,
       },
       body1: {
-        fontSize: defaultTheme.typography.pxToRem(14),
+        fontSize: defaultTheme.typography.pxToRem(16),
       },
       body2: {
         fontSize: defaultTheme.typography.pxToRem(14),
@@ -231,9 +262,14 @@ export const getDesignTokens = (mode: PaletteMode) => {
         fontSize: defaultTheme.typography.pxToRem(12),
         fontWeight: 400,
       },
+      button: {
+        fontSize: defaultTheme.typography.pxToRem(14),
+        fontWeight: 600,
+        textTransform: 'none',
+      },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 10,
     },
     shadows: customShadows,
   };
@@ -244,7 +280,7 @@ export const colorSchemes = {
     palette: {
       primary: {
         light: brand[200],
-        main: brand[400],
+        main: brand[500],
         dark: brand[700],
         contrastText: brand[50],
       },
@@ -274,7 +310,7 @@ export const colorSchemes = {
       },
       divider: alpha(gray[300], 0.4),
       background: {
-        default: 'hsl(0, 0%, 99%)',
+        default: 'hsl(220, 20%, 99%)',
         paper: 'hsl(220, 35%, 97%)',
       },
       text: {
@@ -283,11 +319,16 @@ export const colorSchemes = {
         warning: orange[400],
       },
       action: {
-        hover: alpha(gray[200], 0.2),
-        selected: `${alpha(gray[200], 0.3)}`,
+        hover: alpha(brand[200], 0.2),
+        selected: `${alpha(brand[200], 0.3)}`,
       },
       baseShadow:
         'hsla(220, 30%, 5%, 0.07) 0px 4px 16px 0px, hsla(220, 25%, 10%, 0.07) 0px 8px 16px -5px',
+      interview: {
+        primary: brand[600],
+        secondary: purple[600],
+        accent: green[500],
+      },
     },
   },
   dark: {
@@ -295,7 +336,7 @@ export const colorSchemes = {
       primary: {
         contrastText: brand[50],
         light: brand[300],
-        main: brand[400],
+        main: brand[500],
         dark: brand[700],
       },
       info: {
@@ -332,31 +373,37 @@ export const colorSchemes = {
         secondary: gray[400],
       },
       action: {
-        hover: alpha(gray[600], 0.2),
-        selected: alpha(gray[600], 0.3),
+        hover: alpha(brand[600], 0.2),
+        selected: alpha(brand[600], 0.3),
       },
       baseShadow:
         'hsla(220, 30%, 5%, 0.7) 0px 4px 16px 0px, hsla(220, 25%, 10%, 0.8) 0px 8px 16px -5px',
+      interview: {
+        primary: brand[400],
+        secondary: purple[400],
+        accent: green[400],
+      },
     },
   },
 };
 
 export const typography = {
-  fontFamily: 'Inter, sans-serif',
+  fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   h1: {
     fontSize: defaultTheme.typography.pxToRem(48),
-    fontWeight: 600,
+    fontWeight: 700,
     lineHeight: 1.2,
     letterSpacing: -0.5,
   },
   h2: {
     fontSize: defaultTheme.typography.pxToRem(36),
-    fontWeight: 600,
+    fontWeight: 700,
     lineHeight: 1.2,
   },
   h3: {
     fontSize: defaultTheme.typography.pxToRem(30),
     lineHeight: 1.2,
+    fontWeight: 600,
   },
   h4: {
     fontSize: defaultTheme.typography.pxToRem(24),
@@ -373,13 +420,14 @@ export const typography = {
   },
   subtitle1: {
     fontSize: defaultTheme.typography.pxToRem(18),
+    fontWeight: 500,
   },
   subtitle2: {
     fontSize: defaultTheme.typography.pxToRem(14),
     fontWeight: 500,
   },
   body1: {
-    fontSize: defaultTheme.typography.pxToRem(14),
+    fontSize: defaultTheme.typography.pxToRem(16),
   },
   body2: {
     fontSize: defaultTheme.typography.pxToRem(14),
@@ -389,10 +437,15 @@ export const typography = {
     fontSize: defaultTheme.typography.pxToRem(12),
     fontWeight: 400,
   },
+  button: {
+    fontSize: defaultTheme.typography.pxToRem(14),
+    fontWeight: 600,
+    textTransform: 'none',
+  },
 };
 
 export const shape = {
-  borderRadius: 8,
+  borderRadius: 10,
 };
 
 // @ts-ignore

@@ -2,129 +2,209 @@ import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Alert from '@mui/material/Alert';
 import CustomInput from '@/components/shared/CustomizedInput';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import Avatar from '@mui/material/Avatar';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
 interface Interviewer {
   name: string;
   role: string;
 }
 
-interface InterviewerSetupProps {
-  interviewers: Interviewer[];
-  setInterviewers: (interviewers: Interviewer[]) => void;
+interface InterviewSettings {
+  type: 'technical' | 'behavioral' | 'mixed';
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
 }
 
+interface InterviewerSetupProps {
+  interviewer: Interviewer;
+  setInterviewer: (interviewer: Interviewer) => void;
+  settings: InterviewSettings;
+  setSettings: (settings: InterviewSettings) => void;
+}
+
+const DEFAULT_INTERVIEWER: Interviewer = {
+  name: 'AI Interviewer',
+  role: 'Senior Technical Recruiter'
+};
+
 const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
-  interviewers,
-  setInterviewers,
+  interviewer,
+  setInterviewer,
+  settings,
+  setSettings,
 }) => {
-  const [newInterviewer, setNewInterviewer] = useState<Interviewer>({
-    name: '',
-    role: '',
-  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [tempInterviewer, setTempInterviewer] = useState<Interviewer>(interviewer);
 
-  const MAX_INTERVIEWERS = 5;
-  const isMaxInterviewersReached = interviewers.length >= MAX_INTERVIEWERS;
-
-  const handleAddInterviewer = () => {
-    if (newInterviewer.name && newInterviewer.role && !isMaxInterviewersReached) {
-      setInterviewers([...interviewers, newInterviewer]);
-      setNewInterviewer({ name: '', role: '' });
-    }
+  const handleEditStart = () => {
+    setTempInterviewer(interviewer);
+    setIsEditing(true);
   };
 
-  const handleRemoveInterviewer = (index: number) => {
-    const updatedInterviewers = interviewers.filter((_, i) => i !== index);
-    setInterviewers(updatedInterviewers);
+  const handleEditSave = () => {
+    setInterviewer(tempInterviewer);
+    setIsEditing(false);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditing(false);
+    setTempInterviewer(interviewer);
+  };
+
+  const handleResetToDefault = () => {
+    setInterviewer(DEFAULT_INTERVIEWER);
   };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      
-      <Stack spacing={2}>
-        {interviewers.map((interviewer, index) => (
-          <Paper key={index} variant="outlined" sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Box>
-                <Typography variant="subtitle1">{interviewer.name}</Typography>
-                <Typography variant="body2" color="text.secondary">{interviewer.role}</Typography>
-              </Box>
-              <IconButton 
-                color="error" 
-                onClick={() => handleRemoveInterviewer(index)}
-                aria-label="remove interviewer"
-              >
-                <DeleteIcon />
+      <Paper variant="outlined" sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h6">
+            Your Interviewer
+          </Typography>
+          {!isEditing ? (
+            <IconButton 
+              onClick={handleEditStart} 
+              size="small" 
+              color="primary"
+              aria-label="edit interviewer"
+            >
+              <EditIcon />
+            </IconButton>
+          ) : (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton onClick={handleEditSave} size="small" color="primary" aria-label="save changes">
+                <CheckIcon />
+              </IconButton>
+              <IconButton onClick={handleEditCancel} size="small" color="error" aria-label="cancel editing">
+                <CloseIcon />
               </IconButton>
             </Box>
-          </Paper>
-        ))}
-      </Stack>
+          )}
+        </Box>
 
-      {isMaxInterviewersReached && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          Maximum of {MAX_INTERVIEWERS} interviewers reached.
-        </Alert>
-      )}
+        {!isEditing ? (
+          <Card variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar 
+                sx={{ 
+                  bgcolor: 'interview.primary', 
+                  width: 56, 
+                  height: 56 
+                }}
+              >
+                {interviewer.name.charAt(0)}
+              </Avatar>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>{interviewer.name}</Typography>
+                <Typography variant="body1" color="text.secondary">{interviewer.role}</Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        ) : (
+          <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+            <Grid container spacing={2}>
+              <Grid size={{xs: 12, sm: 6}}>
+                <CustomInput
+                  fullWidth
+                  label="Interviewer Name"
+                  placeholder="Enter interviewer name"
+                  value={tempInterviewer.name}
+                  onChange={(e) =>
+                    setTempInterviewer({ ...tempInterviewer, name: e.target.value })
+                  }
+                  size="small"
+                />
+              </Grid>
+              <Grid size={{xs: 12, sm: 6}}>
+                <CustomInput
+                  fullWidth
+                  label="Interviewer Role"
+                  placeholder="Enter interviewer role"
+                  value={tempInterviewer.role}
+                  onChange={(e) =>
+                    setTempInterviewer({ ...tempInterviewer, role: e.target.value })
+                  }
+                  size="small"
+                />
+              </Grid>
+              <Grid size={{xs: 12}}>
+                <Button 
+                  size="small" 
+                  variant="text" 
+                  onClick={handleResetToDefault}
+                  sx={{ mt: 1 }}
+                >
+                  Reset to default
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+      </Paper>
 
       <Paper variant="outlined" sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Interview Settings
+        </Typography>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomInput
-              fullWidth
-              placeholder="Name"
-              value={newInterviewer.name}
-              onChange={(e) =>
-                setNewInterviewer({ ...newInterviewer, name: e.target.value })
-              }
-              size="small"
-              disabled={isMaxInterviewersReached}
-              InputProps={{
-                sx: { borderRadius: 1.5 }
-              }}
-            />
+          <Grid size={{xs: 12, sm: 6}}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Interview Type</InputLabel>
+              <Select
+                value={settings.type}
+                label="Interview Type"
+                onChange={(e) => setSettings({ ...settings, type: e.target.value as InterviewSettings['type'] })}
+              >
+                <MenuItem value="technical">Technical</MenuItem>
+                <MenuItem value="behavioral">Behavioral</MenuItem>
+                <MenuItem value="mixed">Mixed</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomInput
-              fullWidth
-              placeholder="Role"
-              value={newInterviewer.role}
-              onChange={(e) =>
-                setNewInterviewer({ ...newInterviewer, role: e.target.value })
-              }
-              size="small"
-              disabled={isMaxInterviewersReached}
-              InputProps={{
-                sx: { borderRadius: 1.5 }
-              }}
-            />
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <Button
-              fullWidth
-              variant={!newInterviewer.name || !newInterviewer.role || isMaxInterviewersReached ? "outlined" : "contained"}
-              color="primary"
-              onClick={handleAddInterviewer}
-              disabled={!newInterviewer.name || !newInterviewer.role || isMaxInterviewersReached}
-              sx={{ 
-                borderRadius: 1.5,
-                textTransform: 'none',
-                fontWeight: 500,
-                py: 1
-              }}
-            >
-              Add Interviewer
-            </Button>
+          <Grid size={{xs: 12, sm: 6}}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Difficulty Level</InputLabel>
+              <Select
+                value={settings.difficulty}
+                label="Difficulty Level"
+                onChange={(e) => setSettings({ ...settings, difficulty: e.target.value as InterviewSettings['difficulty'] })}
+              >
+                <MenuItem value="beginner">Beginner</MenuItem>
+                <MenuItem value="intermediate">Intermediate</MenuItem>
+                <MenuItem value="advanced">Advanced</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
       </Paper>
+
+      <Snackbar
+        open={showComingSoon}
+        autoHideDuration={3000}
+        onClose={() => setShowComingSoon(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setShowComingSoon(false)} severity="info" sx={{ width: '100%' }}>
+          Multiple attendees feature coming soon! Stay tuned for updates.
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

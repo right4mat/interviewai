@@ -24,6 +24,11 @@ interface Interviewer {
   role: string;
 }
 
+interface InterviewSettings {
+  type: 'technical' | 'behavioral' | 'mixed';
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+}
+
 interface SetupInterviewProps {
   onComplete: (data: {
     jobDescription: string;
@@ -35,7 +40,14 @@ interface SetupInterviewProps {
 const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
   const [jobDescription, setJobDescription] = useState('');
   const [pdfFile, setPdfFile] = useState<File | undefined>();
-  const [interviewers, setInterviewers] = useState<Interviewer[]>([]);
+  const [interviewer, setInterviewer] = useState<Interviewer>({
+    name: 'AI Interviewer',
+    role: 'Senior Technical Recruiter'
+  });
+  const [settings, setSettings] = useState<InterviewSettings>({
+    type: 'technical',
+    difficulty: 'intermediate'
+  });
   const [showInterviewers, setShowInterviewers] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
@@ -44,15 +56,19 @@ const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
       alert('Job description is required');
       return;
     }
-    onComplete({ jobDescription, pdfFile, interviewers });
+    onComplete({ 
+      jobDescription, 
+      pdfFile, 
+      interviewers: [interviewer] 
+    });
   };
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setActiveStep((prevActiveStep: number) => prevActiveStep + 1);
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setActiveStep((prevActiveStep: number) => prevActiveStep - 1);
   };
 
   // Custom StepIcon component to render icons in primary color and inside a circle
@@ -163,14 +179,16 @@ const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
               variant="text"
               sx={{ fontWeight: 500 }}
             >
-              {showInterviewers ? 'Hide' : 'Add custom interviewers'}
+              {showInterviewers ? 'Hide' : 'Configure Interviewers'}
             </Button>
           </Box>
           
           {showInterviewers && (
             <InterviewerSetup
-              interviewers={interviewers}
-              setInterviewers={setInterviewers}
+              interviewer={interviewer}
+              setInterviewer={setInterviewer}
+              settings={settings}
+              setSettings={setSettings}
             />
           )}
         </Paper>

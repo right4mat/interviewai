@@ -44,26 +44,46 @@ Evaluate the answer based on:
 - Examples provided (if applicable)
 - Alignment with the job requirements in the job description
 
-Provide only a single integer score from 0 to 100. Do not include any explanation or additional text.
+Provide your response as a valid JSON object with the following structure:
+{
+  "score": [a single integer from 0 to 100],
+  "reasoning": [brief explanation of your score in 100 words or less]
+}
+
+Do not include any text outside of this JSON object.
 `;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: "You are an interview evaluator that scores answers on a scale of 0-100." },
+        { role: "system", content: "You are an interview evaluator that scores answers on a scale of 0-100. You always respond with valid JSON." },
         { role: "user", content: prompt }
       ],
       temperature: 0.3,
-      max_tokens: 10
+      max_tokens: 200,
+      response_format: { type: "json_object" }
     });
 
-    const scoreText = response.choices[0].message.content?.trim() || "0";
-    const score = parseInt(scoreText.replace(/\D/g, ""));
-
+    const responseContent = response.choices[0].message.content?.trim() || '{"score": 0, "reasoning": "Unable to evaluate answer"}';
+    
+    let parsedResponse;
+    try {
+      parsedResponse = JSON.parse(responseContent);
+    } catch (e) {
+      console.error("Failed to parse OpenAI response as JSON:", e);
+      parsedResponse = { score: 0, reasoning: "Error parsing evaluation" };
+    }
+    
     // Ensure score is within valid range
-    const validScore = Math.min(Math.max(isNaN(score) ? 0 : score, 0), 100);
+    const validScore = Math.min(Math.max(isNaN(parsedResponse.score) ? 0 : parsedResponse.score, 0), 100);
 
-    return NextResponse.json({ score: validScore });
+    return NextResponse.json({ 
+      status: "success", 
+      data: { 
+        score: validScore,
+        reasoning: parsedResponse.reasoning || "No reasoning provided"
+      } 
+    });
   } catch (error) {
     console.error("Error scoring answer:", error);
     return NextResponse.json({ error: "Failed to score answer" }, { status: 500 });

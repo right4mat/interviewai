@@ -99,7 +99,7 @@ Please conduct a professional interview following these guidelines:
 3. Maintain a professional and engaging conversation
 4. Allow the candidate to ask questions at the end
 5. Conclude the interview appropriately`,
-        input_audio_transcription: true
+        
       },
     };
     

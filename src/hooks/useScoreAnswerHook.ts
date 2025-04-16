@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useScoreAnswer } from "@/services/openAI";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 interface QuestionAnswer {
   question: string;
   answer: string;
   score?: number;
+  reasoning?: string;
 }
 
 interface UseScoreAnswerHookProps {
@@ -17,66 +19,111 @@ export const useScoreAnswerHook = ({ rtcConnection, jobDescription }: UseScoreAn
   const [error, setError] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<string>("");
   const [currentAnswer, setCurrentAnswer] = useState<string>("");
+  const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
 
   const { mutate: scoreAnswer, isPending: isScoring } = useScoreAnswer();
+  
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
 
-  const handleScoreAnswer = (question: string, answer: string) => {
-    scoreAnswer(
-      { question, answer, jobDescription },
-      {
-        onSuccess: (data) => {
-          setQuestionAnswers((prev) => [...prev, { question, answer, score: data.score }]);
-          setError(null);
-        },
-        onError: (err) => {
-          setError("Failed to score answer. Please try again.");
-          console.error("Error scoring answer:", err);
-        }
-      }
-    );
-  };
-
-  // Handle messages from the data channel
+  // Update current answer when transcript changes
   useEffect(() => {
-    if (rtcConnection?.dc) {
-      const handleMessage = (event: MessageEvent) => {
-        try {
-          const parsed = JSON.parse(event.data);
+    if (transcript) {
+      setCurrentAnswer(transcript);
+    }
+  }, [transcript]);
 
-          if (parsed.type !== "response.done") return;
+  // Manage speech recognition based on AI speaking status
+  useEffect(() => {
+    if (!browserSupportsSpeechRecognition) {
+      setError("Your browser doesn't support speech recognition.");
+      return;
+    }
 
+    if (isAISpeaking && listening) {
+      // Stop listening when AI is speaking
+      SpeechRecognition.stopListening();
+    } else if (!isAISpeaking && currentQuestion && !listening) {
+      // Start listening when AI stops speaking and we have a question
+      resetTranscript();
+      SpeechRecognition.startListening({ 
+        continuous: true,
+        language: 'en-US'
+      });
+    }
+  }, [isAISpeaking, currentQuestion, browserSupportsSpeechRecognition, resetTranscript, listening]);
+
+  const handleScoreAnswer = useCallback(
+    (question: string, answer: string) => {
+      if (!question || !answer) return;
+      
+      scoreAnswer(
+        { question, answer, jobDescription },
+        {
+          onSuccess: (data) => {
+            setQuestionAnswers((prev) => [...prev, { question, answer, score: data.score, reasoning: data.reasoning }]);
+            setError(null);
+          },
+          onError: (err) => {
+            setError("Failed to score answer. Please try again.");
+            console.error("Error scoring answer:", err);
+          }
+        }
+      );
+    },
+    [scoreAnswer, jobDescription]
+  );
+
+  // Process messages from the data channel
+  useEffect(() => {
+    if (!rtcConnection?.dc) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const parsed = JSON.parse(event.data);
+
+        if (parsed.type === "response.done") {
           const outputItems = parsed.response?.output || [];
-
-          outputItems.forEach((item: any) => {
-            const role = item.role;
+          
+          for (const item of outputItems) {
+            const { role } = item;
             const transcriptParts = (item.content || [])
               .filter((c: any) => c.type === "audio" && c.transcript)
               .map((c: any) => c.transcript);
 
             const transcript = transcriptParts.join(" ").trim();
-            if (!transcript) return;
+            if (!transcript) continue;
 
             if (role === "assistant") {
-              setCurrentQuestion(transcript); // Store the AI question
-              setCurrentAnswer(""); // Reset any previous answer
+              // Score previous Q&A before setting new question
+              if (currentQuestion && currentAnswer) {
+                handleScoreAnswer(currentQuestion, currentAnswer);
+              }
+              
+              setCurrentQuestion(transcript);
+              setCurrentAnswer("");
+              resetTranscript();
             }
-
-            if (role === "user" && currentQuestion) {
-              setCurrentAnswer(transcript);
-              handleScoreAnswer(currentQuestion, transcript); // Score the user’s answer
-            }
-          });
-        } catch (err) {
-          console.error("Failed to parse message from data channel:", err);
+          }
+        } else if (parsed.type === "output_audio_buffer.stopped") {
+          setIsAISpeaking(false);
+        } else if (parsed.type === "output_audio_buffer.started") {
+          setIsAISpeaking(true);
         }
-      };
+      } catch (err) {
+        console.error("Failed to parse message from data channel:", err);
+      }
+    };
 
-      rtcConnection.dc.addEventListener("message", handleMessage);
-      return () => {
-        rtcConnection.dc.removeEventListener("message", handleMessage);
-      };
-    }
-  }, [rtcConnection, currentQuestion, currentAnswer, handleScoreAnswer]);
+    rtcConnection.dc.addEventListener("message", handleMessage);
+    return () => {
+      rtcConnection.dc.removeEventListener("message", handleMessage);
+    };
+  }, [rtcConnection, currentQuestion, currentAnswer, handleScoreAnswer, resetTranscript]);
 
   return {
     questionAnswers,
@@ -85,6 +132,8 @@ export const useScoreAnswerHook = ({ rtcConnection, jobDescription }: UseScoreAn
     currentQuestion,
     currentAnswer,
     handleScoreAnswer,
-    setError
+    setError,
+    isListening: listening,
+    isAISpeaking
   };
 };
