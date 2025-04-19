@@ -8,6 +8,7 @@ interface QuestionAnswer {
   score?: number;
   reasoning?: string;
   cleanedAnswer?: string;
+  modelAnswer?: string;
 }
 
 interface UseScoreAnswerHookProps {
@@ -72,7 +73,8 @@ export const useScoreAnswerHook = ({ rtcConnection, jobDescription }: UseScoreAn
               score: data.score, 
               reasoning: data.reasoning,
               cleanedAnswer: data.cleanedAnswer,
-              questionSummary: data.questionSummary
+              questionSummary: data.questionSummary,
+              modelAnswer: data.modelAnswer
             }]);
             setError(null);
           },

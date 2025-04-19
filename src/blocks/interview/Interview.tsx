@@ -26,6 +26,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import Avatar from "@mui/material/Avatar";
 import Fade from "@mui/material/Fade";
 import { Interviewer } from "@/types/interview";
+import { Card } from "@mui/material";
 interface InterviewProps {
   jobDescription: string;
   pdfFile?: File;
@@ -178,9 +179,11 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
         </Grid>
 
         <Grid size={{ xs: 12, md: 3 }}>
-          <Paper
-            elevation={2}
+          <Card
+            variant="outlined"
             sx={{
+              bgcolor: "background.paper",
+              padding:0,
               height: "100%",
               display: "flex",
               flexDirection: "column",
@@ -362,12 +365,29 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                           </Typography>
                         </>
                       )}
+
+                      {qa.modelAnswer && (
+                        <>
+                          <Divider sx={{ my: 1.5 }}>
+                            <Chip
+                              icon={<QuestionAnswerIcon fontSize="small" />}
+                              label="Model Answer"
+                              size="small"
+                              color="success"
+                              variant="outlined"
+                            />
+                          </Divider>
+                          <Typography variant="body2" sx={{ color: "success.light", pl: 1, borderLeft: "2px solid", borderColor: "success.light", py: 0.5 }}>
+                            {qa.modelAnswer}
+                          </Typography>
+                        </>
+                      )}
                     </AccordionDetails>
                   </Accordion>
                 ))}
               </Box>
             </Box>
-          </Paper>
+          </Card>
         </Grid>
       </Grid>
     </Box>

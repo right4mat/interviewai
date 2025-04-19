@@ -7,6 +7,7 @@ interface ScoreAnswerResponse {
   reasoning: string;
   cleanedAnswer: string;
   questionSummary: string;
+  modelAnswer: string;
 }
 
 interface ScoreAnswerRequest {

@@ -43,6 +43,8 @@ You are an interview evaluator. You need to:
 3. Evaluate how well the candidate answered the interview question.
 Job Description: ${jobDescription}
 
+4. Provide a model answer based on the candidate's response but improved to be a perfect 100% score answer.
+
 Evaluate the answer based on:
 - Relevance to the question
 - Completeness
@@ -56,7 +58,8 @@ Provide your response as a valid JSON object with the following structure:
   "cleanedAnswer": [the cleaned up transcription with proper punctuation and formatting],
   "questionSummary": [a concise one-line description of the question],
   "score": [a single integer from 0 to 100],
-  "reasoning": [brief explanation of your score in 50 words or less]
+  "reasoning": [brief explanation of your score in 50 words or less],
+  "modelAnswer": [an improved version of the candidate's answer that would score 100%]
 }
 
 Do not include any text outside of this JSON object.
@@ -73,7 +76,7 @@ Do not include any text outside of this JSON object.
       response_format: { type: "json_object" }
     });
 
-    const responseContent = response.choices[0].message.content?.trim() || '{"cleanedAnswer": "", "questionSummary": "", "score": 0, "reasoning": "Unable to evaluate answer"}';
+    const responseContent = response.choices[0].message.content?.trim() || '{"cleanedAnswer": "", "questionSummary": "", "score": 0, "reasoning": "Unable to evaluate answer", "modelAnswer": ""}';
     
     let parsedResponse;
     try {
@@ -84,7 +87,8 @@ Do not include any text outside of this JSON object.
         cleanedAnswer: answer, 
         questionSummary: question,
         score: 0, 
-        reasoning: "Error parsing evaluation" 
+        reasoning: "Error parsing evaluation",
+        modelAnswer: ""
       };
     }
     
@@ -97,7 +101,8 @@ Do not include any text outside of this JSON object.
         score: validScore,
         reasoning: parsedResponse.reasoning || "No reasoning provided",
         cleanedAnswer: parsedResponse.cleanedAnswer || answer,
-        questionSummary: parsedResponse.questionSummary || question
+        questionSummary: parsedResponse.questionSummary || question,
+        modelAnswer: parsedResponse.modelAnswer || "No model answer provided"
       } 
     });
   } catch (error) {
