@@ -1,11 +1,12 @@
 "use client";
+// Import necessary React and Material-UI components
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
-import { initOpenAIRealtime, useGetInterviewQuestions } from "@/services/openAI";
+import { useGetInterviewQuestions } from "@/services/openAI";
 import { useScoreAnswerHook } from "@/hooks/useScoreAnswerHook";
 import VideoDisplay from "@/components/interview/VideoDisplay";
 import Button from "@mui/material/Button";
@@ -27,6 +28,9 @@ import Avatar from "@mui/material/Avatar";
 import Fade from "@mui/material/Fade";
 import { Interviewer } from "@/types/interview";
 import { Card } from "@mui/material";
+import { useReply } from "@/hooks/useReply";
+
+// Interface defining props for the Interview component
 interface InterviewProps {
   jobDescription: string;
   pdfFile?: File;
@@ -35,69 +39,70 @@ interface InterviewProps {
 }
 
 export default function Interview({ jobDescription, pdfFile, interviewers, onBackToSetup }: InterviewProps): React.ReactElement {
+  // State management for video/audio controls
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isVideoOn, setIsVideoOn] = useState<boolean>(true);
   const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+
+  // Refs and connection states
   const webcamRef = useRef<Webcam>(null);
-  const [rtcConnection, setRtcConnection] = useState<{ pc: RTCPeerConnection; dc: RTCDataChannel; cleanup: () => void } | null>(null);
-  const [isConnecting, setIsConnecting] = useState<boolean>(false);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+
+  // Interview progress states
   const [interviewStarted, setInterviewStarted] = useState<boolean>(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
 
-  const { questionAnswers, error, isScoring, currentQuestion, currentAnswer } = useScoreAnswerHook({ rtcConnection, jobDescription });
-  const { data: questions } = useGetInterviewQuestions({ jobDescription, interviewers, pdfFile });
+  // Fetch interview questions using custom hook
+  const { data: questions } = useGetInterviewQuestions({
+    jobDescription,
+    interviewers,
+    resume: "",
+    difficulty: "intermediate"
+  });
 
-  useEffect(() => {
-    // Only initialize connection when interview is started
-    if (questions && interviewStarted && !rtcConnection && !isConnecting) {
-      setIsConnecting(true);
-      initOpenAIRealtime({ questions, jobDescription, interviewers })
-        .then((connection) => {
-          setRtcConnection(connection);
-          setIsConnected(true);
-          setIsConnecting(false);
-          console.log("OpenAI Realtime connection established");
-        })
-        .catch((error) => {
-          console.error("Failed to connect to OpenAI Realtime:", error);
-          setIsConnecting(false);
-        });
-    }
-
-    // Cleanup function to close connection when component unmounts
-    return () => {
-      if (rtcConnection) {
-        rtcConnection.cleanup();
-        console.log("OpenAI Realtime connection closed");
+  // Hook for scoring answers and managing current Q&A
+  const { questionAnswers, error, isScoring, currentQuestion, currentAnswer } = useScoreAnswerHook({
+    question: questions?.questions?.[currentQuestionIndex] || "",
+    jobDescription,
+    stopListening: isAISpeaking,
+    onAnswerComplete: () => {
+      if (currentQuestionIndex < (questions?.questions?.length || 0) - 1) {
+        setCurrentQuestionIndex((prev) => prev + 1);
       }
-    };
-  }, [questions, rtcConnection, isConnecting, interviewStarted, jobDescription, interviewers]);
+    }
+  });
 
+  // Hook for managing AI replies and audio
+  const { stopAudio, replyText } = useReply({
+    jobDescription,
+    resume: "",
+    interviewers,
+    difficulty: "intermediate",
+    nextQuestion: questions?.questions?.[currentQuestionIndex + 1] || "",
+    isFirstQuestion: currentQuestionIndex === 0,
+    isLastAnswer: currentQuestionIndex === (questions?.questions?.length || 0) - 1,
+    currentAnswer: currentAnswer,
+    currentQuestion: questions?.questions?.[currentQuestionIndex] || "",
+    onSpeakingChange: (speaking) => {
+      setIsAISpeaking(speaking);
+    }
+  });
+
+  // Interview control functions
   const startInterview = (): void => {
     setInterviewStarted(true);
+    setCurrentQuestionIndex(0);
   };
 
   const stopInterview = (): void => {
-    if (rtcConnection) {
-      rtcConnection.cleanup();
-      setRtcConnection(null);
-      setIsConnected(false);
-    }
-    setIsConnecting(false);
     setInterviewStarted(false);
+    stopAudio();
   };
 
+  // Video/audio control functions
   const toggleMute = (): void => {
     setIsMuted(!isMuted);
-    if (rtcConnection) {
-      // Update audio track enabled state
-      rtcConnection.pc.getSenders().forEach((sender) => {
-        if (sender.track && sender.track.kind === "audio") {
-          sender.track.enabled = isMuted; // Toggle from current state
-        }
-      });
-    }
   };
 
   const toggleVideo = (): void => {
@@ -113,26 +118,23 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
   };
 
   const endCall = (): void => {
-    if (rtcConnection) {
-      rtcConnection.cleanup();
-      setRtcConnection(null);
-      setIsConnected(false);
-      setIsConnecting(false);
-      setInterviewStarted(false);
-    }
+    setInterviewStarted(false);
   };
 
+  // Render the interview interface
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
+      {/* Header with title and back button */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
         <Typography component="h2" variant="h5">
-          {isConnected ? "AI Interview Session" : "Interview Setup"}
+          {"AI Interview Session"}
         </Typography>
         <Button variant="outlined" onClick={onBackToSetup} startIcon={<ArrowBackIcon />} sx={{ ml: 2 }}>
           Back to Setup
         </Button>
       </Box>
 
+      {/* Error display */}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -140,14 +142,15 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
       )}
 
       <Grid container spacing={3}>
+        {/* Video display section */}
         <Grid size={{ xs: 12, md: 9 }}>
           <VideoDisplay
             isMuted={isMuted}
             isVideoOn={isVideoOn}
             isScreenSharing={isScreenSharing}
             isChatOpen={isChatOpen}
-            isConnecting={isConnecting}
-            isConnected={isConnected}
+            isConnecting={false}
+            isConnected={true}
             participantName={interviewers.name}
             webcamRef={webcamRef as React.RefObject<Webcam>}
             onToggleMute={toggleMute}
@@ -157,6 +160,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
             onEndCall={endCall}
           />
 
+          {/* Interview control buttons */}
           <Box sx={{ mt: 2, textAlign: "center", display: "flex", justifyContent: "center", gap: 2 }}>
             {!interviewStarted ? (
               <Button
@@ -164,7 +168,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                 color="primary"
                 size="large"
                 onClick={startInterview}
-                disabled={isConnecting}
+                disabled={false}
                 startIcon={<PlayArrowIcon />}
                 sx={{ mt: 2 }}
               >
@@ -178,12 +182,13 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
           </Box>
         </Grid>
 
+        {/* Interview progress section */}
         <Grid size={{ xs: 12, md: 3 }}>
           <Card
             variant="outlined"
             sx={{
               bgcolor: "background.paper",
-              padding:0,
+              padding: 0,
               height: "100%",
               display: "flex",
               flexDirection: "column",
@@ -191,6 +196,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
               overflow: "hidden"
             }}
           >
+            {/* Progress header */}
             <Box
               sx={{
                 p: 2,
@@ -207,6 +213,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
               </Typography>
             </Box>
 
+            {/* Questions and answers display */}
             <Box
               sx={{
                 flex: 1,
@@ -217,6 +224,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                 gap: 2
               }}
             >
+              {/* Current question display */}
               {currentQuestion && (
                 <Fade in={!!currentQuestion}>
                   <Paper
@@ -244,6 +252,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                       {currentQuestion}
                     </Typography>
 
+                    {/* Current answer display */}
                     {currentAnswer && (
                       <>
                         <Divider sx={{ my: 1.5 }}>
@@ -259,6 +268,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                       </>
                     )}
 
+                    {/* Loading indicator while scoring */}
                     {isScoring && (
                       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2, gap: 1 }}>
                         <CircularProgress size={16} thickness={6} />
@@ -270,6 +280,8 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                   </Paper>
                 </Fade>
               )}
+
+              {/* Previous questions and answers history */}
               <Box sx={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column-reverse", maxHeight: "60vh" }}>
                 {questionAnswers.map((qa, index) => (
                   <Accordion
@@ -301,8 +313,9 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
                           <Typography variant="subtitle2" sx={{ fontWeight: 500, flex: 1, mr: 1 }}>
-                            {qa.questionSummary || qa.question}
+                            {qa.questionSummary}
                           </Typography>
+                          {/* Score display circle */}
                           <Box sx={{ position: "relative", display: "inline-flex" }}>
                             <CircularProgress
                               variant="determinate"
@@ -335,6 +348,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                         </Box>
                       </Box>
                     </AccordionSummary>
+                    {/* Detailed answer feedback */}
                     <AccordionDetails
                       sx={{ px: 2, py: 1.5, bgcolor: "background.default", borderBottomLeftRadius: "8px", borderBottomRightRadius: "8px" }}
                     >
@@ -346,9 +360,10 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                         color="text.secondary"
                         sx={{ mb: 2, pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}
                       >
-                        {qa.cleanedAnswer}
+                        {qa.answer}
                       </Typography>
 
+                      {/* Feedback section */}
                       {qa.reasoning && (
                         <>
                           <Divider sx={{ my: 1.5 }}>
@@ -366,6 +381,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                         </>
                       )}
 
+                      {/* Model answer section */}
                       {qa.modelAnswer && (
                         <>
                           <Divider sx={{ my: 1.5 }}>
@@ -377,7 +393,10 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                               variant="outlined"
                             />
                           </Divider>
-                          <Typography variant="body2" sx={{ color: "success.light", pl: 1, borderLeft: "2px solid", borderColor: "success.light", py: 0.5 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "success.light", pl: 1, borderLeft: "2px solid", borderColor: "success.light", py: 0.5 }}
+                          >
                             {qa.modelAnswer}
                           </Typography>
                         </>

@@ -53,7 +53,9 @@ Please create a comprehensive set of questions that:
 - Can be reasonably answered within a 30-minute interview (typically 8-12 questions)
 - Progress in a logical order from introductory to more complex topics
 
-Return the questions as a numbered list (1. 2. 3. etc.) without any additional formatting or JSON structure.
+Return ONLY an array of questions in this exact format:
+["Question 1?", "Question 2?", "Question 3?", etc.]
+Do not include any other text or formatting.
 `;
 
     const response = await openai.chat.completions.create({
@@ -63,14 +65,19 @@ Return the questions as a numbered list (1. 2. 3. etc.) without any additional f
         { role: "user", content: questionsPrompt }
       ],
       temperature: 0.7,
-      max_tokens: 1500
+      max_tokens: 300
     });
 
     const responseContent = response.choices[0].message.content?.trim() || '';
     
+    // Parse the response string into an array
+    const questions = JSON.parse(responseContent);
+    
     return NextResponse.json({ 
       status: "success", 
-      data: responseContent 
+      data: {
+        questions: questions
+      }
     });
   } catch (error) {
     console.error("Error generating interview questions:", error);

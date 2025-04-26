@@ -72,7 +72,7 @@ Do not include any text outside of this JSON object.
         { role: "user", content: evaluationPrompt }
       ],
       temperature: 0.3,
-      max_tokens: 1000,
+      max_tokens: 500,
       response_format: { type: "json_object" }
     });
 

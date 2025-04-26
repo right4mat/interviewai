@@ -6,8 +6,22 @@ import {
 import supabase from "./supabase";
 import { ReactNode } from "react";
 
-// React Query client
-const client = new QueryClient();
+// React Query client with configuration
+const client = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // Data considered fresh for 5 minutes
+      retry: 2, // Retry failed requests 2 times
+      refetchOnWindowFocus: false, // Don't refetch when window regains focus
+      refetchOnMount: true, // Refetch on component mount
+      refetchOnReconnect: true, // Refetch when reconnecting
+    },
+    mutations: {
+      retry: 2, // Retry failed mutations 2 times
+    },
+  },
+});
+
 
 /**** USERS ****/
 

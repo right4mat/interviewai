@@ -66,7 +66,7 @@ ${resume ? `Candidate's Resume: ${resume}` : ""}
 
     if (isFirstQuestion) {
       replyPrompt += `
-This is the start of the interview. Begin with a brief introduction of yourself as ${interviewers.name} from ${companyName}, your role as ${interviewers.role}, and then ask the first question: "${nextQuestion}"
+This is the start of the interview. Begin with a brief introduction of yourself as ${interviewers.name} from ${companyName}, your role as ${interviewers.role}, and then ask the first question: "${currentQuestion}"
 
 Keep your introduction professional but warm and welcoming.
 `;
@@ -100,7 +100,7 @@ Keep your response conversational and professional. Respond as if you're speakin
 
     // Generate text response
     const textResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -109,7 +109,7 @@ Keep your response conversational and professional. Respond as if you're speakin
         { role: "user", content: replyPrompt }
       ],
       temperature: 0.7,
-      max_tokens: 500
+      max_tokens: 150
     });
 
     const responseContent = textResponse.choices[0].message.content?.trim() || "";
@@ -121,15 +121,18 @@ Keep your response conversational and professional. Respond as if you're speakin
       input: responseContent
     });
 
-    // Get audio as buffer
+    // Get audio as buffer and convert to base64
     const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
+    const base64Audio = `data:audio/mpeg;base64,${audioBuffer.toString("base64")}`;
 
-    // Create a response with the audio data
-    const response = new NextResponse(audioBuffer);
-    response.headers.set("Content-Type", "audio/mpeg");
-    response.headers.set("Content-Length", audioBuffer.length.toString());
-
-    return response;
+    // Return base64 encoded audio
+    return NextResponse.json({
+      status: "success",
+      data: {
+        audio: base64Audio,
+        text: responseContent
+      }
+    });
   } catch (error) {
     console.error("Error generating interview reply:", error);
     return NextResponse.json({ error: "Failed to generate interview reply" }, { status: 500 });
