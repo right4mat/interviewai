@@ -41,7 +41,7 @@ type GetQuestionsResponse = {questions: string[]};
 
 export const useScoreAnswer = (params: ScoreAnswerRequest) => {
   return useQuery<ScoreAnswerResponse, Error>({
-    queryKey: ["scoreAnswer", params],
+    queryKey: ["scoreAnswer", params.question, params.answer, params.jobDescription],
     queryFn: async () => {
       const response = await apiRequest("interview/score-answer", "POST", params);
       return response;

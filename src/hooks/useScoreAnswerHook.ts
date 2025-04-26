@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useScoreAnswer } from "@/services/openAI";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -24,7 +24,6 @@ export const useScoreAnswerHook = ({ question, jobDescription, stopListening, on
   const [questionAnswers, setQuestionAnswers] = useState<QuestionAnswer[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [internalAnswer, setInternalAnswer] = useState<string>("");
-
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
@@ -60,9 +59,9 @@ export const useScoreAnswerHook = ({ question, jobDescription, stopListening, on
     if (stopListening && listening) {
       SpeechRecognition.stopListening();
     } else if (!stopListening && question && !listening) {
-      SpeechRecognition.startListening({ 
+      SpeechRecognition.startListening({
         continuous: true,
-        language: 'en-US'
+        language: "en-US"
       });
     }
   }, [question, browserSupportsSpeechRecognition, listening, stopListening]);
@@ -77,20 +76,21 @@ export const useScoreAnswerHook = ({ question, jobDescription, stopListening, on
   // Update questionAnswers when we get a score
   useEffect(() => {
     if (scoreData && question && currentAnswer) {
-      setQuestionAnswers((prev) => [...prev, { 
-        question, 
-        answer: currentAnswer, 
-        score: scoreData.score, 
-        reasoning: scoreData.reasoning,
-        cleanedAnswer: scoreData.cleanedAnswer,
-        modelAnswer: scoreData.modelAnswer,
-        questionSummary: scoreData.questionSummary
-      }]);
+      setQuestionAnswers((prev) => [
+        ...prev,
+        {
+          question,
+          answer: currentAnswer,
+          score: scoreData.score,
+          reasoning: scoreData.reasoning,
+          cleanedAnswer: scoreData.cleanedAnswer,
+          modelAnswer: scoreData.modelAnswer,
+          questionSummary: scoreData.questionSummary
+        }
+      ]);
       setError(null);
     }
   }, [scoreData, question, currentAnswer]);
-
-
 
   return {
     questionAnswers,

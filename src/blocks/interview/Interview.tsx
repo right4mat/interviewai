@@ -1,7 +1,7 @@
 "use client";
 // Import necessary React and Material-UI components
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -47,29 +47,38 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
 
   // Refs and connection states
   const webcamRef = useRef<Webcam>(null);
+  const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
 
   // Interview progress states
   const [interviewStarted, setInterviewStarted] = useState<boolean>(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
+  const [isWaitingForAnswer, setIsWaitingForAnswer] = useState<boolean>(false);
 
   // Fetch interview questions using custom hook
-  const { data: questions } = useGetInterviewQuestions({
+  const { data: questions, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
     jobDescription,
     interviewers,
     resume: "",
     difficulty: "intermediate"
   });
 
+  // Memoize current question
+  const currentQuestion = useMemo(() => {
+    return questions?.questions?.[currentQuestionIndex] || "";
+  }, [questions, currentQuestionIndex]);
+
   // Hook for scoring answers and managing current Q&A
-  const { questionAnswers, error, isScoring, currentQuestion, currentAnswer } = useScoreAnswerHook({
-    question: questions?.questions?.[currentQuestionIndex] || "",
+  const { questionAnswers, error, isScoring, currentAnswer } = useScoreAnswerHook({
+    question: currentQuestion,
     jobDescription,
     stopListening: isAISpeaking,
     onAnswerComplete: () => {
-      if (currentQuestionIndex < (questions?.questions?.length || 0) - 1) {
-        setCurrentQuestionIndex((prev) => prev + 1);
-      }
+      setIsWaitingForAnswer(false);
+      setCurrentQuestionIndex((prev) =>{ 
+        console.log("currentQuestionIndex", prev);
+        return prev + 1});
     }
   });
 
@@ -83,22 +92,29 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
     isFirstQuestion: currentQuestionIndex === 0,
     isLastAnswer: currentQuestionIndex === (questions?.questions?.length || 0) - 1,
     currentAnswer: currentAnswer,
-    currentQuestion: questions?.questions?.[currentQuestionIndex] || "",
+    currentQuestion: currentQuestion,
     onSpeakingChange: (speaking) => {
       setIsAISpeaking(speaking);
+      
     }
   });
 
-  // Interview control functions
-  const startInterview = (): void => {
-    setInterviewStarted(true);
-    setCurrentQuestionIndex(0);
-  };
+  // Effect to handle interview session initialization
+  useEffect(() => {
+    if (questions && interviewStarted && !isConnected && !isConnecting) {
+      setIsConnecting(true);
+      setIsConnected(true);
+      setIsConnecting(false);
+      console.log("Interview session started");
+    }
+  }, [questions, isConnecting, interviewStarted, isConnected]);
 
-  const stopInterview = (): void => {
-    setInterviewStarted(false);
-    stopAudio();
-  };
+  // Effect to handle question transitions
+  useEffect(() => {
+    if (interviewStarted && currentQuestion) {
+      setIsWaitingForAnswer(true);
+    }
+  }, [currentQuestionIndex, interviewStarted, currentQuestion]);
 
   // Video/audio control functions
   const toggleMute = (): void => {
@@ -119,6 +135,21 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
 
   const endCall = (): void => {
     setInterviewStarted(false);
+  };
+
+  const startInterview = (): void => {
+    if (!isLoadingQuestions && questions?.questions?.length) {
+      setInterviewStarted(true);
+      setCurrentQuestionIndex(0);
+      setIsWaitingForAnswer(true);
+    }
+  };
+
+  const stopInterview = (): void => {
+    setInterviewStarted(false);
+    setCurrentQuestionIndex(0);
+    setIsWaitingForAnswer(false);
+    stopAudio();
   };
 
   // Render the interview interface
@@ -168,14 +199,21 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                 color="primary"
                 size="large"
                 onClick={startInterview}
-                disabled={false}
+                disabled={isLoadingQuestions || !questions?.questions?.length}
                 startIcon={<PlayArrowIcon />}
                 sx={{ mt: 2 }}
               >
-                Start Interview
+                {isLoadingQuestions ? "Loading Questions..." : "Start Interview"}
               </Button>
             ) : (
-              <Button variant="outlined" color="error" size="large" onClick={stopInterview} startIcon={<StopIcon />} sx={{ mt: 2 }}>
+              <Button 
+                variant="outlined" 
+                color="error" 
+                size="large" 
+                onClick={stopInterview} 
+                startIcon={<StopIcon />} 
+                sx={{ mt: 2 }}
+              >
                 Stop Interview
               </Button>
             )}
@@ -315,7 +353,6 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                           <Typography variant="subtitle2" sx={{ fontWeight: 500, flex: 1, mr: 1 }}>
                             {qa.questionSummary}
                           </Typography>
-                          {/* Score display circle */}
                           <Box sx={{ position: "relative", display: "inline-flex" }}>
                             <CircularProgress
                               variant="determinate"
@@ -348,7 +385,6 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                         </Box>
                       </Box>
                     </AccordionSummary>
-                    {/* Detailed answer feedback */}
                     <AccordionDetails
                       sx={{ px: 2, py: 1.5, bgcolor: "background.default", borderBottomLeftRadius: "8px", borderBottomRightRadius: "8px" }}
                     >
@@ -363,7 +399,6 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                         {qa.answer}
                       </Typography>
 
-                      {/* Feedback section */}
                       {qa.reasoning && (
                         <>
                           <Divider sx={{ my: 1.5 }}>
@@ -381,7 +416,6 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                         </>
                       )}
 
-                      {/* Model answer section */}
                       {qa.modelAnswer && (
                         <>
                           <Divider sx={{ my: 1.5 }}>

@@ -90,11 +90,9 @@ The candidate was just asked: "${currentQuestion}"
 
 The candidate's response was: "${currentAnswer}"
 
-Please provide:
-1. A brief, natural response to the candidate's answer (acknowledge strengths, ask follow-ups if needed)
-2. Transition naturally to the next question: "${nextQuestion}"
+Provide a brief acknowledgment of their answer (1-2 sentences maximum), then transition naturally to asking: "${nextQuestion}"
 
-Keep your response conversational and professional. Respond as if you're speaking directly to the candidate.
+Keep your response conversational and professional. Do not ask any follow-up questions - simply acknowledge their answer and move to the next question.
 `;
     }
 
@@ -104,7 +102,7 @@ Keep your response conversational and professional. Respond as if you're speakin
       messages: [
         {
           role: "system",
-          content: "You are an AI interviewer having a conversation with a job candidate. Respond naturally and professionally."
+          content: "You are an AI interviewer having a conversation with a job candidate. Keep responses brief and direct. Do not ask follow-up questions."
         },
         { role: "user", content: replyPrompt }
       ],
