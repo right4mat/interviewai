@@ -19,6 +19,7 @@ const replySchema = z.object({
   nextQuestion: z.string(),
   currentQuestion: z.string(),
   currentAnswer: z.string(),
+  firstQuestion: z.string(),
   isFirstQuestion: z.boolean().optional().default(false),
   isLastAnswer: z.boolean().optional().default(false)
 });
@@ -47,6 +48,7 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       currentQuestion,
       currentAnswer,
       nextQuestion,
+      firstQuestion,
       isFirstQuestion = false,
       isLastAnswer = false
     } = result.data;
@@ -66,7 +68,7 @@ ${resume ? `Candidate's Resume: ${resume}` : ""}
 
     if (isFirstQuestion) {
       replyPrompt += `
-This is the start of the interview. Begin with a brief introduction of yourself as ${interviewers.name} from ${companyName}, your role as ${interviewers.role}, and then ask the first question: "${currentQuestion}"
+This is the start of the interview. Begin with a brief introduction of yourself as ${interviewers.name} from ${companyName}, your role as ${interviewers.role}, and then ask the first question: "${firstQuestion}"
 
 Keep your introduction professional but warm and welcoming.
 `;

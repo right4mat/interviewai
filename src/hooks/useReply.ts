@@ -12,6 +12,7 @@ interface UseReplyProps {
   isLastAnswer: boolean;
   currentAnswer: string;
   currentQuestion: string;
+  firstQuestion: string;
   onQuestionComplete?: () => void;
   onSpeakingChange?: (isSpeaking: boolean) => void;
 }
@@ -26,6 +27,7 @@ export const useReply = ({
   isLastAnswer,
   currentAnswer,
   currentQuestion,
+  firstQuestion,
   onQuestionComplete,
   onSpeakingChange
 }: UseReplyProps) => {
@@ -40,14 +42,14 @@ export const useReply = ({
     nextQuestion,
     currentQuestion: currentQuestion || "",
     currentAnswer: currentAnswer || "",
+    firstQuestion: firstQuestion || "",
     isFirstQuestion,
     isLastAnswer
   });
 
   // Handle audio playback
   useEffect(() => {
-    if (interviewReply?.audio && currentQuestion !== lastPlayedQuestion.current) {
-      console.log("Playing new audio for question:", currentQuestion);
+    if (interviewReply?.audio && currentQuestion) {
       onSpeakingChange?.(true);
       audioRef.current = new Audio(interviewReply.audio);
       lastPlayedQuestion.current = currentQuestion;
@@ -68,7 +70,7 @@ export const useReply = ({
         audioRef.current = null;
       }
     };
-  }, [interviewReply, currentQuestion, onQuestionComplete, onSpeakingChange]);
+  }, [interviewReply, currentQuestion]);
 
   const stopAudio = () => {
     if (audioRef.current) {

@@ -38,6 +38,7 @@ interface InterviewProps {
 
 export default function Interview({ onBackToSetup }: InterviewProps): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
+  const [isFirstQuestion, setIsFirstQuestion] = useState(true);
   const {
     interviewData,
     isMuted,
@@ -91,8 +92,13 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     jobDescription: interviewData?.jobDescription || '',
     stopListening: isAISpeaking,
     onAnswerComplete: () => {
+      console.log("currentQuestionIndex before", currentQuestionIndex);
       setIsWaitingForAnswer(false);
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      if(!isFirstQuestion)   setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setIsFirstQuestion(false);
+
+   
+      console.log("currentQuestionIndex after", currentQuestionIndex + 1);
     }
   });
 
@@ -103,12 +109,16 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     interviewers: interviewData?.interviewers || { name: '', role: '' },
     difficulty: "intermediate",
     nextQuestion: questions?.questions?.[currentQuestionIndex + 1] || "",
-    isFirstQuestion: currentQuestionIndex === 0,
+    isFirstQuestion: isFirstQuestion,
     isLastAnswer: currentQuestionIndex === (questions?.questions?.length || 0) - 1,
     currentAnswer: newCurrentAnswer || '',
+    firstQuestion: questions?.questions?.[0] || "",
     currentQuestion: currentQuestion,
     onSpeakingChange: (speaking) => {
       setIsAISpeaking(speaking);
+    },
+    onQuestionComplete: () => {
+      setIsFirstQuestion(false);
     }
   });
 

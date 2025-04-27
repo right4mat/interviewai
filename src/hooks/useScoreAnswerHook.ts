@@ -33,6 +33,7 @@ export const useScoreAnswerHook = ({ question, jobDescription, stopListening, on
   useEffect(() => {
     if (currentAnswer) {
       onAnswerComplete();
+      setInternalAnswer("");
     }
   }, [currentAnswer]);
 
@@ -69,7 +70,7 @@ export const useScoreAnswerHook = ({ question, jobDescription, stopListening, on
   // Query for scoring the answer
   const { data: scoreData, isPending: isScoring } = useScoreAnswer({
     question,
-    answer: currentAnswer,
+    answer: currentAnswer || "",
     jobDescription
   });
 

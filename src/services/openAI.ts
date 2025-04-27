@@ -31,6 +31,7 @@ export interface GetInterviewReplyRequest {
   nextQuestion: string;
   currentQuestion: string;
   currentAnswer: string;
+  firstQuestion: string;
   isFirstQuestion: boolean;
   isLastAnswer: boolean;
 }
@@ -63,7 +64,7 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
 
 export const useGetInterviewReply = (params: GetInterviewReplyRequest) => {
   return useQuery<GetInterviewReplyResponse, Error>({
-    queryKey: ["interviewReply", params.currentQuestion],
+    queryKey: ["interviewReply", params.currentQuestion, params.currentAnswer],
     queryFn: async () => {
       
       const response = await apiRequest("interview/reply", "POST", params);

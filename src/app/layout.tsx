@@ -25,7 +25,6 @@ export const metadata = { ...mainMetadata };
 
 // Root layout component that wraps the entire application
 export default function RootLayout({ children }: { children: ReactNode }) {
-  console.log("RootLayout");
 
   return (
     <html lang="en" suppressHydrationWarning>
