@@ -191,6 +191,7 @@ export const useInterview = ({
     currentQuestion:isFirstQuestion ? questions[0] : questions[step],
     currentAnswer,
     isListening: listening,
+    isAISpeaking,
     stopAudio
   };
 };
