@@ -18,48 +18,30 @@ import WorkIcon from '@mui/icons-material/Work';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PeopleIcon from '@mui/icons-material/People';
 import CheckIcon from '@mui/icons-material/Check';
+import { useInterviewStore } from '@/stores/interviewStore';
 
-interface Interviewer {
-  name: string;
-  role: string;
-}
+const SetupInterview: React.FC = () => {
+  const {
+    setupData,
+    setJobDescription,
+    setPdfFile,
+    setInterviewer,
+    setSettings,
+    setInterviewData
+  } = useInterviewStore();
 
-interface InterviewSettings {
-  type: 'technical' | 'behavioral' | 'mixed';
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-}
-
-interface SetupInterviewProps {
-  onComplete: (data: {
-    jobDescription: string;
-    pdfFile?: File;
-    interviewers: Interviewer;
-  }) => void;
-}
-
-const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
-  const [jobDescription, setJobDescription] = useState('');
-  const [pdfFile, setPdfFile] = useState<File | undefined>();
-  const [interviewer, setInterviewer] = useState<Interviewer>({
-    name: 'AI Interviewer',
-    role: 'Senior Technical Recruiter'
-  });
-  const [settings, setSettings] = useState<InterviewSettings>({
-    type: 'technical',
-    difficulty: 'intermediate'
-  });
   const [showInterviewers, setShowInterviewers] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
   const handleSubmit = () => {
-    if (!jobDescription) {
+    if (!setupData.jobDescription) {
       alert('Job description is required');
       return;
     }
-    onComplete({ 
-      jobDescription, 
-      pdfFile, 
-      interviewers: interviewer 
+    setInterviewData({
+      jobDescription: setupData.jobDescription,
+      pdfFile: setupData.pdfFile,
+      interviewers: setupData.interviewer
     });
   };
 
@@ -120,12 +102,12 @@ const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
           }}
         >
           <JobDescriptionInput
-            value={jobDescription}
+            value={setupData.jobDescription}
             onChange={setJobDescription}
           />
         </Paper>
       ),
-      isValid: jobDescription.trim().length > 0
+      isValid: setupData.jobDescription.trim().length > 0
     },
     {
       label: 'Resume',
@@ -144,7 +126,7 @@ const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
         >
           <FileUpload
             onFileSelect={setPdfFile}
-            selectedFile={pdfFile}
+            selectedFile={setupData.pdfFile}
           />
         </Paper>
       ),
@@ -185,9 +167,9 @@ const SetupInterview: React.FC<SetupInterviewProps> = ({ onComplete }) => {
           
           {showInterviewers && (
             <InterviewerSetup
-              interviewer={interviewer}
+              interviewer={setupData.interviewer}
               setInterviewer={setInterviewer}
-              settings={settings}
+              settings={setupData.settings}
               setSettings={setSettings}
             />
           )}

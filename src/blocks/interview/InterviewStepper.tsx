@@ -1,30 +1,19 @@
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import SetupInterview from './SetupInterview';
+import React from 'react';
+import SetupInterview from '@/blocks/interview/SetupInterview';
 import Interview from './Interview';
-import { Interviewer } from '@/types/interview';
-
-interface InterviewData {
-  jobDescription: string;
-  pdfFile?: File;
-  interviewers: Interviewer;
-}
+import { useInterviewStore } from '@/stores/interviewStore';
 
 const InterviewStepper: React.FC = () => {
-  const [interviewData, setInterviewData] = useState<InterviewData | null>(null);
-
-  const handleSetupComplete = (data: InterviewData) => {
-    setInterviewData(data);
-  };
+  const { interviewData, clearInterviewData } = useInterviewStore();
 
   const handleBackToSetup = () => {
-    setInterviewData(null);
+    clearInterviewData();
   };
 
   return (
     <>
       {!interviewData ? (
-        <SetupInterview onComplete={handleSetupComplete} />
+        <SetupInterview />
       ) : (
         <Interview
           jobDescription={interviewData.jobDescription}

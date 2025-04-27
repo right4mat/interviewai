@@ -68,6 +68,13 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
     setInterviewer(DEFAULT_INTERVIEWER);
   };
 
+  const handleChange = (field: keyof Interviewer) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInterviewer({
+      ...interviewer,
+      [field]: e.target.value
+    });
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Paper variant="outlined" sx={{ p: 3 }}>
@@ -123,9 +130,7 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
                   label="Interviewer Name"
                   placeholder="Enter interviewer name"
                   value={tempInterviewer.name}
-                  onChange={(e) =>
-                    setTempInterviewer({ ...tempInterviewer, name: e.target.value })
-                  }
+                  onChange={handleChange('name')}
                   size="small"
                 />
               </Grid>
@@ -135,9 +140,7 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
                   label="Interviewer Role"
                   placeholder="Enter interviewer role"
                   value={tempInterviewer.role}
-                  onChange={(e) =>
-                    setTempInterviewer({ ...tempInterviewer, role: e.target.value })
-                  }
+                  onChange={handleChange('role')}
                   size="small"
                 />
               </Grid>
