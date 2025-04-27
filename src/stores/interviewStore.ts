@@ -142,13 +142,8 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
   toggleScreenShare: () => set((state) => ({ isScreenSharing: !state.isScreenSharing })),
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
   endCall: () => set({ interviewStarted: false }),
-  startInterview: () => set({ interviewStarted: true, currentQuestionIndex: 0, isWaitingForAnswer: true }),
-  stopInterview: () => set({ 
-    interviewStarted: false, 
-    currentQuestionIndex: 0, 
-    isWaitingForAnswer: false,
-    isAISpeaking: false
-  }),
+  startInterview: () => set({ interviewStarted: true }),
+  stopInterview: () => set({ interviewStarted: false }),
   setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
   setIsAISpeaking: (speaking) => set({ isAISpeaking: speaking }),
   setIsWaitingForAnswer: (waiting) => set({ isWaitingForAnswer: waiting }),

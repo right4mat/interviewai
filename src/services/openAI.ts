@@ -40,14 +40,12 @@ type GetInterviewReplyResponse = {text: string, audio: string};
 
 type GetQuestionsResponse = {questions: string[]};
 
-export const useScoreAnswer = (params: ScoreAnswerRequest) => {
-  return useQuery<ScoreAnswerResponse, Error>({
-    queryKey: ["scoreAnswer", params.question, params.answer, params.jobDescription],
-    queryFn: async () => {
-      const response = await apiRequest("interview/score-answer", "POST", params);
+export const useScoreAnswer = () => {
+  return useMutation<ScoreAnswerResponse, Error, ScoreAnswerRequest>({
+    mutationFn: async (variables: ScoreAnswerRequest) => {
+      const response = await apiRequest("interview/score-answer", "POST", variables);
       return response;
-    },
-    enabled: !!params.question && !!params.answer && !!params.jobDescription
+    }
   });
 };
 
@@ -62,16 +60,11 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
   });
 };
 
-export const useGetInterviewReply = (params: GetInterviewReplyRequest) => {
-  return useQuery<GetInterviewReplyResponse, Error>({
-    queryKey: ["interviewReply", params.currentQuestion, params.currentAnswer],
-    queryFn: async () => {
-      
-      const response = await apiRequest("interview/reply", "POST", params);
-
-
+export const useGetInterviewReply = () => {
+  return useMutation<GetInterviewReplyResponse, Error, GetInterviewReplyRequest>({
+    mutationFn: async (variables: GetInterviewReplyRequest) => {
+      const response = await apiRequest("interview/reply", "POST", variables);
       return response;
-    },
-    enabled: !!params.currentQuestion
+    }
   });
 };

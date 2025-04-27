@@ -30,6 +30,7 @@ import { Interviewer } from "@/types/interview";
 import { Card } from "@mui/material";
 import { useReply } from "@/hooks/useReply";
 import { useInterviewStore } from '@/stores/interviewStore';
+import { useInterview } from "@/hooks/useInterview";
 
 // Interface defining props for the Interview component
 interface InterviewProps {
@@ -48,13 +49,6 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     isConnecting,
     isConnected,
     interviewStarted,
-    currentQuestionIndex,
-    isAISpeaking,
-    isWaitingForAnswer,
-    questionAnswers,
-    error,
-    isScoring,
-    currentAnswer,
     toggleMute,
     toggleVideo,
     toggleScreenShare,
@@ -62,13 +56,6 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     endCall,
     startInterview,
     stopInterview,
-    setCurrentQuestionIndex,
-    setIsAISpeaking,
-    setIsWaitingForAnswer,
-    addQuestionAnswer,
-    setError,
-    setIsScoring,
-    setCurrentAnswer,
     setIsConnecting,
     setIsConnected
   } = useInterviewStore();
@@ -81,73 +68,22 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     difficulty: "intermediate"
   });
 
-  // Memoize current question
-  const currentQuestion = useMemo(() => {
-    return questions?.questions?.[currentQuestionIndex] || "";
-  }, [questions, currentQuestionIndex]);
-
-  // Hook for scoring answers and managing current Q&A
-  const { questionAnswers: newQuestionAnswers, error: scoreError, isScoring: isNewScoring, currentAnswer: newCurrentAnswer } = useScoreAnswerHook({
-    question: currentQuestion,
+  // Use the combined interview hook
+  const {
+    questionAnswers,
+    error,
+    isScoring,
+    isGettingReply,
+    currentQuestion,
+    currentAnswer,
+    isListening,
+    stopAudio
+  } = useInterview({
+    questions: questions?.questions || [],
     jobDescription: interviewData?.jobDescription || '',
-    stopListening: isAISpeaking,
-    onAnswerComplete: () => {
-      console.log("currentQuestionIndex before", currentQuestionIndex);
-      setIsWaitingForAnswer(false);
-      if(!isFirstQuestion)   setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setIsFirstQuestion(false);
-
-   
-      console.log("currentQuestionIndex after", currentQuestionIndex + 1);
-    }
+    interviewer: interviewData?.interviewers || { name: '', role: '' },
+    difficulty: "intermediate"
   });
-
-  // Hook for managing AI replies and audio
-  const { stopAudio, replyText } = useReply({
-    jobDescription: interviewData?.jobDescription || '',
-    resume: "",
-    interviewers: interviewData?.interviewers || { name: '', role: '' },
-    difficulty: "intermediate",
-    nextQuestion: questions?.questions?.[currentQuestionIndex + 1] || "",
-    isFirstQuestion: isFirstQuestion,
-    isLastAnswer: currentQuestionIndex === (questions?.questions?.length || 0) - 1,
-    currentAnswer: newCurrentAnswer || '',
-    firstQuestion: questions?.questions?.[0] || "",
-    currentQuestion: currentQuestion,
-    onSpeakingChange: (speaking) => {
-      setIsAISpeaking(speaking);
-    },
-    onQuestionComplete: () => {
-      setIsFirstQuestion(false);
-    }
-  });
-
-  // Update store with new question answers
-  React.useEffect(() => {
-    if (newQuestionAnswers.length > questionAnswers.length) {
-      const newAnswers = newQuestionAnswers.slice(questionAnswers.length);
-      newAnswers.forEach(addQuestionAnswer);
-    }
-  }, [newQuestionAnswers, questionAnswers, addQuestionAnswer]);
-
-  // Update store with new error
-  React.useEffect(() => {
-    if (scoreError) {
-      setError(scoreError);
-    }
-  }, [scoreError, setError]);
-
-  // Update store with new scoring state
-  React.useEffect(() => {
-    setIsScoring(isNewScoring);
-  }, [isNewScoring, setIsScoring]);
-
-  // Update store with new current answer
-  React.useEffect(() => {
-    if (newCurrentAnswer) {
-      setCurrentAnswer(newCurrentAnswer);
-    }
-  }, [newCurrentAnswer, setCurrentAnswer]);
 
   // Effect to handle interview session initialization
   React.useEffect(() => {
@@ -157,13 +93,6 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
       setIsConnecting(false);
     }
   }, [questions, isConnecting, interviewStarted, isConnected, setIsConnecting, setIsConnected]);
-
-  // Effect to handle question transitions
-  React.useEffect(() => {
-    if (interviewStarted && currentQuestion) {
-      setIsWaitingForAnswer(true);
-    }
-  }, [currentQuestionIndex, interviewStarted, currentQuestion, setIsWaitingForAnswer]);
 
   const handleStartInterview = () => {
     if (!isLoadingQuestions && questions?.questions?.length) {
