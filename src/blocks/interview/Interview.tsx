@@ -29,37 +29,53 @@ import Fade from "@mui/material/Fade";
 import { Interviewer } from "@/types/interview";
 import { Card } from "@mui/material";
 import { useReply } from "@/hooks/useReply";
+import { useInterviewStore } from '@/stores/interviewStore';
 
 // Interface defining props for the Interview component
 interface InterviewProps {
-  jobDescription: string;
-  pdfFile?: File;
-  interviewers: Interviewer;
   onBackToSetup: () => void;
 }
 
-export default function Interview({ jobDescription, pdfFile, interviewers, onBackToSetup }: InterviewProps): React.ReactElement {
-  // State management for video/audio controls
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isVideoOn, setIsVideoOn] = useState<boolean>(true);
-  const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-
-  // Refs and connection states
+export default function Interview({ onBackToSetup }: InterviewProps): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
-  const [isConnecting, setIsConnecting] = useState<boolean>(false);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-
-  // Interview progress states
-  const [interviewStarted, setInterviewStarted] = useState<boolean>(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
-  const [isWaitingForAnswer, setIsWaitingForAnswer] = useState<boolean>(false);
+  const {
+    interviewData,
+    isMuted,
+    isVideoOn,
+    isScreenSharing,
+    isChatOpen,
+    isConnecting,
+    isConnected,
+    interviewStarted,
+    currentQuestionIndex,
+    isAISpeaking,
+    isWaitingForAnswer,
+    questionAnswers,
+    error,
+    isScoring,
+    currentAnswer,
+    toggleMute,
+    toggleVideo,
+    toggleScreenShare,
+    toggleChat,
+    endCall,
+    startInterview,
+    stopInterview,
+    setCurrentQuestionIndex,
+    setIsAISpeaking,
+    setIsWaitingForAnswer,
+    addQuestionAnswer,
+    setError,
+    setIsScoring,
+    setCurrentAnswer,
+    setIsConnecting,
+    setIsConnected
+  } = useInterviewStore();
 
   // Fetch interview questions using custom hook
   const { data: questions, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
-    jobDescription,
-    interviewers,
+    jobDescription: interviewData?.jobDescription || '',
+    interviewers: interviewData?.interviewers || { name: '', role: '' },
     resume: "",
     difficulty: "intermediate"
   });
@@ -70,85 +86,83 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
   }, [questions, currentQuestionIndex]);
 
   // Hook for scoring answers and managing current Q&A
-  const { questionAnswers, error, isScoring, currentAnswer } = useScoreAnswerHook({
+  const { questionAnswers: newQuestionAnswers, error: scoreError, isScoring: isNewScoring, currentAnswer: newCurrentAnswer } = useScoreAnswerHook({
     question: currentQuestion,
-    jobDescription,
+    jobDescription: interviewData?.jobDescription || '',
     stopListening: isAISpeaking,
     onAnswerComplete: () => {
       setIsWaitingForAnswer(false);
-      setCurrentQuestionIndex((prev) =>{ 
-        console.log("currentQuestionIndex", prev);
-        return prev + 1});
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   });
 
   // Hook for managing AI replies and audio
   const { stopAudio, replyText } = useReply({
-    jobDescription,
+    jobDescription: interviewData?.jobDescription || '',
     resume: "",
-    interviewers,
+    interviewers: interviewData?.interviewers || { name: '', role: '' },
     difficulty: "intermediate",
     nextQuestion: questions?.questions?.[currentQuestionIndex + 1] || "",
     isFirstQuestion: currentQuestionIndex === 0,
     isLastAnswer: currentQuestionIndex === (questions?.questions?.length || 0) - 1,
-    currentAnswer: currentAnswer,
+    currentAnswer: newCurrentAnswer || '',
     currentQuestion: currentQuestion,
     onSpeakingChange: (speaking) => {
       setIsAISpeaking(speaking);
-      
     }
   });
 
+  // Update store with new question answers
+  React.useEffect(() => {
+    if (newQuestionAnswers.length > questionAnswers.length) {
+      const newAnswers = newQuestionAnswers.slice(questionAnswers.length);
+      newAnswers.forEach(addQuestionAnswer);
+    }
+  }, [newQuestionAnswers, questionAnswers, addQuestionAnswer]);
+
+  // Update store with new error
+  React.useEffect(() => {
+    if (scoreError) {
+      setError(scoreError);
+    }
+  }, [scoreError, setError]);
+
+  // Update store with new scoring state
+  React.useEffect(() => {
+    setIsScoring(isNewScoring);
+  }, [isNewScoring, setIsScoring]);
+
+  // Update store with new current answer
+  React.useEffect(() => {
+    if (newCurrentAnswer) {
+      setCurrentAnswer(newCurrentAnswer);
+    }
+  }, [newCurrentAnswer, setCurrentAnswer]);
+
   // Effect to handle interview session initialization
-  useEffect(() => {
+  React.useEffect(() => {
     if (questions && interviewStarted && !isConnected && !isConnecting) {
       setIsConnecting(true);
       setIsConnected(true);
       setIsConnecting(false);
-      console.log("Interview session started");
     }
-  }, [questions, isConnecting, interviewStarted, isConnected]);
+  }, [questions, isConnecting, interviewStarted, isConnected, setIsConnecting, setIsConnected]);
 
   // Effect to handle question transitions
-  useEffect(() => {
+  React.useEffect(() => {
     if (interviewStarted && currentQuestion) {
       setIsWaitingForAnswer(true);
     }
-  }, [currentQuestionIndex, interviewStarted, currentQuestion]);
+  }, [currentQuestionIndex, interviewStarted, currentQuestion, setIsWaitingForAnswer]);
 
-  // Video/audio control functions
-  const toggleMute = (): void => {
-    setIsMuted(!isMuted);
-  };
-
-  const toggleVideo = (): void => {
-    setIsVideoOn(!isVideoOn);
-  };
-
-  const toggleScreenShare = (): void => {
-    setIsScreenSharing(!isScreenSharing);
-  };
-
-  const toggleChat = (): void => {
-    setIsChatOpen(!isChatOpen);
-  };
-
-  const endCall = (): void => {
-    setInterviewStarted(false);
-  };
-
-  const startInterview = (): void => {
+  const handleStartInterview = () => {
     if (!isLoadingQuestions && questions?.questions?.length) {
-      setInterviewStarted(true);
-      setCurrentQuestionIndex(0);
-      setIsWaitingForAnswer(true);
+      startInterview();
     }
   };
 
-  const stopInterview = (): void => {
-    setInterviewStarted(false);
-    setCurrentQuestionIndex(0);
-    setIsWaitingForAnswer(false);
+  const handleStopInterview = () => {
+    stopInterview();
     stopAudio();
   };
 
@@ -180,9 +194,9 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
             isVideoOn={isVideoOn}
             isScreenSharing={isScreenSharing}
             isChatOpen={isChatOpen}
-            isConnecting={false}
-            isConnected={true}
-            participantName={interviewers.name}
+            isConnecting={isConnecting}
+            isConnected={isConnected}
+            participantName={interviewData?.interviewers.name || ''}
             webcamRef={webcamRef as React.RefObject<Webcam>}
             onToggleMute={toggleMute}
             onToggleVideo={toggleVideo}
@@ -198,7 +212,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                 variant="outlined"
                 color="primary"
                 size="large"
-                onClick={startInterview}
+                onClick={handleStartInterview}
                 disabled={isLoadingQuestions || !questions?.questions?.length}
                 startIcon={<PlayArrowIcon />}
                 sx={{ mt: 2 }}
@@ -210,7 +224,7 @@ export default function Interview({ jobDescription, pdfFile, interviewers, onBac
                 variant="outlined" 
                 color="error" 
                 size="large" 
-                onClick={stopInterview} 
+                onClick={handleStopInterview} 
                 startIcon={<StopIcon />} 
                 sx={{ mt: 2 }}
               >
