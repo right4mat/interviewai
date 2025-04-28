@@ -54,6 +54,7 @@ export const useInterview = ({
   // Handle scoring the answer
   useEffect(() => {
     if (currentQuestion && currentAnswer && stepOfInterview.current === step) {
+      
       scoreAnswer({
         question: currentQuestion,
         answer: currentAnswer,
@@ -93,6 +94,7 @@ export const useInterview = ({
     if (currentQuestion && !isAISpeaking && stepOfInterview.current !== step) {
 
       stepOfInterview.current = step
+      console.time('getReply');
       getReply({
         jobDescription,
         resume: "",
@@ -106,6 +108,7 @@ export const useInterview = ({
         isLastAnswer
       }, {
         onSuccess: (response) => {
+         
           if (response?.audio) {
             setIsAISpeaking(true);
             audioRef.current = new Audio(response.audio);
@@ -115,7 +118,10 @@ export const useInterview = ({
               setIsAISpeaking(false);
             };
 
+            console.timeEnd('getReply');
+
             audioRef.current.play().catch(error => {
+              
               console.error("Error playing audio:", error);
               setIsAISpeaking(false);
             });

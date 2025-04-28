@@ -115,11 +115,13 @@ Keep your response conversational and professional. Do not ask any follow-up que
     const responseContent = textResponse.choices[0].message.content?.trim() || "";
 
     // Generate audio from the text response
+    console.time('tts-1-generation');
     const audioResponse = await openai.audio.speech.create({
       model: "tts-1",
       voice: "alloy",
       input: responseContent
     });
+    console.timeEnd('tts-1-generation');
 
     // Get audio as buffer and convert to base64
     const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
