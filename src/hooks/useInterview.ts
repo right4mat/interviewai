@@ -4,6 +4,7 @@ import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognitio
 import { useDebounce } from "@/hooks/useDebounce";
 import { Interviewer } from "@/types/interview";
 
+// Interface representing a question and its corresponding answer in the interview
 interface QuestionAnswer {
   question: string;
   answer: string;
@@ -14,6 +15,7 @@ interface QuestionAnswer {
   questionSummary: string;
 }
 
+// Props for the useInterview hook
 interface UseInterviewProps {
   questions: string[];
   jobDescription: string;
@@ -21,81 +23,102 @@ interface UseInterviewProps {
   difficulty: string;
 }
 
-export const useInterview = ({
-  questions,
-  jobDescription,
-  interviewer,
-  difficulty,
-}: UseInterviewProps) => {
+// Custom hook to manage the interview flow and state
+export const useInterview = ({ questions, jobDescription, interviewer, difficulty }: UseInterviewProps) => {
+  // State management
   const [questionAnswers, setQuestionAnswers] = useState<QuestionAnswer[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [internalAnswer, setInternalAnswer] = useState<string>("");
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isAISpeaking, setIsAISpeaking] = useState(false);
-  const [isFirstQuestion, setIsFirstQuestion] = useState(true);
+  const [buildingAnswer, setBuildingAnswer] = useState<string>("");
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
+
+  // Refs for managing audio and interview state
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const stepOfInterview = useRef<number>(-1);
+  const stepOfInterview = useRef<number>(-1); //this is used to track the number of answers that have finished scoring so that things don't get mixed up
+
+  // Speech recognition setup
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
-  
-  // Mutations for scoring and getting replies
+
+  // API mutation hooks
   const { mutate: scoreAnswer, isPending: isScoring } = useScoreAnswer();
   const { mutate: getReply, isPending: isGettingReply } = useGetInterviewReply();
 
-  // Use debounced value for currentAnswer
-  const currentAnswer = useDebounce(internalAnswer, 1000);
-
-  // Get current question and next question
+  // Derived state values
+  const currentAnswer = useDebounce(buildingAnswer, 1000);
   const currentQuestion = questions[currentQuestionIndex] || "";
   const nextQuestion = questions[currentQuestionIndex + 1] || "";
   const isLastAnswer = currentQuestionIndex === questions.length - 1;
+  const isFirstQuestion = step === -1;
 
+  // Handles successful scoring of an answer
+  const handleScoreSuccess = (response: {
+    score: number;
+    reasoning: string;
+    cleanedAnswer: string;
+    modelAnswer: string;
+    questionSummary: string;
+  }) => {
+    if (!response) return;
 
-  // Handle scoring the answer
+    const newAnswer: QuestionAnswer = {
+      question: currentQuestion,
+      answer: currentAnswer || "", // Ensure answer is never undefined
+      score: response.score,
+      reasoning: response.reasoning,
+      cleanedAnswer: response.cleanedAnswer,
+      modelAnswer: response.modelAnswer,
+      questionSummary: response.questionSummary
+    };
+
+    setQuestionAnswers((prev) => [...prev, newAnswer]);
+    setError(null);
+
+    if (!isLastAnswer && !isFirstQuestion) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    }
+    setStep((prev) => prev + 1);
+  };
+
+  // Handles successful AI reply with audio
+  const handleReplySuccess = (response: { audio?: string }) => {
+    if (!response?.audio) return;
+
+    setIsAISpeaking(true);
+    audioRef.current = new Audio(response.audio);
+    audioRef.current.onended = () => setIsAISpeaking(false);
+
+    audioRef.current.play().catch((error) => {
+      console.error("Error playing audio:", error);
+      setIsAISpeaking(false);
+    });
+  };
+
+  // Effect to handle scoring answers
   useEffect(() => {
-    if (currentQuestion && currentAnswer && stepOfInterview.current === step) {
-      
-      scoreAnswer({
+    if (!(currentQuestion && currentAnswer && stepOfInterview.current === step)) return; //this is to prevent the AI from scoring twice
+
+    scoreAnswer(
+      {
         question: currentQuestion,
         answer: currentAnswer,
         jobDescription
-      }, {
-        onSuccess: (response) => {
-          if (response) {
-            setQuestionAnswers((prev) => [
-              ...prev,
-              {
-                question: currentQuestion,
-                answer: currentAnswer,
-                score: response.score,
-                reasoning: response.reasoning,
-                cleanedAnswer: response.cleanedAnswer,
-                modelAnswer: response.modelAnswer,
-                questionSummary: response.questionSummary
-              }
-            ]);
-            setError(null);
-            if (!isLastAnswer && !isFirstQuestion) {
-              setCurrentQuestionIndex(prev => prev + 1);
-            }
-            setIsFirstQuestion(false);
-            setStep(prev => prev + 1);
-          }
-        },
-        onError: (error) => {
-          setError("Failed to score answer");
-        }
-      });
-    }
+      },
+      {
+        onSuccess: handleScoreSuccess,
+        onError: () => setError("Failed to score answer")
+      }
+    );
   }, [currentAnswer, currentQuestion, currentQuestionIndex]);
 
-  // Handle getting AI reply
+  // Effect to handle AI replies
   useEffect(() => {
-    if (currentQuestion && !isAISpeaking && stepOfInterview.current !== step) {
+    if (!(currentQuestion && !isAISpeaking && stepOfInterview.current !== step)) return; //this is to prevent the AI from speaking twice
 
-      stepOfInterview.current = step
-      console.time('getReply');
-      getReply({
+    stepOfInterview.current = step;
+
+    getReply(
+      {
         jobDescription,
         resume: "",
         interviewers: interviewer,
@@ -106,37 +129,15 @@ export const useInterview = ({
         firstQuestion: questions[0] || "",
         isFirstQuestion,
         isLastAnswer
-      }, {
-        onSuccess: (response) => {
-         
-          if (response?.audio) {
-            setIsAISpeaking(true);
-            audioRef.current = new Audio(response.audio);
-            
-            
-            audioRef.current.onended = () => {
-              setIsAISpeaking(false);
-            };
-
-            console.timeEnd('getReply');
-
-            audioRef.current.play().catch(error => {
-              
-              console.error("Error playing audio:", error);
-              setIsAISpeaking(false);
-            });
-          }
-        },
-        onError: (error) => {
-          setError("Failed to get reply");
-        }
-      });
-    }
+      },
+      {
+        onSuccess: handleReplySuccess,
+        onError: () => setError("Failed to get reply")
+      }
+    );
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current = null;
-      }
+      audioRef.current = null;
     };
   }, [
     currentQuestion,
@@ -148,23 +149,23 @@ export const useInterview = ({
     currentAnswer,
     questions,
     isFirstQuestion,
-    isLastAnswer,
+    isLastAnswer
   ]);
 
-  // Update internal answer when transcript changes
+  // Effect to update internal answer from transcript
   useEffect(() => {
     if (transcript) {
-      setInternalAnswer(transcript);
+      setBuildingAnswer(transcript);
     }
   }, [transcript]);
 
-  // Reset answer when question changes
+  // Effect to reset transcript on question change
   useEffect(() => {
     resetTranscript();
-    setInternalAnswer("");
+    setBuildingAnswer("");
   }, [currentQuestion, resetTranscript]);
 
-  // Manage speech recognition
+  // Effect to manage speech recognition
   useEffect(() => {
     if (!browserSupportsSpeechRecognition) {
       setError("Your browser doesn't support speech recognition.");
@@ -174,13 +175,11 @@ export const useInterview = ({
     if (isAISpeaking && listening) {
       SpeechRecognition.stopListening();
     } else if (!isAISpeaking && !listening && currentQuestion) {
-      SpeechRecognition.startListening({
-        continuous: true,
-        language: "en-US"
-      });
+      SpeechRecognition.startListening({ continuous: true, language: "en-US" });
     }
   }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion]);
 
+  // Stops the current audio playback
   const stopAudio = () => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -194,10 +193,11 @@ export const useInterview = ({
     error,
     isScoring,
     isGettingReply,
-    currentQuestion:isFirstQuestion ? questions[0] : questions[step],
+    currentQuestion: isFirstQuestion ? questions[0] : questions[step],
     currentAnswer,
     isListening: listening,
     isAISpeaking,
+    buildingAnswer,
     stopAudio
   };
 };
