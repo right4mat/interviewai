@@ -32,6 +32,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
+  const [cleanedAnswer, setCleanedAnswer] = useState<string>("");
 
   // Refs for managing audio and interview state
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -47,9 +48,10 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   // Derived state values
   const currentAnswer = useDebounce(buildingAnswer, 1000);
   const currentQuestion = questions[currentQuestionIndex] || "";
+  const firstQuestion = questions[0] || "";
   const nextQuestion = questions[currentQuestionIndex + 1] || "";
   const isLastAnswer = currentQuestionIndex === questions.length - 1;
-  const isFirstQuestion = step === -1;
+  const isFirstQuestion = step === 0;
 
   // Handles successful scoring of an answer
   const handleScoreSuccess = (response: {
@@ -71,11 +73,14 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
       questionSummary: response.questionSummary
     };
 
+    setCleanedAnswer(response.cleanedAnswer);
+
     setQuestionAnswers((prev) => [...prev, newAnswer]);
     setError(null);
 
     if (!isLastAnswer && !isFirstQuestion) {
       setCurrentQuestionIndex((prev) => prev + 1);
+   
     }
     setStep((prev) => prev + 1);
   };
@@ -87,8 +92,8 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     setIsAISpeaking(true);
     audioRef.current = new Audio(response.audio);
     audioRef.current.onended = () => setIsAISpeaking(false);
-
     audioRef.current.play().catch((error) => {
+
       console.error("Error playing audio:", error);
       setIsAISpeaking(false);
     });
@@ -126,7 +131,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
         nextQuestion,
         currentQuestion,
         currentAnswer: currentAnswer || "",
-        firstQuestion: questions[0] || "",
+        firstQuestion: firstQuestion,
         isFirstQuestion,
         isLastAnswer
       },
@@ -163,6 +168,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   useEffect(() => {
     resetTranscript();
     setBuildingAnswer("");
+    setCleanedAnswer("");
   }, [currentQuestion, resetTranscript]);
 
   // Effect to manage speech recognition
@@ -194,7 +200,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     isScoring,
     isGettingReply,
     currentQuestion: isFirstQuestion ? questions[0] : questions[step],
-    currentAnswer,
+    cleanedAnswer,
     isListening: listening,
     isAISpeaking,
     buildingAnswer,

@@ -39,7 +39,6 @@ interface InterviewProps {
 
 export default function Interview({ onBackToSetup }: InterviewProps): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
-  const [isFirstQuestion, setIsFirstQuestion] = useState(true);
   const {
     interviewData,
     isMuted,
@@ -75,7 +74,8 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     isScoring,
     isGettingReply,
     currentQuestion,
-    currentAnswer,
+    cleanedAnswer,
+    buildingAnswer,
     isAISpeaking,
     stopAudio
   } = useInterview({
@@ -244,7 +244,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
                     </Typography>
 
                     {/* Current answer display */}
-                    {currentAnswer && (
+                    {(cleanedAnswer || buildingAnswer )&& (
                       <>
                         <Divider sx={{ my: 1.5 }}>
                           <Chip label="Your Response" size="small" variant="outlined" />
@@ -254,7 +254,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
                           color="text.secondary"
                           sx={{ pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}
                         >
-                          {currentAnswer}
+                          {cleanedAnswer || buildingAnswer}
                         </Typography>
                       </>
                     )}
