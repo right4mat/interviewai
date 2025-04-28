@@ -76,7 +76,6 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     isGettingReply,
     currentQuestion,
     currentAnswer,
-    isListening,
     isAISpeaking,
     stopAudio
   } = useInterview({
