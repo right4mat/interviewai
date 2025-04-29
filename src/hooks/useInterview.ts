@@ -31,27 +31,32 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   const [buildingAnswer, setBuildingAnswer] = useState<string>("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
-  const [step, setStep] = useState<number>(0);
   const [cleanedAnswer, setCleanedAnswer] = useState<string>("");
-
+  const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(true);
+  const [lastAnswerIndex, setLastAnswerIndex] = useState<number>(0);
   // Refs for managing audio and interview state
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const stepOfInterview = useRef<number>(-1); //this is used to track the number of answers that have finished scoring so that things don't get mixed up
+  const firstReplyHasStarted = useRef<boolean>(false);
+  const lastQuestionIndex = useRef<number>(-1);
 
   // Speech recognition setup
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
   // API mutation hooks
-  const { mutate: scoreAnswer, isPending: isScoring } = useScoreAnswer();
-  const { mutate: getReply, isPending: isGettingReply } = useGetInterviewReply();
+  const { mutateAsync: scoreAnswerAsync, isPending: isScoring } = useScoreAnswer();
+  const { mutateAsync: getReplyAsync, isPending: isGettingReply } = useGetInterviewReply();
 
   // Derived state values
   const currentAnswer = useDebounce(buildingAnswer, 1000);
+
+  useEffect(() => {
+    setLastAnswerIndex((prev) => prev + 1);
+  }, [currentAnswer]);
+
   const currentQuestion = questions[currentQuestionIndex] || "";
   const firstQuestion = questions[0] || "";
   const nextQuestion = questions[currentQuestionIndex + 1] || "";
   const isLastAnswer = currentQuestionIndex === questions.length - 1;
-  const isFirstQuestion = step === 0;
 
   // Handles successful scoring of an answer
   const handleScoreSuccess = (response: {
@@ -77,12 +82,6 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
 
     setQuestionAnswers((prev) => [...prev, newAnswer]);
     setError(null);
-
-    if (!isLastAnswer && !isFirstQuestion) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-   
-    }
-    setStep((prev) => prev + 1);
   };
 
   // Handles successful AI reply with audio
@@ -93,69 +92,83 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     audioRef.current = new Audio(response.audio);
     audioRef.current.onended = () => setIsAISpeaking(false);
     audioRef.current.play().catch((error) => {
-
       console.error("Error playing audio:", error);
       setIsAISpeaking(false);
     });
   };
 
-  // Effect to handle scoring answers
+  // Effect to handle scoring answers and read the next question
   useEffect(() => {
-    if (!(currentQuestion && currentAnswer && stepOfInterview.current === step)) return; //this is to prevent the AI from scoring twice
+    if (!currentQuestion || !currentAnswer || isFirstQuestion) return; //this is to prevent the AI from scoring twice
 
-    scoreAnswer(
-      {
-        question: currentQuestion,
-        answer: currentAnswer,
-        jobDescription
-      },
-      {
-        onSuccess: handleScoreSuccess,
-        onError: () => setError("Failed to score answer")
+    console.log("scoreAndReply rendering");
+
+    const scoreAndReply = async () => {
+      try {
+        await Promise.all([
+          scoreAnswerAsync({
+            question: currentQuestion,
+            answer: currentAnswer,
+            jobDescription
+          }).then(handleScoreSuccess).catch(() => setError("Failed to score answer")),
+
+          getReplyAsync({
+            jobDescription,
+            resume: "",
+            interviewers: interviewer,
+            difficulty,
+            nextQuestion,
+            currentQuestion,
+            currentAnswer: currentAnswer || "",
+            firstQuestion: firstQuestion,
+            isFirstQuestion: false,
+            isLastAnswer
+          }).then(handleReplySuccess).catch(() => setError("Failed to get reply"))
+        ]);
+
+        //only now should we move to the next question
+        //lastQuestionIndex.current = currentQuestionIndex;
+        setCurrentQuestionIndex((prev) => prev + 1);
+        lastQuestionIndex.current = currentQuestionIndex;
+        setBuildingAnswer("");
+        setCleanedAnswer("");
+      } catch (err) {
+        console.error("Error in scoreAndReply:", err);
+        setError("Failed to process answer and get reply");
       }
-    );
-  }, [currentAnswer, currentQuestion, currentQuestionIndex]);
-
-  // Effect to handle AI replies
-  useEffect(() => {
-    if (!(currentQuestion && !isAISpeaking && stepOfInterview.current !== step)) return; //this is to prevent the AI from speaking twice
-
-    stepOfInterview.current = step;
-
-    getReply(
-      {
-        jobDescription,
-        resume: "",
-        interviewers: interviewer,
-        difficulty,
-        nextQuestion,
-        currentQuestion,
-        currentAnswer: currentAnswer || "",
-        firstQuestion: firstQuestion,
-        isFirstQuestion,
-        isLastAnswer
-      },
-      {
-        onSuccess: handleReplySuccess,
-        onError: () => setError("Failed to get reply")
-      }
-    );
-
-    return () => {
-      audioRef.current = null;
     };
-  }, [
-    currentQuestion,
-    isAISpeaking,
-    jobDescription,
-    interviewer,
-    difficulty,
-    nextQuestion,
-    currentAnswer,
-    questions,
-    isFirstQuestion,
-    isLastAnswer
-  ]);
+
+    scoreAndReply();
+  }, [lastAnswerIndex]);
+
+  // Effect to handle first question / intro
+  useEffect(() => {
+    if (!firstQuestion || !isFirstQuestion || firstReplyHasStarted.current) return; //this is to prevent the AI from speaking twice
+    console.log("isFirstQuestion rendering");
+    firstReplyHasStarted.current = true;
+    setIsFirstQuestion(false);
+    
+    const getFirstReply = async () => {
+      try {
+        await getReplyAsync({
+          jobDescription,
+          resume: "",
+          interviewers: interviewer,
+          difficulty,
+          nextQuestion: "",
+          currentQuestion: "",
+          currentAnswer: "",
+          firstQuestion: firstQuestion,
+          isFirstQuestion,
+          isLastAnswer: false
+        }).then(handleReplySuccess);
+      } catch (err) {
+        setError("Failed to get reply");
+      }
+    };
+
+    getFirstReply();
+  }, [currentQuestion, isAISpeaking, jobDescription, interviewer, difficulty, nextQuestion, currentAnswer, questions, isFirstQuestion]);
 
   // Effect to update internal answer from transcript
   useEffect(() => {
@@ -199,7 +212,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     error,
     isScoring,
     isGettingReply,
-    currentQuestion: isFirstQuestion ? questions[0] : questions[step],
+    currentQuestion: isFirstQuestion ? questions[0] : questions[currentQuestionIndex],
     cleanedAnswer,
     isListening: listening,
     isAISpeaking,
