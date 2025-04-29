@@ -260,7 +260,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
                     )}
 
                     {/* Loading indicator while scoring */}
-                    {isScoring && (
+                    {(isScoring || isGettingReply) && (
                       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2, gap: 1 }}>
                         <CircularProgress size={16} thickness={6} />
                         <Typography variant="caption" color="text.secondary">

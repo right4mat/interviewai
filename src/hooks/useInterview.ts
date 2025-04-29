@@ -4,7 +4,10 @@ import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognitio
 import { useDebounce } from "@/hooks/useDebounce";
 import { Interviewer } from "@/types/interview";
 
-// Interface representing a question and its corresponding answer in the interview
+/**
+ * Interface representing a question and its corresponding answer in the interview
+ * Includes the original question/answer pair along with AI-generated analysis
+ */
 interface QuestionAnswer {
   question: string;
   answer: string;
@@ -15,7 +18,9 @@ interface QuestionAnswer {
   questionSummary: string;
 }
 
-// Props for the useInterview hook
+/**
+ * Props required to initialize the interview hook
+ */
 interface UseInterviewProps {
   questions: string[];
   jobDescription: string;
@@ -23,42 +28,54 @@ interface UseInterviewProps {
   difficulty: string;
 }
 
-// Custom hook to manage the interview flow and state
+/**
+ * Custom hook to manage the interview flow and state
+ * Handles speech recognition, audio playback, and interaction with AI services
+ */
 export const useInterview = ({ questions, jobDescription, interviewer, difficulty }: UseInterviewProps) => {
-  // State management
+  // Core interview state
   const [questionAnswers, setQuestionAnswers] = useState<QuestionAnswer[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [buildingAnswer, setBuildingAnswer] = useState<string>("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
-  const [cleanedAnswer, setCleanedAnswer] = useState<string>("");
   const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(true);
   const [lastAnswerIndex, setLastAnswerIndex] = useState<number>(0);
-  // Refs for managing audio and interview state
+
+  // Answer handling state
+  const [buildingAnswer, setBuildingAnswer] = useState<string>("");
+  const [cleanedAnswer, setCleanedAnswer] = useState<string>("");
+  
+  // UI state
+  const [error, setError] = useState<string | null>(null);
+  const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
+
+  // Persistent refs
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const firstReplyHasStarted = useRef<boolean>(false);
   const lastQuestionIndex = useRef<number>(-1);
 
-  // Speech recognition setup
+  // Speech recognition configuration
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
-  // API mutation hooks
+  // API hooks for AI interactions
   const { mutateAsync: scoreAnswerAsync, isPending: isScoring } = useScoreAnswer();
   const { mutateAsync: getReplyAsync, isPending: isGettingReply } = useGetInterviewReply();
 
-  // Derived state values
+  // Debounced answer to prevent rapid API calls
   const currentAnswer = useDebounce(buildingAnswer, 1000);
 
+  // Update answer index when the debounced answer changes
   useEffect(() => {
     setLastAnswerIndex((prev) => prev + 1);
   }, [currentAnswer]);
 
+  // Derived question state
   const currentQuestion = questions[currentQuestionIndex] || "";
   const firstQuestion = questions[0] || "";
   const nextQuestion = questions[currentQuestionIndex + 1] || "";
   const isLastAnswer = currentQuestionIndex === questions.length - 1;
 
-  // Handles successful scoring of an answer
+  /**
+   * Processes the AI's scoring response and updates the interview state
+   */
   const handleScoreSuccess = (response: {
     score: number;
     reasoning: string;
@@ -70,7 +87,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
 
     const newAnswer: QuestionAnswer = {
       question: currentQuestion,
-      answer: currentAnswer || "", // Ensure answer is never undefined
+      answer: currentAnswer || "",
       score: response.score,
       reasoning: response.reasoning,
       cleanedAnswer: response.cleanedAnswer,
@@ -79,12 +96,13 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     };
 
     setCleanedAnswer(response.cleanedAnswer);
-
     setQuestionAnswers((prev) => [...prev, newAnswer]);
     setError(null);
   };
 
-  // Handles successful AI reply with audio
+  /**
+   * Handles audio playback of AI responses
+   */
   const handleReplySuccess = (response: { audio?: string }) => {
     if (!response?.audio) return;
 
@@ -97,9 +115,9 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     });
   };
 
-  // Effect to handle scoring answers and read the next question
+  // Main interview flow effect - handles scoring and AI replies
   useEffect(() => {
-    if (!currentQuestion || !currentAnswer || isFirstQuestion) return; //this is to prevent the AI from scoring twice
+    if (!currentQuestion || !currentAnswer || isFirstQuestion) return;
 
     console.log("scoreAndReply rendering");
 
@@ -126,8 +144,6 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
           }).then(handleReplySuccess).catch(() => setError("Failed to get reply"))
         ]);
 
-        //only now should we move to the next question
-        //lastQuestionIndex.current = currentQuestionIndex;
         setCurrentQuestionIndex((prev) => prev + 1);
         lastQuestionIndex.current = currentQuestionIndex;
         setBuildingAnswer("");
@@ -141,9 +157,9 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     scoreAndReply();
   }, [lastAnswerIndex]);
 
-  // Effect to handle first question / intro
+  // Initial interview setup and first question handling
   useEffect(() => {
-    if (!firstQuestion || !isFirstQuestion || firstReplyHasStarted.current) return; //this is to prevent the AI from speaking twice
+    if (!firstQuestion || !isFirstQuestion || firstReplyHasStarted.current) return;
   
     firstReplyHasStarted.current = true;
     setIsFirstQuestion(false);
@@ -170,21 +186,21 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     getFirstReply();
   }, [currentQuestion, isAISpeaking, jobDescription, interviewer, difficulty, nextQuestion, currentAnswer, questions, isFirstQuestion]);
 
-  // Effect to update internal answer from transcript
+  // Speech-to-text conversion
   useEffect(() => {
     if (transcript) {
       setBuildingAnswer(transcript);
     }
   }, [transcript]);
 
-  // Effect to reset transcript on question change
+  // Reset speech recognition on question change
   useEffect(() => {
     resetTranscript();
     setBuildingAnswer("");
     setCleanedAnswer("");
   }, [currentQuestion, resetTranscript]);
 
-  // Effect to manage speech recognition
+  // Speech recognition management
   useEffect(() => {
     if (!browserSupportsSpeechRecognition) {
       setError("Your browser doesn't support speech recognition.");
@@ -198,7 +214,9 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     }
   }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion]);
 
-  // Stops the current audio playback
+  /**
+   * Stops current audio playback and resets speaking state
+   */
   const stopAudio = () => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -216,7 +234,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     cleanedAnswer,
     isListening: listening,
     isAISpeaking,
-    buildingAnswer,
+    buildingAnswer,    
     stopAudio
   };
 };
