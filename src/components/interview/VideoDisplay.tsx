@@ -1,10 +1,10 @@
-import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
 import Webcam from "react-webcam";
 import VideoControls from "./VideoControls";
+import AnimatedAvatar from "./AnimatedAvatar";
 
 interface VideoDisplayProps {
   isMuted: boolean;
@@ -15,6 +15,7 @@ interface VideoDisplayProps {
   isConnected: boolean;
   participantName: string;
   webcamRef: React.RefObject<Webcam>;
+  isAISpeaking: boolean;
   onToggleMute: () => void;
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
@@ -31,6 +32,7 @@ export default function VideoDisplay({
   isConnected,
   participantName,
   webcamRef,
+  isAISpeaking,
   onToggleMute,
   onToggleVideo,
   onToggleScreenShare,
@@ -57,22 +59,10 @@ export default function VideoDisplay({
           screenshotFormat="image/jpeg"
         />
       ) : (
-        <Box 
-          sx={{ 
-            width: "100%", 
-            height: "100%", 
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center",
-            bgcolor: "#333"
-          }}
-        >
-          <Avatar 
-            sx={{ width: 120, height: 120, fontSize: "3rem" }}
-          >
-            {participantName.charAt(0)}
-          </Avatar>
-        </Box>
+        <AnimatedAvatar
+          participantName={participantName}
+          isAISpeaking={isAISpeaking}
+        />
       )}
 
       <VideoControls

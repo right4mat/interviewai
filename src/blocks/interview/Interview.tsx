@@ -77,6 +77,8 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     cleanedAnswer,
     buildingAnswer,
     isAISpeaking,
+    audioWaveform,
+    audioDuration,
     stopAudio
   } = useInterview({
     questions: questions?.questions || [],
@@ -130,6 +132,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
         <Grid size={{ xs: 12, md: 9 }}>
           <VideoDisplay
             isMuted={isAISpeaking}
+            isAISpeaking={isAISpeaking}
             isVideoOn={isVideoOn}
             isScreenSharing={isScreenSharing}
             isChatOpen={isChatOpen}
@@ -142,6 +145,8 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
             onToggleScreenShare={toggleScreenShare}
             onToggleChat={toggleChat}
             onEndCall={endCall}
+            audioWaveform={audioWaveform}
+            audioDuration={audioDuration}
           />
 
           {/* Interview control buttons */}

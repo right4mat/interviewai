@@ -67,3 +67,32 @@ export const scrollToSection = (id: string): void => {
     section.scrollIntoView({ behavior: "smooth" });
   }
 };
+
+// Get waveform data from base64 audio for visualization
+export const getAudioWaveform = async (base64Audio: string): Promise<{ waveform: number[], duration: number }> => {
+  const audioContext = new AudioContext();
+  const audioData = atob(base64Audio.split(',')[1]); // Remove data URL prefix and decode
+  const arrayBuffer = new ArrayBuffer(audioData.length);
+  const view = new Uint8Array(arrayBuffer);
+  
+  for (let i = 0; i < audioData.length; i++) {
+    view[i] = audioData.charCodeAt(i);
+  }
+
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  const analyser = audioContext.createAnalyser();
+  const source = audioContext.createBufferSource();
+  
+  source.buffer = audioBuffer;
+  analyser.fftSize = 256;
+  source.connect(analyser);
+  
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Float32Array(bufferLength);
+  
+  analyser.getFloatTimeDomainData(dataArray);
+  return {
+    waveform: Array.from(dataArray),
+    duration: audioBuffer.duration
+  };
+};

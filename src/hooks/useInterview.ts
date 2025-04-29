@@ -3,6 +3,7 @@ import { useGetInterviewReply, useScoreAnswer } from "@/services/openAI";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Interviewer } from "@/types/interview";
+import { getAudioWaveform } from "@/utils/util";
 
 /**
  * Interface representing a question and its corresponding answer in the interview
@@ -39,10 +40,13 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(true);
   const [lastAnswerIndex, setLastAnswerIndex] = useState<number>(0);
 
+  const [audioWaveform, setAudioWaveform] = useState<number[]>([]);
+  const [audioDuration, setAudioDuration] = useState<number>(0);
+
   // Answer handling state
   const [buildingAnswer, setBuildingAnswer] = useState<string>("");
   const [cleanedAnswer, setCleanedAnswer] = useState<string>("");
-  
+
   // UI state
   const [error, setError] = useState<string | null>(null);
   const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
@@ -103,10 +107,11 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   /**
    * Handles audio playback of AI responses
    */
-  const handleReplySuccess = (response: { audio?: string }) => {
+  const handleReplySuccess = async (response: { audio?: string }) => {
     if (!response?.audio) return;
 
     setIsAISpeaking(true);
+
     audioRef.current = new Audio(response.audio);
     audioRef.current.onended = () => setIsAISpeaking(false);
     audioRef.current.play().catch((error) => {
@@ -128,7 +133,9 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
             question: currentQuestion,
             answer: currentAnswer,
             jobDescription
-          }).then(handleScoreSuccess).catch(() => setError("Failed to score answer")),
+          })
+            .then(handleScoreSuccess)
+            .catch(() => setError("Failed to score answer")),
 
           getReplyAsync({
             jobDescription,
@@ -141,7 +148,9 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
             firstQuestion: firstQuestion,
             isFirstQuestion: false,
             isLastAnswer
-          }).then(handleReplySuccess).catch(() => setError("Failed to get reply"))
+          })
+            .then(handleReplySuccess)
+            .catch(() => setError("Failed to get reply"))
         ]);
 
         setCurrentQuestionIndex((prev) => prev + 1);
@@ -160,10 +169,10 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   // Initial interview setup and first question handling
   useEffect(() => {
     if (!firstQuestion || !isFirstQuestion || firstReplyHasStarted.current) return;
-  
+
     firstReplyHasStarted.current = true;
     setIsFirstQuestion(false);
-    
+
     const getFirstReply = async () => {
       try {
         await getReplyAsync({
@@ -234,7 +243,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     cleanedAnswer,
     isListening: listening,
     isAISpeaking,
-    buildingAnswer,    
+    buildingAnswer,
     stopAudio
   };
 };
