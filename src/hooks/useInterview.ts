@@ -144,7 +144,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   // Effect to handle first question / intro
   useEffect(() => {
     if (!firstQuestion || !isFirstQuestion || firstReplyHasStarted.current) return; //this is to prevent the AI from speaking twice
-    console.log("isFirstQuestion rendering");
+  
     firstReplyHasStarted.current = true;
     setIsFirstQuestion(false);
     
