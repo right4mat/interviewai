@@ -50,20 +50,41 @@ export default function VideoDisplay({
         bgcolor: "#000"
       }}
     >
-      {isVideoOn ? (
-        <Webcam
-          ref={webcamRef}
-          audio={!isMuted}
-          muted={true}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          screenshotFormat="image/jpeg"
-        />
-      ) : (
+      {/* Main AI Avatar */}
+      <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
         <AnimatedAvatar
           participantName={participantName}
           isAISpeaking={isAISpeaking}
         />
-      )}
+        
+        {/* Bottom right user video/avatar */}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 20,
+            right: 20,
+            width: "200px",
+            height: "150px",
+            borderRadius: 2,
+            overflow: "hidden",
+            border: "2px solid rgba(255,255,255,0.2)"
+          }}
+        >
+          {isVideoOn ? (
+            <Webcam
+              ref={webcamRef}
+              audio={!isMuted}
+              muted={true}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              screenshotFormat="image/jpeg"
+            />
+          ) : (
+            <Box sx={{ width: "100%", height: "100%", bgcolor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Typography sx={{ color: "white" }}>Camera Off</Typography>
+            </Box>
+          )}
+        </Box>
+      </Box>
 
       <VideoControls
         isMuted={isMuted}
@@ -93,4 +114,4 @@ export default function VideoDisplay({
       </Typography>
     </Card>
   );
-} 
+}
