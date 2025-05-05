@@ -21,7 +21,8 @@ const replySchema = z.object({
   currentAnswer: z.string(),
   firstQuestion: z.string(),
   isFirstQuestion: z.boolean().optional().default(false),
-  isLastAnswer: z.boolean().optional().default(false)
+  isLastAnswer: z.boolean().optional().default(false),
+  type: z.string().optional().default("mixed")
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {
@@ -43,14 +44,16 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
 
     const {
       jobDescription,
-      resume = "",
+      resume,
       interviewers,
       currentQuestion,
       currentAnswer,
       nextQuestion,
       firstQuestion,
       isFirstQuestion = false,
-      isLastAnswer = false
+      isLastAnswer = false,
+      type,
+      difficulty
     } = result.data;
 
     // Extract company name from job description (simple extraction)
@@ -64,6 +67,8 @@ You are ${interviewers.name}, a ${interviewers.role} conducting an interview.
 
 Job Description: ${jobDescription}
 ${resume ? `Candidate's Resume: ${resume}` : ""}
+
+The interview is ${type} and the difficulty is ${difficulty}.
 `;
 
     if (isFirstQuestion) {

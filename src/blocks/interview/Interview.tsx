@@ -7,7 +7,6 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
 import { useGetInterviewQuestions } from "@/services/openAI";
-import { useScoreAnswerHook } from "@/hooks/useScoreAnswerHook";
 import VideoDisplay from "@/components/interview/VideoDisplay";
 import Button from "@mui/material/Button";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -26,22 +25,15 @@ import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import Avatar from "@mui/material/Avatar";
 import Fade from "@mui/material/Fade";
-import { Interviewer } from "@/types/interview";
 import { Card } from "@mui/material";
-import { useReply } from "@/hooks/useReply";
-import { useInterviewStore } from '@/stores/interviewStore';
+import { useInterviewStore } from "@/stores/interviewStore";
 import { useInterview } from "@/hooks/useInterview";
 
-// Interface defining props for the Interview component
-interface InterviewProps {
-  onBackToSetup: () => void;
-}
-
-export default function Interview({ onBackToSetup }: InterviewProps): React.ReactElement {
+export default function Interview(): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
   const {
-    interviewData,
     isMuted,
+    setupData,
     isVideoOn,
     isScreenSharing,
     isChatOpen,
@@ -56,36 +48,32 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
     startInterview,
     stopInterview,
     setIsConnecting,
-    setIsConnected
+    setIsConnected,
+    setStage
   } = useInterviewStore();
 
   // Fetch interview questions using custom hook
   const { data: questions, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
-    jobDescription: interviewData?.jobDescription || '',
-    interviewers: interviewData?.interviewers || { name: '', role: '' },
-    resume: "",
-    difficulty: "intermediate"
+    jobDescription: setupData.jobDescription,
+    interviewers: setupData.interviewer,
+    resume: setupData.resume,
+    difficulty: setupData.settings.difficulty,
+    type: setupData.settings.type
+
   });
 
   // Use the combined interview hook
-  const {
-    questionAnswers,
-    error,
-    isScoring,
-    isGettingReply,
-    currentQuestion,
-    cleanedAnswer,
-    buildingAnswer,
-    isAISpeaking,
-    audioWaveform,
-    audioDuration,
-    stopAudio
-  } = useInterview({
-    questions: questions?.questions || [],
-    jobDescription: interviewData?.jobDescription || '',
-    interviewer: interviewData?.interviewers || { name: '', role: '' },
-    difficulty: "intermediate"
-  });
+  const { questionAnswers, error, isScoring, isGettingReply, currentQuestion, cleanedAnswer, buildingAnswer, isAISpeaking, isListening, stopAudio,  } =
+    useInterview({
+      questions: questions?.questions || [],
+      jobDescription: setupData.jobDescription,
+      interviewer: setupData.interviewer,
+      resume: setupData.resume,
+      difficulty: setupData.settings.difficulty,
+      type: setupData.settings.type,
+      stopListening: isLoadingQuestions || isMuted,
+      interviewStarted
+    });
 
   // Effect to handle interview session initialization
   React.useEffect(() => {
@@ -115,7 +103,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
         <Typography component="h2" variant="h5">
           {"AI Interview Session"}
         </Typography>
-        <Button variant="outlined" onClick={onBackToSetup} startIcon={<ArrowBackIcon />} sx={{ ml: 2 }}>
+        <Button variant="outlined" onClick={() => setStage('setup')} startIcon={<ArrowBackIcon />} sx={{ ml: 2 }}>
           Back to Setup
         </Button>
       </Box>
@@ -131,22 +119,20 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
         {/* Video display section */}
         <Grid size={{ xs: 12, md: 9 }}>
           <VideoDisplay
-            isMuted={isAISpeaking}
+            isMuted={isAISpeaking || !isListening || isGettingReply || isScoring || isLoadingQuestions}
             isAISpeaking={isAISpeaking}
             isVideoOn={isVideoOn}
             isScreenSharing={isScreenSharing}
             isChatOpen={isChatOpen}
             isConnecting={isConnecting}
             isConnected={isConnected}
-            participantName={interviewData?.interviewers.name || ''}
+            participantName={setupData.interviewer.name}
             webcamRef={webcamRef as React.RefObject<Webcam>}
             onToggleMute={toggleMute}
             onToggleVideo={toggleVideo}
             onToggleScreenShare={toggleScreenShare}
             onToggleChat={toggleChat}
             onEndCall={endCall}
-            audioWaveform={audioWaveform}
-            audioDuration={audioDuration}
           />
 
           {/* Interview control buttons */}
@@ -164,14 +150,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
                 {isLoadingQuestions ? "Loading Questions..." : "Start Interview"}
               </Button>
             ) : (
-              <Button 
-                variant="outlined" 
-                color="error" 
-                size="large" 
-                onClick={handleStopInterview} 
-                startIcon={<StopIcon />} 
-                sx={{ mt: 2 }}
-              >
+              <Button variant="outlined" color="error" size="large" onClick={handleStopInterview} startIcon={<StopIcon />} sx={{ mt: 2 }}>
                 Stop Interview
               </Button>
             )}
@@ -179,7 +158,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
         </Grid>
 
         {/* Interview progress section */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        {isChatOpen && <Grid size={{ xs: 12, md: 3 }}>
           <Card
             variant="outlined"
             sx={{
@@ -249,7 +228,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
                     </Typography>
 
                     {/* Current answer display */}
-                    {(cleanedAnswer || buildingAnswer )&& (
+                    {(cleanedAnswer || buildingAnswer) && (
                       <>
                         <Divider sx={{ my: 1.5 }}>
                           <Chip label="Your Response" size="small" variant="outlined" />
@@ -265,7 +244,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
                     )}
 
                     {/* Loading indicator while scoring */}
-                    {(isScoring || isGettingReply) && (
+                    {(isScoring) && (
                       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2, gap: 1 }}>
                         <CircularProgress size={16} thickness={6} />
                         <Typography variant="caption" color="text.secondary">
@@ -399,7 +378,7 @@ export default function Interview({ onBackToSetup }: InterviewProps): React.Reac
               </Box>
             </Box>
           </Card>
-        </Grid>
+        </Grid>}
       </Grid>
     </Box>
   );

@@ -1,11 +1,6 @@
 import { create } from 'zustand';
 import { Interviewer } from '@/types/interview';
 
-interface InterviewData {
-  jobDescription: string;
-  pdfFile?: File;
-  interviewers: Interviewer;
-}
 
 interface InterviewSettings {
   type: 'technical' | 'behavioral' | 'mixed';
@@ -29,17 +24,17 @@ interface InterviewStore {
     pdfFile?: File;
     interviewer: Interviewer;
     settings: InterviewSettings;
+    resume: string;    
   };
   setJobDescription: (description: string) => void;
   setPdfFile: (file: File | undefined) => void;
+  setResume: (text: string) => void;
   setInterviewer: (interviewer: Interviewer) => void;
   setSettings: (settings: InterviewSettings) => void;
   clearSetupData: () => void;
+  setStage: (stage: 'setup' | 'interview') => void;
   
-  // Interview state
-  interviewData: InterviewData | null;
-  setInterviewData: (data: InterviewData) => void;
-  clearInterviewData: () => void;
+
 
   // Interview session state
   isMuted: boolean;
@@ -56,6 +51,7 @@ interface InterviewStore {
   error: string | null;
   isScoring: boolean;
   currentAnswer: string;
+  stage: 'setup' | 'interview';
 
   // Interview actions
   toggleMute: () => void;
@@ -92,8 +88,12 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
     jobDescription: '',
     pdfFile: undefined,
     interviewer: DEFAULT_INTERVIEWER,
-    settings: DEFAULT_SETTINGS
+    settings: DEFAULT_SETTINGS,
+    resume: ''
   },
+  setResume: (text) => set((state) => ({
+    setupData: { ...state.setupData, resume: text }
+  })),
   setJobDescription: (description) => set((state) => ({
     setupData: { ...state.setupData, jobDescription: description }
   })),
@@ -111,16 +111,15 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
       jobDescription: '',
       pdfFile: undefined,
       interviewer: DEFAULT_INTERVIEWER,
-      settings: DEFAULT_SETTINGS
+      settings: DEFAULT_SETTINGS,
+      resume: ''
     }
   })),
+  setStage: (stage) => set({ stage }),
   
-  // Interview state
-  interviewData: null,
-  setInterviewData: (data) => set({ interviewData: data }),
-  clearInterviewData: () => set({ interviewData: null }),
 
   // Interview session state
+  stage: 'setup',
   isMuted: false,
   isVideoOn: true,
   isScreenSharing: false,

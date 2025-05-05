@@ -1,6 +1,7 @@
 import { apiRequest } from "@/utils/util";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Interviewer } from "@/types/interview";
+import { convertPdfToImageArray } from "@/utils/util";
 
 interface ScoreAnswerResponse {
   score: number;
@@ -14,6 +15,9 @@ interface ScoreAnswerRequest {
   question: string;
   answer: string;
   jobDescription: string;
+  type: string;
+  difficulty: string;
+  resume: string;
 }
 
 interface GetQuestionsRequest {
@@ -21,6 +25,7 @@ interface GetQuestionsRequest {
   resume: string;
   interviewers: Interviewer;
   difficulty: string;
+  type: string;
 }
 
 export interface GetInterviewReplyRequest {
@@ -34,11 +39,30 @@ export interface GetInterviewReplyRequest {
   firstQuestion: string;
   isFirstQuestion: boolean;
   isLastAnswer: boolean;
+  type: string;
 }
 
 type GetInterviewReplyResponse = {text: string, audio: string};
 
 type GetQuestionsResponse = {questions: string[]};
+
+type ExtractResumeResponse = string;
+
+export const useExtractResume = () => {
+  return useMutation<ExtractResumeResponse, Error, File>({
+    mutationFn: async (pdfFile: File) => {
+      // Convert PDF to array of images
+      const images = await convertPdfToImageArray(pdfFile);
+      
+      // Send images to resume extraction API
+      const response = await apiRequest("interview/resume-extraction", "POST", {
+        resumeImageArray: images
+      });
+      
+      return response;
+    }
+  });
+};
 
 export const useScoreAnswer = () => {
   return useMutation<ScoreAnswerResponse, Error, ScoreAnswerRequest>({

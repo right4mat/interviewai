@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 
 interface FileUploadProps {
+  isPending: boolean;
   onFileSelect: (file: File | undefined) => void;
   selectedFile?: File;
 }
@@ -41,7 +42,7 @@ const UploadArea = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFile }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFile, isPending }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
@@ -136,7 +137,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFile }) =
       ) : (
         <Paper
           variant="outlined"
-          sx={{ p: 2, borderRadius: 1, mb: 2 }}
+          sx={{ p: 2, borderRadius: 1, mb: 2 , opacity: isPending ? 0.5 : 1}}
         >
           <Stack direction="row" spacing={2} alignItems="center">
             <PictureAsPdfIcon color="error" />
@@ -152,6 +153,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFile }) =
               size="small" 
               onClick={handleRemoveFile}
               aria-label="remove file"
+              disabled={isPending}
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -159,9 +161,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFile }) =
         </Paper>
       )}
       
-      {isUploading && (
+      {(isUploading || isPending) && (
         <Box sx={{ width: '100%', mt: 1 }}>
           <LinearProgress />
+          {isPending && (
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, textAlign: 'center' }}>
+              AI interviewer is reading your resume...
+            </Typography>
+          )}
         </Box>
       )}
     </Box>

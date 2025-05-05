@@ -15,7 +15,9 @@ const getQuestionsSchema = z.object({
     name: z.string().min(1, "Interviewer name is required"),
     role: z.string().min(1, "Interviewer role is required")
   }),
-  difficulty: z.string().optional().default("intermediate")
+  difficulty: z.string().optional().default("intermediate"),
+  type: z.string().optional().default("mixed"),
+  resume: z.string().optional().default("")
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {
@@ -32,7 +34,7 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       }, { status: 400 });
     }
 
-    const { jobDescription, resume = "", interviewers, difficulty = "intermediate" } = result.data;
+    const { jobDescription, resume, interviewers, difficulty, type} = result.data;
 
     const questionsPrompt = `
 Generate a list of interview questions for a 30-minute interview.
@@ -43,7 +45,7 @@ ${resume ? `Candidate's Resume: ${resume}` : ""}
 
 Interviewer: ${interviewers.name} (${interviewers.role})
 
-Difficulty Level: ${difficulty}
+The interview is ${type} and the difficulty is ${difficulty}.
 
 Please create a comprehensive set of questions that:
 - Are appropriate for the specified difficulty level

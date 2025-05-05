@@ -3,7 +3,6 @@ import { useGetInterviewReply, useScoreAnswer } from "@/services/openAI";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Interviewer } from "@/types/interview";
-import { getAudioWaveform } from "@/utils/util";
 
 /**
  * Interface representing a question and its corresponding answer in the interview
@@ -26,22 +25,32 @@ interface UseInterviewProps {
   questions: string[];
   jobDescription: string;
   interviewer: Interviewer;
+  resume: string;
   difficulty: string;
+  type: "technical" | "behavioral" | "mixed";
+  stopListening: boolean;
+  interviewStarted: boolean;
 }
 
 /**
  * Custom hook to manage the interview flow and state
  * Handles speech recognition, audio playback, and interaction with AI services
  */
-export const useInterview = ({ questions, jobDescription, interviewer, difficulty }: UseInterviewProps) => {
+export const useInterview = ({
+  questions,
+  jobDescription,
+  interviewer,
+  resume,
+  difficulty,
+  type,
+  stopListening,
+  interviewStarted
+}: UseInterviewProps) => {
   // Core interview state
   const [questionAnswers, setQuestionAnswers] = useState<QuestionAnswer[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(true);
   const [lastAnswerIndex, setLastAnswerIndex] = useState<number>(0);
-
-  const [audioWaveform, setAudioWaveform] = useState<number[]>([]);
-  const [audioDuration, setAudioDuration] = useState<number>(0);
 
   // Answer handling state
   const [buildingAnswer, setBuildingAnswer] = useState<string>("");
@@ -64,7 +73,7 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
   const { mutateAsync: getReplyAsync, isPending: isGettingReply } = useGetInterviewReply();
 
   // Debounced answer to prevent rapid API calls
-  const currentAnswer = useDebounce(buildingAnswer, 1000);
+  const currentAnswer = useDebounce(buildingAnswer, 2000);
 
   // Update answer index when the debounced answer changes
   useEffect(() => {
@@ -113,87 +122,94 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
     setIsAISpeaking(true);
 
     audioRef.current = new Audio(response.audio);
-    audioRef.current.onended = () => setIsAISpeaking(false);
+    audioRef.current.onended = () => {
+      setIsAISpeaking(false);
+      audioRef.current = null;
+    };
     audioRef.current.play().catch((error) => {
       console.error("Error playing audio:", error);
       setIsAISpeaking(false);
+      audioRef.current = null;
     });
   };
 
   // Main interview flow effect - handles scoring and AI replies
   useEffect(() => {
-    if (!currentQuestion || !currentAnswer || isFirstQuestion) return;
+    if (!currentQuestion || !currentAnswer || isFirstQuestion || !interviewStarted) return;
 
     console.log("scoreAndReply rendering");
 
-    const scoreAndReply = async () => {
-      try {
-        await Promise.all([
-          scoreAnswerAsync({
-            question: currentQuestion,
-            answer: currentAnswer,
-            jobDescription
-          })
-            .then(handleScoreSuccess)
-            .catch(() => setError("Failed to score answer")),
+    Promise.all([
+      scoreAnswerAsync({
+        question: currentQuestion,
+        answer: currentAnswer,
+        jobDescription,
+        type,
+        difficulty,
+        resume
+      }).then(handleScoreSuccess),
 
-          getReplyAsync({
-            jobDescription,
-            resume: "",
-            interviewers: interviewer,
-            difficulty,
-            nextQuestion,
-            currentQuestion,
-            currentAnswer: currentAnswer || "",
-            firstQuestion: firstQuestion,
-            isFirstQuestion: false,
-            isLastAnswer
-          })
-            .then(handleReplySuccess)
-            .catch(() => setError("Failed to get reply"))
-        ]);
-
+      getReplyAsync({
+        jobDescription,
+        resume,
+        interviewers: interviewer,
+        difficulty,
+        nextQuestion,
+        currentQuestion,
+        currentAnswer: currentAnswer || "",
+        firstQuestion: firstQuestion,
+        isFirstQuestion: false,
+        isLastAnswer,
+        type
+      }).then(handleReplySuccess)
+    ])
+      .then(() => {
         setCurrentQuestionIndex((prev) => prev + 1);
         lastQuestionIndex.current = currentQuestionIndex;
         setBuildingAnswer("");
         setCleanedAnswer("");
-      } catch (err) {
+      })
+      .catch((err) => {
         console.error("Error in scoreAndReply:", err);
         setError("Failed to process answer and get reply");
-      }
-    };
-
-    scoreAndReply();
-  }, [lastAnswerIndex]);
+      });
+  }, [lastAnswerIndex, interviewStarted]);
 
   // Initial interview setup and first question handling
   useEffect(() => {
-    if (!firstQuestion || !isFirstQuestion || firstReplyHasStarted.current) return;
+    if (!firstQuestion || !isFirstQuestion || firstReplyHasStarted.current || !interviewStarted) return;
 
     firstReplyHasStarted.current = true;
     setIsFirstQuestion(false);
 
-    const getFirstReply = async () => {
-      try {
-        await getReplyAsync({
-          jobDescription,
-          resume: "",
-          interviewers: interviewer,
-          difficulty,
-          nextQuestion: "",
-          currentQuestion: "",
-          currentAnswer: "",
-          firstQuestion: firstQuestion,
-          isFirstQuestion,
-          isLastAnswer: false
-        }).then(handleReplySuccess);
-      } catch (err) {
-        setError("Failed to get reply");
-      }
-    };
-
-    getFirstReply();
-  }, [currentQuestion, isAISpeaking, jobDescription, interviewer, difficulty, nextQuestion, currentAnswer, questions, isFirstQuestion]);
+    getReplyAsync({
+      jobDescription,
+      resume,
+      interviewers: interviewer,
+      difficulty,
+      nextQuestion: "",
+      currentQuestion: "",
+      currentAnswer: "",
+      firstQuestion: firstQuestion,
+      isFirstQuestion,
+      isLastAnswer: false,
+      type
+    })
+      .then(handleReplySuccess)
+      .catch(() => setError("Failed to get reply"));
+  }, [
+    currentQuestion,
+    isAISpeaking,
+    jobDescription,
+    interviewer,
+    difficulty,
+    resume,
+    nextQuestion,
+    currentAnswer,
+    questions,
+    isFirstQuestion,
+    interviewStarted
+  ]);
 
   // Speech-to-text conversion
   useEffect(() => {
@@ -216,12 +232,12 @@ export const useInterview = ({ questions, jobDescription, interviewer, difficult
       return;
     }
 
-    if (isAISpeaking && listening) {
+    if ((isAISpeaking && listening) || stopListening || !interviewStarted) {
       SpeechRecognition.stopListening();
-    } else if (!isAISpeaking && !listening && currentQuestion) {
+    } else if (!isAISpeaking && !listening && currentQuestion && !stopListening && interviewStarted) {
       SpeechRecognition.startListening({ continuous: true, language: "en-US" });
     }
-  }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion]);
+  }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion, stopListening]);
 
   /**
    * Stops current audio playback and resets speaking state
