@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import { Avatar, Box } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -6,18 +6,73 @@ interface AnimatedAvatarProps {
   participantName: string;
   isAISpeaking: boolean;
   isGettingReply: boolean;
+  volumeLevel: number;
 }
 
-export default function AnimatedAvatar({ participantName, isAISpeaking, isGettingReply }: AnimatedAvatarProps) {
-  const getRandomScale = () => {
-    return Array.from({length: 30}, () => 1.1 + Math.random() * 0.2); // Random values between 0.95 and 1.15
-  };
+export default React.memo(function AnimatedAvatar({ participantName, isAISpeaking, isGettingReply, volumeLevel }: AnimatedAvatarProps) {
+  const scaleRef = useRef(1);
+  const blurRef = useRef(5);
+  const animationFrameRef = useRef<number>(0);
+  const elementRef = useRef<HTMLDivElement>(null);
 
-  const getRandomBlur = () => {
-    return Array.from({length: 30}, () => Math.floor(10 + Math.random() * 10)); // Random values between 10px and 35px
-  };
+  useEffect(() => {
+    let lastTimestamp = 0;
+    const animationDuration = 300; // 300ms duration
+    let startScale = scaleRef.current;
+    let startBlur = blurRef.current;
 
- 
+    const animate = (timestamp: number) => {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const elapsed = timestamp - lastTimestamp;
+      const progress = Math.min(elapsed / animationDuration, 1);
+
+      if (isAISpeaking && elementRef.current) {
+        // Limit the maximum scale to prevent massive growth
+        const targetScale = 1 + volumeLevel * 0.002; // Max 30% growth
+        const targetBlur = 5 + volumeLevel * 0.02; // Max 8px blur
+
+        scaleRef.current = startScale + (targetScale - startScale) ;
+        blurRef.current = startBlur + (targetBlur - startBlur) ;
+
+        elementRef.current.style.transform = `scale(${scaleRef.current})`;
+        elementRef.current.style.filter = `blur(${blurRef.current}px)`;
+      }
+
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    if (isAISpeaking) {
+      animationFrameRef.current = requestAnimationFrame(animate);
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isAISpeaking, volumeLevel]);
+
+  const variants = useMemo(
+    () => ({
+      loading: {
+        scale: [1, 1.1, 1],
+        rotate: [0, 180, 360],
+        borderRadius: ["30%", "50%", "30%"],
+        backgroundColor: "#82b1ff",
+        filter: ["blur(10px)", "blur(20px)", "blur(10px)"]
+      },
+      listening: {
+        scale: [1, 1.03, 1],
+        rotate: [0, 180, 360],
+        borderRadius: ["45%", "50%", "45%"],
+        backgroundColor: "#82b1ff",
+        filter: ["blur(5px)", "blur(8px)", "blur(5px)"]
+      }
+    }),
+    []
+  );
 
   return (
     <Box
@@ -27,41 +82,30 @@ export default function AnimatedAvatar({ participantName, isAISpeaking, isGettin
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "#333",
-        position: "relative"
+        bgcolor: "transparent",
+        position: "relative",
+    
       }}
     >
-      {(isGettingReply || isAISpeaking) && (
-        <motion.div
-          animate={
-            isAISpeaking ? {
-              scale: getRandomScale(),
-              filter: getRandomBlur().map(blur => `blur(${blur}px)`),
-              backgroundColor: "#82b1ff",
-              borderRadius: "50%",
-              opacity: 0.3,
-            } : {
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360],
-              borderRadius: ["20%", "50%", "20%"],
-              backgroundColor: ["#1976d2", "#2196f3", "#1976d2"],
-              filter: ["blur(20px)", "blur(35px)", "blur(20px)"],
-            }
-          }
-          transition={{
-            duration: isAISpeaking ? 3 : 2,
-            ease: "linear",
-            repeat: Infinity,
-            times: isAISpeaking ? Array.from({length: 30}, (_, i) => i / 29) : undefined
-          }}
-          style={{
-            position: "absolute",
-            width: 120,
-            height: 120,
-            opacity: 0.9,
-          }}
-        />
-      )}
+      <motion.div
+        ref={elementRef}
+        variants={variants}
+        animate={isAISpeaking ? undefined : isGettingReply ? "loading" : "listening"}
+        transition={{
+          duration: isAISpeaking ? 1 : isGettingReply ? 3 : 4,
+          ease: "easeInOut",
+          repeat: Infinity,
+          times: isAISpeaking ? undefined : [0, 0.5, 1]
+        }}
+        style={{
+          backgroundColor: "#82b1ff",
+          position: "absolute",
+          width: 120,
+          height: 120,
+          opacity: isGettingReply ? 0.9 : 0.5,
+          borderRadius: "50%"
+        }}
+      />
       <Avatar
         component={motion.div}
         sx={{
@@ -75,4 +119,4 @@ export default function AnimatedAvatar({ participantName, isAISpeaking, isGettin
       </Avatar>
     </Box>
   );
-}
+});

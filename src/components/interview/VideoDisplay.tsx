@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
 import VideoControls from "./VideoControls";
 import AnimatedAvatar from "./AnimatedAvatar";
+import { useColorScheme, useTheme } from "@mui/material/styles";
 
 interface VideoDisplayProps {
   isMuted: boolean;
@@ -17,6 +18,7 @@ interface VideoDisplayProps {
   webcamRef: React.RefObject<Webcam>;
   isAISpeaking: boolean;
   isGettingReply: boolean;
+  volumeLevel: number;
   onToggleMute: () => void;
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
@@ -34,13 +36,17 @@ export default function VideoDisplay({
   participantName,
   webcamRef,
   isAISpeaking,
-  isGettingReply,
+  isGettingReply, 
+  volumeLevel,
   onToggleMute,
   onToggleVideo,
   onToggleScreenShare,
   onToggleChat,
   onEndCall,
 }: VideoDisplayProps): React.ReactElement {
+  const { mode } = useColorScheme();
+  const isDarkMode = mode === 'dark';
+
   return (
     <Card 
       variant="outlined"
@@ -49,12 +55,13 @@ export default function VideoDisplay({
         display: "flex", 
         flexDirection: "column",
         position: "relative",
-        bgcolor: "#000"
+        //bgcolor: isDarkMode ? "#000" : "#f5f5f5"
       }}
     >
       {/* Main AI Avatar */}
-      <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+      <Box sx={{ position: "relative", width: "100%", height: "100%", bgcolor: isDarkMode ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.6)" }}>
         <AnimatedAvatar
+          volumeLevel={volumeLevel}
           isGettingReply={isGettingReply}
           participantName={participantName}
           isAISpeaking={isAISpeaking}
@@ -70,7 +77,7 @@ export default function VideoDisplay({
             height: "150px",
             borderRadius: 2,
             overflow: "hidden",
-            border: "2px solid rgba(255,255,255,0.2)"
+            border: `2px solid ${isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`
           }}
         >
           {isVideoOn ? (
@@ -82,8 +89,8 @@ export default function VideoDisplay({
               screenshotFormat="image/jpeg"
             />
           ) : (
-            <Box sx={{ width: "100%", height: "100%", bgcolor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Typography sx={{ color: "white" }}>Camera Off</Typography>
+            <Box sx={{ width: "100%", height: "100%", bgcolor: isDarkMode ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Typography sx={{ color: isDarkMode ? "white" : "black" }}>Camera Off</Typography>
             </Box>
           )}
         </Box>
@@ -106,8 +113,8 @@ export default function VideoDisplay({
           position: "absolute", 
           bottom: 10, 
           left: 10,
-          color: "white",
-          bgcolor: "rgba(0,0,0,0.5)",
+          color: isDarkMode ? "white" : "black",
+          bgcolor: isDarkMode ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.8)",
           padding: "2px 8px",
           borderRadius: 1
         }}

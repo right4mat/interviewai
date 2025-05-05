@@ -59,11 +59,14 @@ export const useInterview = ({
   // UI state
   const [error, setError] = useState<string | null>(null);
   const [isAISpeaking, setIsAISpeaking] = useState<boolean>(false);
+  const [volumeLevel, setVolumeLevel] = useState<number>(0);
 
   // Persistent refs
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const firstReplyHasStarted = useRef<boolean>(false);
   const lastQuestionIndex = useRef<number>(-1);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
 
   // Speech recognition configuration
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
@@ -125,11 +128,41 @@ export const useInterview = ({
     audioRef.current.onended = () => {
       setIsAISpeaking(false);
       audioRef.current = null;
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      setVolumeLevel(0);
     };
-    audioRef.current.play().catch((error) => {
-      console.error("Error playing audio:", error);
-      setIsAISpeaking(false);
-      audioRef.current = null;
+
+    // Set up audio analysis
+    audioContextRef.current = new window.AudioContext();
+    analyserRef.current = audioContextRef.current.createAnalyser();
+    analyserRef.current.fftSize = 256;
+
+    const source = audioContextRef.current.createMediaElementSource(audioRef.current);
+    source.connect(analyserRef.current);
+    analyserRef.current.connect(audioContextRef.current.destination);
+
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+
+    const updateVolume = () => {
+      if (analyserRef.current) {
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        setVolumeLevel(avg);
+        requestAnimationFrame(updateVolume);
+      }
+    };
+
+    audioContextRef.current.resume().then(() => {
+      audioRef.current?.play().catch((error) => {
+        console.error("Error playing audio:", error);
+        setIsAISpeaking(false);
+        audioRef.current = null;
+        setVolumeLevel(0);
+      });
+      updateVolume();
     });
   };
 
@@ -232,12 +265,12 @@ export const useInterview = ({
       return;
     }
 
-    if ((isAISpeaking && listening) || stopListening || !interviewStarted) {
+    if ((isAISpeaking || !interviewStarted) && listening) {
       SpeechRecognition.stopListening();
-    } else if (!isAISpeaking && !listening && currentQuestion && !stopListening && interviewStarted) {
+    } else if (!isAISpeaking && currentQuestion  && interviewStarted) {
       SpeechRecognition.startListening({ continuous: true, language: "en-US" });
     }
-  }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion, stopListening]);
+  }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion, interviewStarted]);
 
   /**
    * Stops current audio playback and resets speaking state
@@ -247,7 +280,12 @@ export const useInterview = ({
       audioRef.current.pause();
       audioRef.current = null;
     }
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
     setIsAISpeaking(false);
+    setVolumeLevel(0);
   };
 
   return {
@@ -260,6 +298,8 @@ export const useInterview = ({
     isListening: listening,
     isAISpeaking,
     buildingAnswer,
-    stopAudio
+    stopAudio,
+    volumeLevel,
+    currentQuestionIndex
   };
 };
