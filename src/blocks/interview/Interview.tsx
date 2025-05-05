@@ -1,7 +1,7 @@
 "use client";
 // Import necessary React and Material-UI components
 import * as React from "react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import {  useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -12,27 +12,16 @@ import Button from "@mui/material/Button";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CircularProgress from "@mui/material/CircularProgress";
-import Alert from "@mui/material/Alert";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Paper from "@mui/material/Paper";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
-import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import Avatar from "@mui/material/Avatar";
-import Fade from "@mui/material/Fade";
-import { alpha, Card, LinearProgress } from "@mui/material";
+import {  LinearProgress } from "@mui/material";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useInterview } from "@/hooks/useInterview";
 import InterviewProgress from "@/components/interview/InterviewProgress";
 import { brand } from "@/theme/themePrimitives";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 
 export default function Interview(): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
+  const [showEndCallDialog, setShowEndCallDialog] = useState(false);
   const {
     isMuted,
     setupData,
@@ -110,6 +99,19 @@ export default function Interview(): React.ReactElement {
     stopAudio();
   };
 
+  const handleEndCall = () => {
+    setShowEndCallDialog(true);
+  };
+
+  const handleConfirmEndCall = () => {
+    setShowEndCallDialog(false);
+    endCall();
+  };
+
+  const handleCancelEndCall = () => {
+    setShowEndCallDialog(false);
+  };
+
   // Render the interview interface
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
@@ -125,7 +127,7 @@ export default function Interview(): React.ReactElement {
         </Box>
         <LinearProgress
           variant="determinate"
-          value={(currentQuestionIndex) / (questions?.questions?.length || 0) * 100}
+          value={isLoadingQuestions ? 0 : (currentQuestionIndex) / (questions?.questions?.length || 0) * 100}
           sx={{
             width: "100%",
             height: 8,
@@ -140,6 +142,17 @@ export default function Interview(): React.ReactElement {
       </Box>
 
       
+
+      <ConfirmationDialog
+        open={showEndCallDialog}
+        title="End Interview"
+        message="Are you sure you want to end this interview? This action cannot be undone."
+        confirmLabel="End Interview"
+        cancelLabel="Continue Interview"
+        onConfirm={handleConfirmEndCall}
+        onCancel={handleCancelEndCall}
+        confirmColor="error"
+      />
 
       <Grid container spacing={3}>
         {/* Video display section */}
@@ -158,7 +171,7 @@ export default function Interview(): React.ReactElement {
             onToggleVideo={toggleVideo}
             onToggleScreenShare={toggleScreenShare}
             onToggleChat={toggleChat}
-            onEndCall={endCall}
+            onEndCall={handleEndCall}
             isGettingReply={isGettingReply}
             volumeLevel={volumeLevel}
           />
@@ -197,6 +210,8 @@ export default function Interview(): React.ReactElement {
               buildingAnswer={buildingAnswer}
               isScoring={isScoring}
               questionAnswers={questionAnswers}
+              started={interviewStarted}
+              finished={currentQuestionIndex >= (questions?.questions?.length || 999)}
             />
           </Grid>
         )}

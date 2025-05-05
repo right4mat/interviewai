@@ -123,7 +123,7 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
   isMuted: false,
   isVideoOn: true,
   isScreenSharing: false,
-  isChatOpen: false,
+  isChatOpen: true,
   isConnecting: false,
   isConnected: false,
   interviewStarted: false,

@@ -17,7 +17,6 @@ const getQuestionsSchema = z.object({
   }),
   difficulty: z.string().optional().default("intermediate"),
   type: z.string().optional().default("mixed"),
-  resume: z.string().optional().default("")
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {

@@ -12,11 +12,9 @@ import CallEndIcon from "@mui/icons-material/CallEnd";
 interface VideoControlsProps {
   isMuted: boolean;
   isVideoOn: boolean;
-  isScreenSharing: boolean;
   isChatOpen: boolean;
   onToggleMute: () => void;
   onToggleVideo: () => void;
-  onToggleScreenShare: () => void;
   onToggleChat: () => void;
   onEndCall: () => void;
 }
@@ -24,11 +22,9 @@ interface VideoControlsProps {
 export default function VideoControls({
   isMuted,
   isVideoOn,
-  isScreenSharing,
   isChatOpen,
   onToggleMute,
   onToggleVideo,
-  onToggleScreenShare,
   onToggleChat,
   onEndCall,
 }: VideoControlsProps): React.ReactElement {
@@ -68,16 +64,7 @@ export default function VideoControls({
         {isVideoOn ? <VideocamIcon /> : <VideocamOffIcon />}
       </IconButton>
       
-      <IconButton 
-        onClick={onToggleScreenShare}
-        sx={{ 
-          bgcolor: isScreenSharing ? "primary.main" : "rgba(255,255,255,0.2)",
-          color: "white",
-          "&:hover": { bgcolor: isScreenSharing ? "primary.dark" : "rgba(255,255,255,0.3)" }
-        }}
-      >
-        <ScreenShareIcon />
-      </IconButton>
+
       
       <IconButton 
         onClick={onToggleChat}
