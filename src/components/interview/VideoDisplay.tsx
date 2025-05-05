@@ -16,6 +16,7 @@ interface VideoDisplayProps {
   participantName: string;
   webcamRef: React.RefObject<Webcam>;
   isAISpeaking: boolean;
+  isGettingReply: boolean;
   onToggleMute: () => void;
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
@@ -33,6 +34,7 @@ export default function VideoDisplay({
   participantName,
   webcamRef,
   isAISpeaking,
+  isGettingReply,
   onToggleMute,
   onToggleVideo,
   onToggleScreenShare,
@@ -53,6 +55,7 @@ export default function VideoDisplay({
       {/* Main AI Avatar */}
       <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
         <AnimatedAvatar
+          isGettingReply={isGettingReply}
           participantName={participantName}
           isAISpeaking={isAISpeaking}
         />

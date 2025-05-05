@@ -119,7 +119,7 @@ export default function Interview(): React.ReactElement {
         {/* Video display section */}
         <Grid size={{ xs: 12, md: 9 }}>
           <VideoDisplay
-            isMuted={isAISpeaking || !isListening || isGettingReply || isScoring || isLoadingQuestions}
+            isMuted={isAISpeaking || !isListening || isGettingReply || isScoring || isLoadingQuestions || !interviewStarted}
             isAISpeaking={isAISpeaking}
             isVideoOn={isVideoOn}
             isScreenSharing={isScreenSharing}
@@ -133,6 +133,7 @@ export default function Interview(): React.ReactElement {
             onToggleScreenShare={toggleScreenShare}
             onToggleChat={toggleChat}
             onEndCall={endCall}
+            isGettingReply={isGettingReply}
           />
 
           {/* Interview control buttons */}
@@ -199,8 +200,35 @@ export default function Interview(): React.ReactElement {
                 gap: 2
               }}
             >
-              {/* Current question display */}
-              {currentQuestion && (
+              {/* Current question or thinking indicator */}
+              {isGettingReply ? (
+                <Fade in>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      border: "1px solid",
+                      borderColor: "primary.light",
+                      borderLeft: "4px solid",
+                      borderLeftColor: "primary.main",
+                      bgcolor: "background.paper",
+                      position: "relative",
+                      overflow: "hidden"
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <Avatar sx={{ width: 28, height: 28, bgcolor: "primary.main", fontSize: "0.875rem" }}>AI</Avatar>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <CircularProgress size={16} thickness={6} />
+                        <Typography variant="body1">
+                          Thinking...
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Paper>
+                </Fade>
+              ) : currentQuestion && (
                 <Fade in={!!currentQuestion}>
                   <Paper
                     elevation={3}
