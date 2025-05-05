@@ -17,6 +17,12 @@ const getQuestionsSchema = z.object({
   }),
   difficulty: z.string().optional().default("intermediate"),
   type: z.string().optional().default("mixed"),
+  questionAnswers: z.array(z.object({
+    question: z.string(),
+    score: z.number().optional(),
+    reasoning: z.string().optional(), 
+    cleanedAnswer: z.string().optional(),
+  }))
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {
@@ -33,55 +39,55 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       }, { status: 400 });
     }
 
-    const { jobDescription, resume, interviewers, difficulty, type} = result.data;
+    const { jobDescription, questionAnswers } = result.data;
 
-    const questionsPrompt = `
-Generate a list of interview questions for a 30-minute interview.
+    const totalScore = questionAnswers.reduce((sum, qa) => sum + (qa.score || 0), 0);
+    const averageScore = totalScore / questionAnswers.length;
+
+    const reviewPrompt = `
+Please provide a critical review (max 200 words) of this interview performance.
 
 Job Description: ${jobDescription}
 
-${resume ? `Candidate's Resume: ${resume}` : ""}
+Questions and Answers:
+${questionAnswers.map(qa => `
+Question: ${qa.question}
+Answer: ${qa.cleanedAnswer || 'No answer provided'}
+Score: ${qa.score || 0}/100
+Feedback: ${qa.reasoning || 'No feedback provided'}`).join('\n')}
 
-Interviewer: ${interviewers.name} (${interviewers.role})
+Average Score: ${averageScore}/100
 
-The interview is ${type} and the difficulty is ${difficulty}.
-
-Please create a comprehensive set of questions that:
-- Are appropriate for the specified difficulty level
-- Assess the candidate's fit for the role based on the job description
-- ${resume ? "Consider the candidate's background from their resume" : ""}
-- Include a mix of behavioral, technical, and role-specific questions
-- Can be reasonably answered within a 30-minute interview (typically 8-12 questions)
-- Progress in a logical order from introductory to more complex topics
-
-Return ONLY an array of questions in this exact format:
-["Question 1?", "Question 2?", "Question 3?", etc.]
-Do not include any other text or formatting.
+Provide a balanced review that:
+- Evaluates overall performance
+- Highlights key strengths
+- Identifies areas for improvement
+- Considers alignment with the job requirements
+- Makes specific recommendations
 `;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are an expert interview question generator who creates tailored questions based on job descriptions and candidate resumes." },
-        { role: "user", content: questionsPrompt }
+        { role: "system", content: "You are an expert interviewer who provides balanced, constructive interview feedback." },
+        { role: "user", content: reviewPrompt }
       ],
       temperature: 0.7,
-      max_tokens: 300
+      max_tokens: 400
     });
 
-    const responseContent = response.choices[0].message.content?.trim() || '';
-    
-    // Parse the response string into an array
-    const questions = JSON.parse(responseContent);
+    const review = response.choices[0].message.content?.trim() || '';
     
     return NextResponse.json({ 
-      status: "success", 
+      status: "success",
       data: {
-        questions: questions
+        review,
+        averageScore,
+        totalScore,
       }
     });
   } catch (error) {
-    console.error("Error generating interview questions:", error);
-    return NextResponse.json({ error: "Failed to generate interview questions" }, { status: 500 });
+    console.error("Error generating interview review:", error);
+    return NextResponse.json({ error: "Failed to generate interview review" }, { status: 500 });
   }
 });

@@ -48,6 +48,29 @@ type GetQuestionsResponse = {questions: string[]};
 
 type ExtractResumeResponse = string;
 
+interface ReviewInterviewRequest {
+  jobDescription: string;
+  resume?: string;
+  interviewers: Interviewer;
+  difficulty?: string;
+  type?: string;
+  questionAnswers: Array<{
+    question: string;
+    score?: number;
+    reasoning?: string;
+    cleanedAnswer?: string;
+  }>;
+}
+
+interface ReviewInterviewResponse {
+  status: string;
+  data: {
+    review: string;
+    averageScore: number;
+    totalScore: number;
+  };
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, File>({
     mutationFn: async (pdfFile: File) => {
@@ -90,5 +113,16 @@ export const useGetInterviewReply = () => {
       const response = await apiRequest("interview/reply", "POST", variables);
       return response;
     }
+  });
+};
+
+export const useReviewInterview = (params: ReviewInterviewRequest) => {
+  return useQuery<ReviewInterviewResponse, Error>({
+    queryKey: ["interviewReview", params],
+    queryFn: async () => {
+      const response = await apiRequest("interview/review-interview", "POST", params);
+      return response;
+    },
+    enabled: !!params.jobDescription && !!params.interviewers && !!params.questionAnswers.length
   });
 };

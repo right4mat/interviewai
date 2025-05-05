@@ -112,7 +112,11 @@ export default React.memo(function AnimatedAvatar({ participantName, isAISpeakin
           width: 120,
           height: 120,
           fontSize: "3rem",
-          zIndex: 1
+          zIndex: 1,
+          bgcolor: "primary.main",
+          color: "primary.contrastText",
+          opacity: 0.8
+
         }}
       >
         {participantName.charAt(0)}

@@ -37,6 +37,120 @@ interface InterviewProgressProps {
   finished: boolean;
 }
 
+const StatusPaper = ({ children, color = "primary" }: { children: React.ReactNode, color?: "primary" | "success" }) => (
+  <Fade in>
+    <Paper
+      elevation={3}
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: `${color}.light`,
+        borderLeft: "4px solid",
+        borderLeftColor: `${color}.main`,
+        bgcolor: "background.paper",
+        position: "relative",
+        overflow: "hidden"
+      }}
+    >
+      {children}
+    </Paper>
+  </Fade>
+);
+
+const ScoreCircle = ({ score }: { score?: number }) => (
+  <Box sx={{ position: "relative", display: "inline-flex" }}>
+    <CircularProgress
+      variant="determinate"
+      value={score || 0}
+      size={50}
+      thickness={4}
+      sx={{
+        color: score && score > 70 ? "success.main" : score && score > 40 ? "warning.main" : "error.main",
+      }}
+    />
+    <Box
+      sx={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <Typography variant="caption" component="div" sx={{ fontWeight: "bold" }}>
+        {score}
+      </Typography>
+    </Box>
+  </Box>
+);
+
+const QuestionHistory = ({ qa, index }: { qa: QuestionAnswer, index: number }) => (
+  <Accordion
+    sx={{
+      width: "100%",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+      borderRadius: "8px !important",
+      "&:before": { display: "none" },
+      mb: 1.5
+    }}
+  >
+    <AccordionSummary
+      expandIcon={<ExpandMoreIcon />}
+      sx={{
+        borderRadius: "8px",
+        "&.Mui-expanded": {
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          display: "flex",
+          flexDirection: "column"
+        }
+      }}
+    >
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Question</Typography>
+        <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 500, flex: 1, mr: 1 }}>
+            {qa.questionSummary}
+          </Typography>
+          <ScoreCircle score={qa.score} />
+        </Box>
+      </Box>
+    </AccordionSummary>
+    <AccordionDetails sx={{ px: 2, py: 1.5, bgcolor: "background.default", borderBottomLeftRadius: "8px", borderBottomRightRadius: "8px" }}>
+      <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>Your Answer:</Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}>
+        {qa.answer}
+      </Typography>
+
+      {qa.reasoning && (
+        <>
+          <Divider sx={{ my: 1.5 }}>
+            <Chip icon={<AssessmentIcon fontSize="small" />} label="Feedback" size="small" color="primary" variant="outlined" />
+          </Divider>
+          <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.secondary", pl: 1 }}>
+            {qa.reasoning}
+          </Typography>
+        </>
+      )}
+
+      {qa.modelAnswer && (
+        <>
+          <Divider sx={{ my: 1.5 }}>
+            <Chip icon={<QuestionAnswerIcon fontSize="small" />} label="Model Answer" size="small" color="success" variant="outlined" />
+          </Divider>
+          <Typography variant="body2" sx={{ color: "success.light", pl: 1, borderLeft: "2px solid", borderColor: "success.light", py: 0.5 }}>
+            {qa.modelAnswer}
+          </Typography>
+        </>
+      )}
+    </AccordionDetails>
+  </Accordion>
+);
+
 export default function InterviewProgress({
   isGettingReply,
   currentQuestion,
@@ -48,16 +162,11 @@ export default function InterviewProgress({
   finished
 }: InterviewProgressProps): React.ReactElement {
   const questionsContainerRef = React.useRef<HTMLDivElement>(null);
-
   const reversedQuestionAnswers = useMemo(() => [...questionAnswers].reverse(), [questionAnswers]);
 
-  // Scroll to top when new questions are added
   React.useEffect(() => {
     if (questionsContainerRef.current) {
-      questionsContainerRef.current.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      questionsContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [questionAnswers.length]);
 
@@ -74,7 +183,6 @@ export default function InterviewProgress({
         overflow: "hidden"
       }}
     >
-      {/* Progress header */}
       <Box
         sx={{
           p: 2,
@@ -86,284 +194,72 @@ export default function InterviewProgress({
         }}
       >
         <QuestionAnswerIcon />
-        <Typography variant="h6" sx={{ fontWeight: 500 }}>
-          Interview Progress
-        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 500 }}>Interview Progress</Typography>
       </Box>
 
-      {/* Questions and answers display */}
-      <Box
-        sx={{
-          flex: 1,
-          overflow: "auto",
-          display: "flex",
-          flexDirection: "column",
-          p: 2,
-          gap: 2
-        }}
-      >
-        {/* Not started state */}
+      <Box sx={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column", p: 2, gap: 2 }}>
         {!started && (
-          <Fade in>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                border: "1px solid",
-                borderColor: "primary.light",
-                borderLeft: "4px solid",
-                borderLeftColor: "primary.main",
-                bgcolor: "background.paper",
-                position: "relative",
-                overflow: "hidden"
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Avatar sx={{ width: 28, height: 28, bgcolor: "primary.main", fontSize: "0.875rem" }}>AI</Avatar>
-                <Typography variant="body1">
-                  Press the start button to begin your interview
-                </Typography>
-              </Box>
-            </Paper>
-          </Fade>
+          <StatusPaper>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Avatar sx={{ width: 28, height: 28, bgcolor: "primary.main", fontSize: "0.875rem" }}>AI</Avatar>
+              <Typography variant="body1">Press the start button to begin your interview</Typography>
+            </Box>
+          </StatusPaper>
         )}
 
-        {/* Finished state */}
         {finished && (
-          <Fade in>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                border: "1px solid",
-                borderColor: "success.light",
-                borderLeft: "4px solid",
-                borderLeftColor: "success.main",
-                bgcolor: "background.paper",
-                position: "relative",
-                overflow: "hidden"
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Avatar sx={{ width: 28, height: 28, bgcolor: "success.main", fontSize: "0.875rem" }}>AI</Avatar>
-                <Typography variant="body1" color="success.main" sx={{ fontWeight: 500 }}>
-                  Interview Complete!
-                </Typography>
-              </Box>
-            </Paper>
-          </Fade>
+          <StatusPaper color="success">
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Avatar sx={{ width: 28, height: 28, bgcolor: "success.main", fontSize: "0.875rem" }}>AI</Avatar>
+              <Typography variant="body1" color="success.main" sx={{ fontWeight: 500 }}>Interview Complete!</Typography>
+            </Box>
+          </StatusPaper>
         )}
 
-        {/* Current question or thinking indicator */}
-        {started && !finished && (isGettingReply ? (
-          <Fade in>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                border: "1px solid",
-                borderColor: "primary.light",
-                borderLeft: "4px solid",
-                borderLeftColor: "primary.main",
-                bgcolor: "background.paper",
-                position: "relative",
-                overflow: "hidden"
-              }}
-            >
+        {started && !finished && (
+          isGettingReply ? (
+            <StatusPaper>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Avatar sx={{ width: 28, height: 28, bgcolor: "primary.main", fontSize: "0.875rem" }}>AI</Avatar>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={16} thickness={6} />
-                  <Typography variant="body1">
-                    Thinking...
-                  </Typography>
+                  <Typography variant="body1">Thinking...</Typography>
                 </Box>
               </Box>
-            </Paper>
-          </Fade>
-        ) : currentQuestion && (
-          <Fade in={!!currentQuestion}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                border: "1px solid",
-                borderColor: "primary.light",
-                borderLeft: "4px solid",
-                borderLeftColor: "primary.main",
-                bgcolor: "background.paper",
-                position: "relative",
-                overflow: "hidden"
-              }}
-            >
+            </StatusPaper>
+          ) : currentQuestion && (
+            <StatusPaper>
               <Box sx={{ display: "flex", alignItems: "center", mb: 1.5, gap: 1 }}>
                 <Avatar sx={{ width: 28, height: 28, bgcolor: "primary.main", fontSize: "0.875rem" }}>AI</Avatar>
-                <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 600 }}>
-                  Current Question:
-                </Typography>
+                <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 600 }}>Current Question:</Typography>
               </Box>
 
-              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
-                {currentQuestion}
-              </Typography>
+              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>{currentQuestion}</Typography>
 
-              {/* Current answer display */}
               {(cleanedAnswer || buildingAnswer) && (
                 <>
                   <Divider sx={{ my: 1.5 }}>
                     <Chip label="Your Response" size="small" variant="outlined" />
                   </Divider>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}
-                  >
+                  <Typography variant="body2" color="text.secondary" sx={{ pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}>
                     {cleanedAnswer || buildingAnswer}
                   </Typography>
                 </>
               )}
 
-              {/* Loading indicator while scoring */}
-              {(isScoring) && (
+              {isScoring && (
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2, gap: 1 }}>
                   <CircularProgress size={16} thickness={6} />
-                  <Typography variant="caption" color="text.secondary">
-                    Analyzing your response...
-                  </Typography>
+                  <Typography variant="caption" color="text.secondary">Analyzing your response...</Typography>
                 </Box>
               )}
-            </Paper>
-          </Fade>
-        ))}
+            </StatusPaper>
+          )
+        )}
 
-        {/* Previous questions and answers history */}
-        <Box 
-          ref={questionsContainerRef}
-          sx={{ flex: 1, overflow: "auto", maxHeight: "60vh" }}
-        >
+        <Box ref={questionsContainerRef} sx={{ flex: 1, overflow: "auto", maxHeight: "60vh" }}>
           {reversedQuestionAnswers.map((qa, index) => (
-            <Accordion
-              key={index}
-              sx={{
-                width: "100%",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                borderRadius: "8px !important",
-                "&:before": { display: "none" },
-                mb: 1.5
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={`chat-panel${index}-content`}
-                id={`chat-panel${index}-header`}
-                sx={{
-                  borderRadius: "8px",
-                  "&.Mui-expanded": {
-                    borderBottomLeftRadius: 0,
-                    borderBottomRightRadius: 0,
-                    display: "flex",
-                    flexDirection: "column"
-                  }
-                }}
-              >
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, flex: 1, mr: 1 }}>
-                    Question
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 500, flex: 1, mr: 1 }}>
-                      {qa.questionSummary}
-                    </Typography>
-                    <Box sx={{ position: "relative", display: "inline-flex" }}>
-                      <CircularProgress
-                        variant="determinate"
-                        value={qa.score || 0}
-                        size={50}
-                        thickness={4}
-                    
-                        sx={{
-                          strokeColor: "primary.main",
-                          color:
-                            qa.score && qa.score > 70 ? "success.main" : qa.score && qa.score > 40 ? "warning.main" : "error.main",
-                  
-                        }}
-                      />
-                      <Box
-                        sx={{
-                          top: 0,
-                          left: 0,
-                          bottom: 0,
-                          right: 0,
-                          position: "absolute",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}
-                      >
-                        <Typography variant="caption" component="div" sx={{ fontWeight: "bold" }}>
-                          {qa.score}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{ px: 2, py: 1.5, bgcolor: "background.default", borderBottomLeftRadius: "8px", borderBottomRightRadius: "8px" }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-                  Your Answer:
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2, pl: 1, borderLeft: "2px solid", borderColor: "divider", py: 0.5 }}
-                >
-                  {qa.answer}
-                </Typography>
-
-                {qa.reasoning && (
-                  <>
-                    <Divider sx={{ my: 1.5 }}>
-                      <Chip
-                        icon={<AssessmentIcon fontSize="small" />}
-                        label="Feedback"
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                      />
-                    </Divider>
-                    <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.secondary", pl: 1 }}>
-                      {qa.reasoning}
-                    </Typography>
-                  </>
-                )}
-
-                {qa.modelAnswer && (
-                  <>
-                    <Divider sx={{ my: 1.5 }}>
-                      <Chip
-                        icon={<QuestionAnswerIcon fontSize="small" />}
-                        label="Model Answer"
-                        size="small"
-                        color="success"
-                        variant="outlined"
-                      />
-                    </Divider>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "success.light", pl: 1, borderLeft: "2px solid", borderColor: "success.light", py: 0.5 }}
-                    >
-                      {qa.modelAnswer}
-                    </Typography>
-                  </>
-                )}
-              </AccordionDetails>
-            </Accordion>
+            <QuestionHistory key={index} qa={qa} index={index} />
           ))}
         </Box>
       </Box>

@@ -18,10 +18,12 @@ import { useInterview } from "@/hooks/useInterview";
 import InterviewProgress from "@/components/interview/InterviewProgress";
 import { brand } from "@/theme/themePrimitives";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import ReviewDialog from "@/components/interview/ReviewDialog";
 
 export default function Interview(): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
   const [showEndCallDialog, setShowEndCallDialog] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
   const {
     isMuted,
     setupData,
@@ -77,8 +79,6 @@ export default function Interview(): React.ReactElement {
     interviewStarted
   });
 
-
-
   // Effect to handle interview session initialization
   React.useEffect(() => {
     if (questions && interviewStarted && !isConnected && !isConnecting) {
@@ -87,6 +87,13 @@ export default function Interview(): React.ReactElement {
       setIsConnecting(false);
     }
   }, [questions, isConnecting, interviewStarted, isConnected, setIsConnecting, setIsConnected]);
+
+  // Effect to show review dialog when interview finishes
+  React.useEffect(() => {
+    if (currentQuestionIndex >= (questions?.questions?.length || 999) && interviewStarted) {
+      setShowReviewDialog(true);
+    }
+  }, [currentQuestionIndex, questions?.questions?.length, interviewStarted]);
 
   const handleStartInterview = () => {
     if (!isLoadingQuestions && questions?.questions?.length) {
@@ -110,6 +117,11 @@ export default function Interview(): React.ReactElement {
 
   const handleCancelEndCall = () => {
     setShowEndCallDialog(false);
+  };
+
+  const handleCloseReview = () => {
+    setShowReviewDialog(false);
+    setStage("setup");
   };
 
   // Render the interview interface
@@ -141,8 +153,6 @@ export default function Interview(): React.ReactElement {
         />
       </Box>
 
-      
-
       <ConfirmationDialog
         open={showEndCallDialog}
         title="End Interview"
@@ -152,6 +162,15 @@ export default function Interview(): React.ReactElement {
         onConfirm={handleConfirmEndCall}
         onCancel={handleCancelEndCall}
         confirmColor="error"
+      />
+
+      <ReviewDialog
+        open={showReviewDialog}
+        onClose={handleCloseReview}
+        questionAnswers={questionAnswers}
+        jobDescription={setupData.jobDescription}
+        interviewers={setupData.interviewer}
+        resume={setupData.resume}
       />
 
       <Grid container spacing={3}>
@@ -172,7 +191,7 @@ export default function Interview(): React.ReactElement {
             onToggleScreenShare={toggleScreenShare}
             onToggleChat={toggleChat}
             onEndCall={handleEndCall}
-            isGettingReply={isGettingReply}
+            isGettingReply={isGettingReply || isLoadingQuestions}
             volumeLevel={volumeLevel}
           />
 
@@ -204,7 +223,7 @@ export default function Interview(): React.ReactElement {
         {isChatOpen && (
           <Grid size={{ xs: 12, md: 3 }}>
             <InterviewProgress
-              isGettingReply={isGettingReply}
+              isGettingReply={isGettingReply || isLoadingQuestions}
               currentQuestion={currentQuestion}
               cleanedAnswer={cleanedAnswer}
               buildingAnswer={buildingAnswer}

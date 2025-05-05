@@ -99,11 +99,9 @@ export default function VideoDisplay({
       <VideoControls
         isMuted={isMuted}
         isVideoOn={isVideoOn}
-        isScreenSharing={isScreenSharing}
         isChatOpen={isChatOpen}
         onToggleMute={onToggleMute}
         onToggleVideo={onToggleVideo}
-        onToggleScreenShare={onToggleScreenShare}
         onToggleChat={onToggleChat}
         onEndCall={onEndCall}
       />
@@ -119,8 +117,8 @@ export default function VideoDisplay({
           borderRadius: 1
         }}
       >
-        {participantName} (You) {isConnecting && "- Connecting..."}
-        {isConnected && "- Connected"}
+        {isConnecting && "Connecting..."}
+        {isConnected && "Connected"}
       </Typography>
     </Card>
   );
