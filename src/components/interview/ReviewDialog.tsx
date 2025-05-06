@@ -29,6 +29,7 @@ interface ReviewDialogProps {
   resume: string;
   type: string;
   difficulty: string;
+
 }
 
 export default function ReviewDialog({
@@ -90,15 +91,15 @@ export default function ReviewDialog({
       </DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 4, textAlign: "center" }}>
-          <Typography variant="h2" component="div" sx={{ color: getScoreColor(data?.data.averageScore || 0), mb: 1 }}>
-            {Math.round(data?.data.averageScore || 0)}%
+          <Typography variant="h2" component="div" sx={{ color: getScoreColor(data?.data?.averageScore || 0), mb: 1 }}>
+            {Math.round(data?.data?.averageScore || 0)}%
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {data?.data.totalScore} points total
+            {data?.data?.totalScore} points total
           </Typography>
         </Box>
 
-        {data?.data.review && (
+        {data?.data?.review && (
           <Box sx={{ mb: 4 }}>
             <Typography variant="h6" gutterBottom>
               Overall Review

@@ -288,6 +288,27 @@ export const useInterview = ({
     setVolumeLevel(0);
   };
 
+  /**
+   * Skips the current question and moves to the next one
+   */
+  const skipQuestion = () => {
+    const skippedAnswer: QuestionAnswer = {
+      question: currentQuestion,
+      answer: "",
+      score: 0,
+      reasoning: "User skipped this question",
+      cleanedAnswer: "",
+      modelAnswer: "",
+      questionSummary: ""
+    };
+
+    setQuestionAnswers((prev) => [...prev, skippedAnswer]);
+    setCurrentQuestionIndex((prev) => prev + 1);
+    lastQuestionIndex.current = currentQuestionIndex;
+    setBuildingAnswer("");
+    setCleanedAnswer("");
+  };
+
   return {
     questionAnswers,
     error,
@@ -300,6 +321,7 @@ export const useInterview = ({
     buildingAnswer,
     stopAudio,
     volumeLevel,
-    currentQuestionIndex
+    currentQuestionIndex,
+    skipQuestion
   };
 };

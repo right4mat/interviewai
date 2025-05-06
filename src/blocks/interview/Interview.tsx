@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SkipNextIcon from "@mui/icons-material/SkipNext";
 import {  LinearProgress } from "@mui/material";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useInterview } from "@/hooks/useInterview";
@@ -66,6 +67,7 @@ export default function Interview(): React.ReactElement {
     isAISpeaking,
     isListening,
     stopAudio,
+    skipQuestion,
     volumeLevel,
     currentQuestionIndex
   } = useInterview({
@@ -164,14 +166,16 @@ export default function Interview(): React.ReactElement {
         confirmColor="error"
       />
 
-      <ReviewDialog
+      {currentQuestionIndex >= (questions?.questions?.length || 999) && <ReviewDialog
         open={showReviewDialog}
         onClose={handleCloseReview}
         questionAnswers={questionAnswers}
         jobDescription={setupData.jobDescription}
         interviewers={setupData.interviewer}
         resume={setupData.resume}
-      />
+        type={setupData.settings.type}
+        difficulty={setupData.settings.difficulty}
+      />}
 
       <Grid container spacing={3}>
         {/* Video display section */}
@@ -212,9 +216,14 @@ export default function Interview(): React.ReactElement {
                 {isLoadingQuestions ? "Loading Questions..." : "Start Interview"}
               </Button>
             ) : (
-              <Button variant="outlined" color="error" size="large" onClick={handleStopInterview} startIcon={<StopIcon />}>
-                Stop Interview
-              </Button>
+              <>
+                <Button variant="outlined" color="error" size="large" onClick={handleStopInterview} startIcon={<StopIcon />}>
+                  Stop Interview
+                </Button>
+                <Button variant="outlined" size="large" onClick={skipQuestion} startIcon={<SkipNextIcon />}>
+                  Skip Question
+                </Button>
+              </>
             )}
           </Box>
         </Grid>

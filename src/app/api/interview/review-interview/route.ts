@@ -82,8 +82,8 @@ Provide a balanced review that:
       status: "success",
       data: {
         review,
-        averageScore,
-        totalScore,
+        averageScore: averageScore || 0,
+        totalScore: totalScore || 0,
       }
     });
   } catch (error) {
