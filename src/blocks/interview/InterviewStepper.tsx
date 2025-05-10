@@ -4,7 +4,7 @@ import Interview from "./Interview";
 import { useInterviewStore } from "@/stores/interviewStore";
 
 const InterviewStepper: React.FC = () => {
-  const { stage } = useInterviewStore();
+  const { interviewState: { stage } } = useInterviewStore();
 
   return <>{stage === "setup" ? <SetupInterview /> : <Interview />}</>;
 };

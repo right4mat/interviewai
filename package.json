@@ -32,7 +32,7 @@
     "@uiw/react-markdown-preview": "^5.1.4",
     "analytics": "^0.8.16",
     "axios": "1.7.7",
-    "framer-motion": "^11.11.17",
+    "framer-motion": "^11.18.2",
     "lodash-es": "4.17.21",
     "lunarphase-js": "^2.0.3",
     "mailchimp-api-v3": "^1.15.0",

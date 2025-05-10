@@ -30,6 +30,8 @@ interface UseInterviewProps {
   type: "technical" | "behavioral" | "mixed";
   stopListening: boolean;
   interviewStarted: boolean;
+  startingIndex: number;
+  startingAnswers: QuestionAnswer[];
 }
 
 /**
@@ -44,12 +46,14 @@ export const useInterview = ({
   difficulty,
   type,
   stopListening,
+  startingIndex,
+  startingAnswers,
   interviewStarted
 }: UseInterviewProps) => {
   // Core interview state
-  const [questionAnswers, setQuestionAnswers] = useState<QuestionAnswer[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(true);
+  const [questionAnswers, setQuestionAnswers] = useState<QuestionAnswer[]>(startingAnswers);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(startingIndex);
+  const [isFirstQuestion, setIsFirstQuestion] = useState<boolean>(startingIndex === 0);
   const [lastAnswerIndex, setLastAnswerIndex] = useState<number>(0);
 
   // Answer handling state

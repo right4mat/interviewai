@@ -1,7 +1,7 @@
 "use client";
 // Import necessary React and Material-UI components
 import * as React from "react";
-import {  useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -13,7 +13,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
-import {  LinearProgress } from "@mui/material";
+import { LinearProgress } from "@mui/material";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useInterview } from "@/hooks/useInterview";
 import InterviewProgress from "@/components/interview/InterviewProgress";
@@ -27,17 +27,16 @@ export default function Interview(): React.ReactElement {
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const {
     isMuted,
-    interviewState,
     isVideoOn,
     isChatOpen,
-    interviewStarted,
+    interviewState: { interviewStarted, ...interviewState },
     toggleMute,
     toggleVideo,
     toggleChat,
-    endCall,
     startInterview,
     stopInterview,
-    setStage
+    setStage,
+    updateInterviewState
   } = useInterviewStore();
 
   // Fetch interview questions using custom hook
@@ -72,10 +71,10 @@ export default function Interview(): React.ReactElement {
     difficulty: interviewState.settings.difficulty,
     type: interviewState.settings.type,
     stopListening: isLoadingQuestions || isMuted,
+    startingIndex: interviewState.currentQuestionIndex,
+    startingAnswers: interviewState.questionAnswers,
     interviewStarted
   });
-
-
 
   // Effect to show review dialog when interview finishes this is messy but it works can fix later
   React.useEffect(() => {
@@ -101,7 +100,7 @@ export default function Interview(): React.ReactElement {
 
   const handleConfirmEndCall = () => {
     setShowEndCallDialog(false);
-    endCall();
+    stopInterview();
   };
 
   const handleCancelEndCall = () => {
@@ -128,7 +127,7 @@ export default function Interview(): React.ReactElement {
         </Box>
         <LinearProgress
           variant="determinate"
-          value={isLoadingQuestions ? 0 : (currentQuestionIndex) / (questions?.questions?.length || 0) * 100}
+          value={isLoadingQuestions ? 0 : (currentQuestionIndex / (questions?.questions?.length || 0)) * 100}
           sx={{
             width: "100%",
             height: 8,
@@ -153,16 +152,18 @@ export default function Interview(): React.ReactElement {
         confirmColor="error"
       />
 
-      {currentQuestionIndex >= (questions?.questions?.length || 999) && <ReviewDialog
-        open={showReviewDialog}
-        onClose={handleCloseReview}
-        questionAnswers={questionAnswers}
-        jobDescription={interviewState.jobDescription}
-        interviewers={interviewState.interviewer}
-        resume={interviewState.resume}
-        type={interviewState.settings.type}
-        difficulty={interviewState.settings.difficulty}
-      />}
+      {currentQuestionIndex >= (questions?.questions?.length || 999) && (
+        <ReviewDialog
+          open={showReviewDialog}
+          onClose={handleCloseReview}
+          questionAnswers={questionAnswers}
+          jobDescription={interviewState.jobDescription}
+          interviewers={interviewState.interviewer}
+          resume={interviewState.resume}
+          type={interviewState.settings.type}
+          difficulty={interviewState.settings.difficulty}
+        />
+      )}
 
       <Grid container spacing={3}>
         {/* Video display section */}
@@ -191,7 +192,7 @@ export default function Interview(): React.ReactElement {
             </Button>
             {!interviewStarted ? (
               <Button
-              component="div"
+                component="div"
                 variant="contained"
                 color="primary"
                 onClick={handleStartInterview}
