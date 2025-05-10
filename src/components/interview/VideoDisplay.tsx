@@ -10,7 +10,6 @@ import { useColorScheme, useTheme } from "@mui/material/styles";
 interface VideoDisplayProps {
   isMuted: boolean;
   isVideoOn: boolean;
-  isScreenSharing: boolean;
   isChatOpen: boolean;
   isConnecting: boolean;
   isConnected: boolean;
@@ -21,7 +20,6 @@ interface VideoDisplayProps {
   volumeLevel: number;
   onToggleMute: () => void;
   onToggleVideo: () => void;
-  onToggleScreenShare: () => void;
   onToggleChat: () => void;
   onEndCall: () => void;
 }
@@ -29,7 +27,6 @@ interface VideoDisplayProps {
 export default function VideoDisplay({
   isMuted,
   isVideoOn,
-  isScreenSharing,
   isChatOpen,
   isConnecting,
   isConnected,
@@ -40,7 +37,6 @@ export default function VideoDisplay({
   volumeLevel,
   onToggleMute,
   onToggleVideo,
-  onToggleScreenShare,
   onToggleChat,
   onEndCall,
 }: VideoDisplayProps): React.ReactElement {

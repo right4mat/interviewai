@@ -29,20 +29,14 @@ export default function Interview(): React.ReactElement {
     isMuted,
     interviewState,
     isVideoOn,
-    isScreenSharing,
     isChatOpen,
-    isConnecting,
-    isConnected,
     interviewStarted,
     toggleMute,
     toggleVideo,
-    toggleScreenShare,
     toggleChat,
     endCall,
     startInterview,
     stopInterview,
-    setIsConnecting,
-    setIsConnected,
     setStage
   } = useInterviewStore();
 
@@ -58,7 +52,6 @@ export default function Interview(): React.ReactElement {
   // Use the combined interview hook
   const {
     questionAnswers,
-    error,
     isScoring,
     isGettingReply,
     currentQuestion,
@@ -82,16 +75,9 @@ export default function Interview(): React.ReactElement {
     interviewStarted
   });
 
-  // Effect to handle interview session initialization
-  React.useEffect(() => {
-    if (questions && interviewStarted && !isConnected && !isConnecting) {
-      setIsConnecting(true);
-      setIsConnected(true);
-      setIsConnecting(false);
-    }
-  }, [questions, isConnecting, interviewStarted, isConnected, setIsConnecting, setIsConnected]);
 
-  // Effect to show review dialog when interview finishes
+
+  // Effect to show review dialog when interview finishes this is messy but it works can fix later
   React.useEffect(() => {
     if (currentQuestionIndex >= (questions?.questions?.length || 999) && interviewStarted) {
       setShowReviewDialog(true);
@@ -185,15 +171,13 @@ export default function Interview(): React.ReactElement {
             isMuted={isAISpeaking || !isListening || isGettingReply || isScoring || isLoadingQuestions || !interviewStarted}
             isAISpeaking={isAISpeaking}
             isVideoOn={isVideoOn}
-            isScreenSharing={isScreenSharing}
             isChatOpen={isChatOpen}
-            isConnecting={isConnecting}
-            isConnected={isConnected}
+            isConnecting={isLoadingQuestions}
+            isConnected={!!questions}
             participantName={interviewState.interviewer.name}
             webcamRef={webcamRef as React.RefObject<Webcam>}
             onToggleMute={toggleMute}
             onToggleVideo={toggleVideo}
-            onToggleScreenShare={toggleScreenShare}
             onToggleChat={toggleChat}
             onEndCall={handleEndCall}
             isGettingReply={isGettingReply || isLoadingQuestions}
