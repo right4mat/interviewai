@@ -42,9 +42,9 @@ export interface GetInterviewReplyRequest {
   type: string;
 }
 
-type GetInterviewReplyResponse = {text: string, audio: string};
+type GetInterviewReplyResponse = { text: string; audio: string };
 
-type GetQuestionsResponse = {questions: string[]};
+type GetQuestionsResponse = { questions: string[] };
 
 type ExtractResumeResponse = string;
 
@@ -63,12 +63,9 @@ interface ReviewInterviewRequest {
 }
 
 interface ReviewInterviewResponse {
-  status: string;
-  data: {
-    review: string;
-    averageScore: number;
-    totalScore: number;
-  };
+  review: string;
+  averageScore: number;
+  totalScore: number;
 }
 
 export const useExtractResume = () => {
@@ -76,12 +73,12 @@ export const useExtractResume = () => {
     mutationFn: async (pdfFile: File) => {
       // Convert PDF to array of images
       const images = await convertPdfToImageArray(pdfFile);
-      
+
       // Send images to resume extraction API
       const response = await apiRequest("interview/resume-extraction", "POST", {
         resumeImageArray: images
       });
-      
+
       return response;
     }
   });

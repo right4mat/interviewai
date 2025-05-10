@@ -9,6 +9,8 @@ import Box from "@mui/material/Box";
 import { brand } from "@/theme/themePrimitives";
 import { useReviewInterview } from "@/services/openAI";
 import { Interviewer } from "@/types/interview";
+import { Gauge } from "@mui/x-charts/Gauge";
+import Grid from "@mui/material/Grid";
 
 interface QuestionAnswer {
   question: string;
@@ -29,7 +31,6 @@ interface ReviewDialogProps {
   resume: string;
   type: string;
   difficulty: string;
-
 }
 
 export default function ReviewDialog({
@@ -82,33 +83,61 @@ export default function ReviewDialog({
     );
   }
 
+  const score = Math.round(data?.averageScore || 0);
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
         <Typography variant="h4" component="div" align="center" gutterBottom>
           Interview Review
         </Typography>
       </DialogTitle>
       <DialogContent>
-        <Box sx={{ mb: 4, textAlign: "center" }}>
-          <Typography variant="h2" component="div" sx={{ color: getScoreColor(data?.data?.averageScore || 0), mb: 1 }}>
-            {Math.round(data?.data?.averageScore || 0)}%
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {data?.data?.totalScore} points total
-          </Typography>
-        </Box>
-
-        {data?.data?.review && (
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Overall Review
-            </Typography>
-            <Typography variant="body1">
-              {data.data.review}
-            </Typography>
-          </Box>
-        )}
+        <Grid container spacing={4}>
+          <Grid size={{ xs: 12, md: 6 }} component="div" container>
+            <Grid size={{ xs: 12, md: 12 }}>
+              <Box sx={{ height: 300, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <Gauge
+                  value={data?.totalScore ? (data.totalScore / 1200) * 100 : 0}
+                  text={({ value }) => `${value?.toFixed(0)}%`}
+                  sx={{
+                    "& .MuiGauge-valueText": {
+                      fontSize: "2rem",
+                      fill: getScoreColor(score)
+                    }
+                  }}
+                />
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, md: 12 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <Typography variant="h6" gutterBottom>
+                  Scores
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Total Score: {data?.totalScore || 0} points
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Average Score: {score}%
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box sx={{ height: "100%", display: "flex", flexDirection: "column", gap: 3 }}>
+              {data?.review && (
+                <Box>
+                  <Typography variant="h6" gutterBottom>
+                    Overall Review
+                  </Typography>
+                  <Box sx={{ overflowY: "scroll", }}>
+                    <Typography variant="body1">{data.review}</Typography>
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="contained" color="primary">

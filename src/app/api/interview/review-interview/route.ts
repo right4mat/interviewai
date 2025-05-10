@@ -45,7 +45,7 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
     const averageScore = totalScore / questionAnswers.length;
 
     const reviewPrompt = `
-Please provide a critical review (max 200 words) of this interview performance.
+Please provide a critical review of this interview performance. Format your response with clear sections and line breaks between paragraphs.
 
 Job Description: ${jobDescription}
 
@@ -58,22 +58,33 @@ Feedback: ${qa.reasoning || 'No feedback provided'}`).join('\n')}
 
 Average Score: ${averageScore}/100
 
-Provide a balanced review that:
-- Evaluates overall performance
-- Highlights key strengths
-- Identifies areas for improvement
-- Considers alignment with the job requirements
-- Makes specific recommendations
-`;
+Structure your review with the following sections, using line breaks between each:
+
+1. Overall Performance Summary
+[Add line break]
+
+2. Key Strengths
+[Add line break]
+
+3. Areas for Improvement
+[Add line break]
+
+4. Alignment with Job Requirements
+[Add line break]
+
+5. Specific Recommendations
+[Add line break]
+
+Please ensure each section is clearly separated by line breaks for readability.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are an expert interviewer who provides balanced, constructive interview feedback." },
+        { role: "system", content: "You are an expert interviewer who provides balanced, constructive interview feedback. Format your responses with clear sections separated by line breaks." },
         { role: "user", content: reviewPrompt }
       ],
       temperature: 0.7,
-      max_tokens: 400
+      max_tokens: 200
     });
 
     const review = response.choices[0].message.content?.trim() || '';

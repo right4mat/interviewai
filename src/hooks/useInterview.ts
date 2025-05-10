@@ -76,7 +76,7 @@ export const useInterview = ({
   const { mutateAsync: getReplyAsync, isPending: isGettingReply } = useGetInterviewReply();
 
   // Debounced answer to prevent rapid API calls
-  const currentAnswer = useDebounce(buildingAnswer, 2000);
+  const currentAnswer = useDebounce(buildingAnswer, 5000);
 
   // Update answer index when the debounced answer changes
   useEffect(() => {
@@ -120,6 +120,11 @@ export const useInterview = ({
    * Handles audio playback of AI responses
    */
   const handleReplySuccess = async (response: { audio?: string }) => {
+    //if use skips to next question the past audio should be stopped if its still playing
+    if(audioRef.current) {
+      audioRef.current.pause();
+    }
+
     if (!response?.audio) return;
 
     setIsAISpeaking(true);
@@ -133,6 +138,7 @@ export const useInterview = ({
         audioContextRef.current = null;
       }
       setVolumeLevel(0);
+      SpeechRecognition.startListening({ continuous: true, language: "en-US" });
     };
 
     // Set up audio analysis
@@ -163,6 +169,10 @@ export const useInterview = ({
         setVolumeLevel(0);
       });
       updateVolume();
+      audioRef?.current?.onended && (audioRef.current.onended = () => {
+        setIsAISpeaking(false);
+        SpeechRecognition.startListening({ continuous: true, language: "en-US" });
+      });
     });
   };
 
@@ -292,21 +302,8 @@ export const useInterview = ({
    * Skips the current question and moves to the next one
    */
   const skipQuestion = () => {
-    const skippedAnswer: QuestionAnswer = {
-      question: currentQuestion,
-      answer: "",
-      score: 0,
-      reasoning: "User skipped this question",
-      cleanedAnswer: "",
-      modelAnswer: "",
-      questionSummary: ""
-    };
-
-    setQuestionAnswers((prev) => [...prev, skippedAnswer]);
-    setCurrentQuestionIndex((prev) => prev + 1);
-    lastQuestionIndex.current = currentQuestionIndex;
-    setBuildingAnswer("");
-    setCleanedAnswer("");
+    SpeechRecognition.stopListening();
+    setBuildingAnswer("I would like to skip this question");
   };
 
   return {
