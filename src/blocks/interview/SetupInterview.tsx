@@ -23,7 +23,7 @@ import { useExtractResume } from "@/services/openAI";
 import CircularProgress from "@mui/material/CircularProgress";
 
 const SetupInterview: React.FC = () => {
-  const { setupData, setJobDescription, setPdfFile, setResume, setInterviewer, setSettings, setStage } = useInterviewStore();
+  const { interviewState, setJobDescription, setPdfFile, setResume, setInterviewer, setSettings, setStage } = useInterviewStore();
   const extractResume = useExtractResume();
 
   const [showInterviewers, setShowInterviewers] = useState(false);
@@ -44,7 +44,7 @@ const SetupInterview: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    if (!setupData.jobDescription) {
+    if (!interviewState.jobDescription) {
       alert("Job description is required");
     } else {
       setStage("interview");
@@ -107,10 +107,10 @@ const SetupInterview: React.FC = () => {
             bgcolor: "background.paper"
           }}
         >
-          <JobDescriptionInput value={setupData.jobDescription} onChange={setJobDescription} />
+          <JobDescriptionInput value={interviewState.jobDescription} onChange={setJobDescription} />
         </Paper>
       ),
-      isValid: setupData.jobDescription.trim().length > 0
+      isValid: interviewState.jobDescription.trim().length > 0
     },
     {
       label: "Resume",
@@ -127,7 +127,7 @@ const SetupInterview: React.FC = () => {
             bgcolor: "background.paper"
           }}
         >
-          <FileUpload isPending={extractResume.isPending} onFileSelect={handlePdfFileChange} selectedFile={setupData.pdfFile} />
+          <FileUpload isPending={extractResume.isPending} onFileSelect={handlePdfFileChange} selectedFile={interviewState.pdfFile} />
         </Paper>
       ),
       isValid: true // Resume is optional
@@ -171,9 +171,9 @@ const SetupInterview: React.FC = () => {
 
           {showInterviewers && (
             <InterviewerSetup
-              interviewer={setupData.interviewer}
+              interviewer={interviewState.interviewer}
               setInterviewer={setInterviewer}
-              settings={setupData.settings}
+              settings={interviewState.settings}
               setSettings={setSettings}
             />
           )}

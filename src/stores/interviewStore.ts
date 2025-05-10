@@ -19,7 +19,7 @@ interface QuestionAnswer {
 
 interface InterviewStore {
   // Setup state
-  setupData: {
+  interviewState: {
     jobDescription: string;
     pdfFile?: File;
     interviewer: Interviewer;
@@ -31,7 +31,7 @@ interface InterviewStore {
   setResume: (text: string) => void;
   setInterviewer: (interviewer: Interviewer) => void;
   setSettings: (settings: InterviewSettings) => void;
-  clearSetupData: () => void;
+  clearinterviewState: () => void;
   setStage: (stage: 'setup' | 'interview') => void;
   
 
@@ -84,7 +84,7 @@ const DEFAULT_SETTINGS: InterviewSettings = {
 
 export const useInterviewStore = create<InterviewStore>((set) => ({
   // Setup state
-  setupData: {
+  interviewState: {
     jobDescription: '',
     pdfFile: undefined,
     interviewer: DEFAULT_INTERVIEWER,
@@ -92,22 +92,22 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
     resume: ''
   },
   setResume: (text) => set((state) => ({
-    setupData: { ...state.setupData, resume: text }
+    interviewState: { ...state.interviewState, resume: text }
   })),
   setJobDescription: (description) => set((state) => ({
-    setupData: { ...state.setupData, jobDescription: description }
+    interviewState: { ...state.interviewState, jobDescription: description }
   })),
   setPdfFile: (file) => set((state) => ({
-    setupData: { ...state.setupData, pdfFile: file }
+    interviewState: { ...state.interviewState, pdfFile: file }
   })),
   setInterviewer: (interviewer) => set((state) => ({
-    setupData: { ...state.setupData, interviewer }
+    interviewState: { ...state.interviewState, interviewer }
   })),
   setSettings: (settings) => set((state) => ({
-    setupData: { ...state.setupData, settings }
+    interviewState: { ...state.interviewState, settings }
   })),
-  clearSetupData: () => set((state) => ({
-    setupData: {
+  clearinterviewState: () => set((state) => ({
+    interviewState: {
       jobDescription: '',
       pdfFile: undefined,
       interviewer: DEFAULT_INTERVIEWER,

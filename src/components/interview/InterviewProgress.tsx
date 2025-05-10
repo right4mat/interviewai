@@ -35,6 +35,7 @@ interface InterviewProgressProps {
   questionAnswers: QuestionAnswer[];
   started: boolean;
   finished: boolean;
+  answerWillCompleteIn: number;
 }
 
 const StatusPaper = ({ children, color = "primary" }: { children: React.ReactNode, color?: "primary" | "success" }) => (
@@ -159,7 +160,8 @@ export default function InterviewProgress({
   isScoring,
   questionAnswers,
   started,
-  finished
+  finished,
+  answerWillCompleteIn
 }: InterviewProgressProps): React.ReactElement {
   const questionsContainerRef = React.useRef<HTMLDivElement>(null);
   const reversedQuestionAnswers = useMemo(() => [...questionAnswers].reverse(), [questionAnswers]);
@@ -190,11 +192,41 @@ export default function InterviewProgress({
           color: "primary.contrastText",
           display: "flex",
           alignItems: "center",
+          justifyContent: "space-between",
           gap: 1
         }}
       >
-        <QuestionAnswerIcon />
-        <Typography variant="h6" sx={{ fontWeight: 500 }}>Interview Progress</Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <QuestionAnswerIcon />
+          <Typography variant="h6" sx={{ fontWeight: 500 }}>Interview Progress</Typography>
+        </Box>
+        {answerWillCompleteIn > 0 && (
+          <Box sx={{ position: "relative", display: "inline-flex" }}>
+            <CircularProgress
+              variant="determinate"
+              value={(5 - answerWillCompleteIn) / 5 * 100}
+              size={30}
+              thickness={4}
+              sx={{ color: "primary.contrastText" }}
+            />
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Typography variant="caption" component="div" color="primary.contrastText">
+                {answerWillCompleteIn}
+              </Typography>
+            </Box>
+          </Box>
+        )}
       </Box>
 
       <Box sx={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column", p: 2, gap: 2 }}>

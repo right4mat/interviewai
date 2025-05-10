@@ -55,6 +55,7 @@ export const useInterview = ({
   // Answer handling state
   const [buildingAnswer, setBuildingAnswer] = useState<string>("");
   const [cleanedAnswer, setCleanedAnswer] = useState<string>("");
+  const [answerWillCompleteIn, setAnswerWillCompleteIn] = useState<number>(5);
 
   // UI state
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export const useInterview = ({
   const lastQuestionIndex = useRef<number>(-1);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Speech recognition configuration
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
@@ -77,6 +79,34 @@ export const useInterview = ({
 
   // Debounced answer to prevent rapid API calls
   const currentAnswer = useDebounce(buildingAnswer, 5000);
+
+  // Reset countdown timer when building answer changes
+  useEffect(() => {
+    if (!buildingAnswer) return;
+    if (answerTimeoutRef.current) {
+      clearInterval(answerTimeoutRef.current);
+    }
+
+    setAnswerWillCompleteIn(5);
+
+    answerTimeoutRef.current = setInterval(() => {
+      setAnswerWillCompleteIn((prev) => {
+        if (prev <= 0) {
+          if (answerTimeoutRef.current) {
+            clearInterval(answerTimeoutRef.current);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (answerTimeoutRef.current) {
+        clearInterval(answerTimeoutRef.current);
+      }
+    };
+  }, [buildingAnswer]);
 
   // Update answer index when the debounced answer changes
   useEffect(() => {
@@ -121,7 +151,7 @@ export const useInterview = ({
    */
   const handleReplySuccess = async (response: { audio?: string }) => {
     //if use skips to next question the past audio should be stopped if its still playing
-    if(audioRef.current) {
+    if (audioRef.current) {
       audioRef.current.pause();
     }
 
@@ -169,10 +199,11 @@ export const useInterview = ({
         setVolumeLevel(0);
       });
       updateVolume();
-      audioRef?.current?.onended && (audioRef.current.onended = () => {
-        setIsAISpeaking(false);
-        SpeechRecognition.startListening({ continuous: true, language: "en-US" });
-      });
+      audioRef?.current?.onended &&
+        (audioRef.current.onended = () => {
+          setIsAISpeaking(false);
+          SpeechRecognition.startListening({ continuous: true, language: "en-US" });
+        });
     });
   };
 
@@ -277,7 +308,7 @@ export const useInterview = ({
 
     if ((isAISpeaking || !interviewStarted) && listening) {
       SpeechRecognition.stopListening();
-    } else if (!isAISpeaking && currentQuestion  && interviewStarted) {
+    } else if (!isAISpeaking && currentQuestion && interviewStarted) {
       SpeechRecognition.startListening({ continuous: true, language: "en-US" });
     }
   }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion, interviewStarted]);
@@ -319,6 +350,7 @@ export const useInterview = ({
     stopAudio,
     volumeLevel,
     currentQuestionIndex,
-    skipQuestion
+    skipQuestion,
+    answerWillCompleteIn
   };
 };

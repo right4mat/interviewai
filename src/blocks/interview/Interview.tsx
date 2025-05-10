@@ -27,7 +27,7 @@ export default function Interview(): React.ReactElement {
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const {
     isMuted,
-    setupData,
+    interviewState,
     isVideoOn,
     isScreenSharing,
     isChatOpen,
@@ -48,11 +48,11 @@ export default function Interview(): React.ReactElement {
 
   // Fetch interview questions using custom hook
   const { data: questions, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
-    jobDescription: setupData.jobDescription,
-    interviewers: setupData.interviewer,
-    resume: setupData.resume,
-    difficulty: setupData.settings.difficulty,
-    type: setupData.settings.type
+    jobDescription: interviewState.jobDescription,
+    interviewers: interviewState.interviewer,
+    resume: interviewState.resume,
+    difficulty: interviewState.settings.difficulty,
+    type: interviewState.settings.type
   });
 
   // Use the combined interview hook
@@ -69,14 +69,15 @@ export default function Interview(): React.ReactElement {
     stopAudio,
     skipQuestion,
     volumeLevel,
-    currentQuestionIndex
+    currentQuestionIndex,
+    answerWillCompleteIn
   } = useInterview({
     questions: questions?.questions || [],
-    jobDescription: setupData.jobDescription,
-    interviewer: setupData.interviewer,
-    resume: setupData.resume,
-    difficulty: setupData.settings.difficulty,
-    type: setupData.settings.type,
+    jobDescription: interviewState.jobDescription,
+    interviewer: interviewState.interviewer,
+    resume: interviewState.resume,
+    difficulty: interviewState.settings.difficulty,
+    type: interviewState.settings.type,
     stopListening: isLoadingQuestions || isMuted,
     interviewStarted
   });
@@ -170,11 +171,11 @@ export default function Interview(): React.ReactElement {
         open={showReviewDialog}
         onClose={handleCloseReview}
         questionAnswers={questionAnswers}
-        jobDescription={setupData.jobDescription}
-        interviewers={setupData.interviewer}
-        resume={setupData.resume}
-        type={setupData.settings.type}
-        difficulty={setupData.settings.difficulty}
+        jobDescription={interviewState.jobDescription}
+        interviewers={interviewState.interviewer}
+        resume={interviewState.resume}
+        type={interviewState.settings.type}
+        difficulty={interviewState.settings.difficulty}
       />}
 
       <Grid container spacing={3}>
@@ -188,7 +189,7 @@ export default function Interview(): React.ReactElement {
             isChatOpen={isChatOpen}
             isConnecting={isConnecting}
             isConnected={isConnected}
-            participantName={setupData.interviewer.name}
+            participantName={interviewState.interviewer.name}
             webcamRef={webcamRef as React.RefObject<Webcam>}
             onToggleMute={toggleMute}
             onToggleVideo={toggleVideo}
@@ -232,6 +233,7 @@ export default function Interview(): React.ReactElement {
         {isChatOpen && (
           <Grid size={{ xs: 12, md: 3 }}>
             <InterviewProgress
+              answerWillCompleteIn={answerWillCompleteIn}
               isGettingReply={isGettingReply || isLoadingQuestions}
               currentQuestion={currentQuestion}
               cleanedAnswer={cleanedAnswer}
