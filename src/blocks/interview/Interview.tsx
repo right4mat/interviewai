@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
-import { useGetInterviewQuestions } from "@/services/openAI";
+import { useGetInterviewQuestions, useSaveInterview } from "@/services/InterviewServices";
 import VideoDisplay from "@/components/interview/VideoDisplay";
 import Button from "@mui/material/Button";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -18,13 +18,13 @@ import { useInterviewStore } from "@/stores/interviewStore";
 import { useInterview } from "@/hooks/useInterview";
 import InterviewProgress from "@/components/interview/InterviewProgress";
 import { brand } from "@/theme/themePrimitives";
-import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import ReviewDialog from "@/components/interview/ReviewDialog";
 
 export default function Interview(): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
   const [showEndCallDialog, setShowEndCallDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const { mutate: saveInterview, ConfirmDialog: SaveConfirmDialog } = useSaveInterview();
   const {
     isMuted,
     isVideoOn,
@@ -89,9 +89,27 @@ export default function Interview(): React.ReactElement {
     }
   };
 
-  const handleStopInterview = () => {
+  const handleSaveSuccess = () => {
     stopInterview();
     stopAudio();
+    setStage("setup");
+  };
+
+  const handleStopInterview = () => {
+    saveInterview({
+      questions: questions?.questions || [],
+      currentQuestionIndex,
+      interviewer: interviewState.interviewer,
+      settings: interviewState.settings,
+      jobDescription: interviewState.jobDescription,
+      resume: interviewState.resume,
+      interviewers: interviewState.interviewer,
+      difficulty: interviewState.settings.difficulty,
+      type: interviewState.settings.type,
+      questionAnswers
+    }, {
+      onSuccess: handleSaveSuccess
+    });
   };
 
   const handleEndCall = () => {
@@ -99,8 +117,18 @@ export default function Interview(): React.ReactElement {
   };
 
   const handleConfirmEndCall = () => {
+    saveInterview({
+      questions: questions?.questions || [],
+      currentQuestionIndex,
+      settings: interviewState.settings,
+      jobDescription: interviewState.jobDescription,
+      resume: interviewState.resume,
+      interviewer: interviewState.interviewer,
+      questionAnswers
+    }, {
+      onSuccess: handleSaveSuccess
+    });
     setShowEndCallDialog(false);
-    stopInterview();
   };
 
   const handleCancelEndCall = () => {
@@ -141,16 +169,9 @@ export default function Interview(): React.ReactElement {
         />
       </Box>
 
-      <ConfirmationDialog
-        open={showEndCallDialog}
-        title="End Interview"
-        message="Are you sure you want to end this interview? This action cannot be undone."
-        confirmLabel="End Interview"
-        cancelLabel="Continue Interview"
-        onConfirm={handleConfirmEndCall}
-        onCancel={handleCancelEndCall}
-        confirmColor="error"
-      />
+      {SaveConfirmDialog}
+
+
 
       {currentQuestionIndex >= (questions?.questions?.length || 999) && (
         <ReviewDialog

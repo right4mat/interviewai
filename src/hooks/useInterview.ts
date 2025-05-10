@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useGetInterviewReply, useScoreAnswer } from "@/services/openAI";
+import { useGetInterviewReply, useScoreAnswer } from "@/services/InterviewServices";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Interviewer } from "@/types/interview";

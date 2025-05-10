@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { brand } from "@/theme/themePrimitives";
-import { useReviewInterview } from "@/services/openAI";
+import { useReviewInterview } from "@/services/InterviewServices";
 import { Interviewer } from "@/types/interview";
 import { Gauge } from "@mui/x-charts/Gauge";
 import Grid from "@mui/material/Grid";

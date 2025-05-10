@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import supabase from './_supabase';
+import { User } from '@supabase/supabase-js';
 
-// Define user type
-interface User {
-  id: string;
-  [key: string]: any;
-}
+
 
 // Define handler function type
 type HandlerFunction = (req: NextRequest, user: User) => Promise<NextResponse>;
