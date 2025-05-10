@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Interviewer } from "@/types/interview";
 import { convertPdfToImageArray } from "@/utils/util";
 import { useConfirmMutation } from "@/hooks/useConfirmMutation";
+import supabase from "@/utils/supabase";
 
 interface ScoreAnswerResponse {
   score: number;
@@ -90,6 +91,10 @@ interface SaveInterviewRequest {
   }>;
 }
 
+interface LoadInterviewRequest {
+  interviewId: string;
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, File>({
     mutationFn: async (pdfFile: File) => {
@@ -158,6 +163,42 @@ export const useSaveInterview = () => {
       confirmLabel: "Stop and Save",
       cancelLabel: "Cancel",
       confirmColor: "primary"
+    }
+  });
+};
+
+export const useLoadInterview = () => {
+  return useMutation<SaveInterviewRequest, Error, LoadInterviewRequest>({
+    mutationFn: async (variables: LoadInterviewRequest) => {
+      const { data: interview, error: interviewError } = await supabase
+        .from('interviews')
+        .select(`
+          *,
+          job_descriptions (
+            job_description
+          ),
+          resumes (
+            resume
+          )
+        `)
+        .eq('id', variables.interviewId)
+        .single();
+
+      if (interviewError) throw interviewError;
+      if (!interview) {
+        throw new Error("Interview not found");
+      }
+
+      // Transform the data to match SaveInterviewRequest shape
+      return {
+        questions: interview.questions,
+        currentQuestionIndex: interview.current_question_index,
+        interviewer: interview.interviewer,
+        settings: interview.settings,
+        jobDescription: interview.job_descriptions.job_description,
+        resume: interview.resumes?.resume,
+        questionAnswers: interview.question_answers
+      };
     }
   });
 };
