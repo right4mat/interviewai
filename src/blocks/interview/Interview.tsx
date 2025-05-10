@@ -103,9 +103,6 @@ export default function Interview(): React.ReactElement {
       settings: interviewState.settings,
       jobDescription: interviewState.jobDescription,
       resume: interviewState.resume,
-      interviewers: interviewState.interviewer,
-      difficulty: interviewState.settings.difficulty,
-      type: interviewState.settings.type,
       questionAnswers
     }, {
       onSuccess: handleSaveSuccess
