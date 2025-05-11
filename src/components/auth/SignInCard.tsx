@@ -14,7 +14,7 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import GoogleIcon from "@/images/brandIcons/Google";
-import { PAGE_PATH } from "@/path";
+import { AFTER_AUTH_PATH, PAGE_PATH } from "@/path";
 import { useAuth } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import LogoIcon from "@/icons/LogoIcon";
@@ -73,7 +73,7 @@ export default function SignInCard() {
       // On successful signin, redirect to dashboard
       // Use router.push inside useEffect to ensure it's only called after component is mounted
 
-      router.push("/dashboard");
+      router.push(AFTER_AUTH_PATH);
     } catch (error: unknown) {
       // Handle error - you may want to show this to the user
       console.error("Error signing in:", error instanceof Error ? error.message : String(error));
@@ -103,7 +103,7 @@ export default function SignInCard() {
   React.useEffect(() => {
     // Check if user is authenticated before redirecting
     if (auth.user) {
-      router.push("/dashboard");
+      router.push(AFTER_AUTH_PATH);
     }
   }, [auth.user, router]);
 

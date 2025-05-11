@@ -9,6 +9,7 @@ const openai = new OpenAI({
 
 // Define schema for request validation
 const replySchema = z.object({
+  company: z.string(),
   jobDescription: z.string().min(1, "Job description is required"),
   resume: z.string().optional(),
   interviewers: z.object({
@@ -43,6 +44,7 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
     }
 
     const {
+      company,
       jobDescription,
       resume,
       interviewers,
@@ -56,12 +58,6 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       difficulty
     } = result.data;
 
-    // Extract company name from job description (simple extraction)
-    const companyMatch = jobDescription.match(
-      /(?:at|for|with)\s+([A-Z][A-Za-z0-9\s]+?)(?:\.|\,|\s+is|\s+are|\s+we|\s+I|\s+in|\s+to|\s+and|\s+seeking|\s+looking|\s+hiring|$)/
-    );
-    const companyName = companyMatch ? companyMatch[1].trim() : "our company";
-
     let replyPrompt = `
 You are ${interviewers.name}, a ${interviewers.role} conducting an interview.
 
@@ -73,7 +69,7 @@ The interview is ${type} and the difficulty is ${difficulty}.
 
     if (isFirstQuestion) {
       replyPrompt += `
-This is the start of the interview. Begin with a brief introduction of yourself as ${interviewers.name} from ${companyName}, your role as ${interviewers.role}, and then ask the first question: "${firstQuestion}"
+This is the start of the interview. Begin with a brief introduction of yourself as ${interviewers.name}${company ? ` from ${company}` : ""}, your role as ${interviewers.role}, and then ask the first question: "${firstQuestion}"
 
 Keep your introduction professional but warm and welcoming.
 `;

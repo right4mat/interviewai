@@ -20,6 +20,7 @@ interface QuestionAnswer {
 interface InterviewStore {
   // Setup state
   interviewState: {
+    company: string;
     jobDescription: string;
     pdfFile?: File;
     interviewer: Interviewer;
@@ -67,6 +68,7 @@ const DEFAULT_SETTINGS: InterviewSettings = {
 export const useInterviewStore = create<InterviewStore>((set) => ({
   // Setup state
   interviewState: {
+    company: "",
     jobDescription: "",
     pdfFile: undefined,
     interviewer: DEFAULT_INTERVIEWER,
@@ -105,6 +107,7 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
   clearinterviewState: () =>
     set((state) => ({
       interviewState: {
+        company: "",
         jobDescription: "",
         pdfFile: undefined,
         interviewer: DEFAULT_INTERVIEWER,

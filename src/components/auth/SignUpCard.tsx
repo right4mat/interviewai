@@ -16,7 +16,7 @@ import Collapse from "@mui/material/Collapse";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import GoogleIcon from "@/images/brandIcons/Google";
-import { PAGE_PATH } from "@/path";
+import { PAGE_PATH, AFTER_AUTH_PATH } from "@/path";
 import { useAuth } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import LogoIcon from "@/icons/LogoIcon";
@@ -99,7 +99,7 @@ export default function SignUpCard(): React.ReactElement {
       // Only redirect if router is ready to prevent "NextRouter was not mounted" error
 
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push(AFTER_AUTH_PATH);
       }, 500);
     } catch (error: unknown) {
       // Handle error - show to the user

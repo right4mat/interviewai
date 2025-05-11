@@ -22,6 +22,7 @@ interface QuestionAnswer {
  * Props required to initialize the interview hook
  */
 interface UseInterviewProps {
+  company: string;
   questions: string[];
   jobDescription: string;
   interviewer: Interviewer;
@@ -39,6 +40,7 @@ interface UseInterviewProps {
  * Handles speech recognition, audio playback, and interaction with AI services
  */
 export const useInterview = ({
+  company,
   questions,
   jobDescription,
   interviewer,
@@ -228,6 +230,7 @@ export const useInterview = ({
       }).then(handleScoreSuccess),
 
       getReplyAsync({
+        company,
         jobDescription,
         resume,
         interviewers: interviewer,
@@ -261,6 +264,7 @@ export const useInterview = ({
     setIsFirstQuestion(false);
 
     getReplyAsync({
+      company,
       jobDescription,
       resume,
       interviewers: interviewer,

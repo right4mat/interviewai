@@ -46,7 +46,8 @@ Interviewer: ${interviewers.name} (${interviewers.role})
 
 The interview is ${type} and the difficulty is ${difficulty}.
 
-Please create a comprehensive set of questions that:
+First, extract the company name from the job description.
+Then, create a comprehensive set of questions that:
 - Are appropriate for the specified difficulty level
 - Assess the candidate's fit for the role based on the job description
 - ${resume ? "Consider the candidate's background from their resume" : ""}
@@ -54,8 +55,8 @@ Please create a comprehensive set of questions that:
 - Can be reasonably answered within a 30-minute interview (typically 8-12 questions)
 - Progress in a logical order from introductory to more complex topics
 
-Return ONLY an array of questions in this exact format:
-["Question 1?", "Question 2?", "Question 3?", etc.]
+Return ONLY a JSON object in this exact format:
+{"company": "extracted company name", "questions": ["Question 1?", "Question 2?", "Question 3?", etc.]}
 Do not include any other text or formatting.
 `;
 
@@ -71,13 +72,14 @@ Do not include any other text or formatting.
 
     const responseContent = response.choices[0].message.content?.trim() || '';
     
-    // Parse the response string into an array
-    const questions = JSON.parse(responseContent);
+    // Parse the response string into an object
+    const { company, questions } = JSON.parse(responseContent);
     
     return NextResponse.json({ 
       status: "success", 
       data: {
-        questions: questions
+        company,
+        questions
       }
     });
   } catch (error) {

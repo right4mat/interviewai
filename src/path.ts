@@ -7,10 +7,10 @@ export const BUY_NOW_URL = "#";
 export const FREEBIES_URL = "#";
 export const DOCS_URL = "#";
 const AUTH_PATH = "/auth";
-const DASHBOARD_PATH = "/dashboard";
-export const AFTER_AUTH_PATH = "/dashboard";
+const DASHBOARD_PATH = "/app";
+export const AFTER_AUTH_PATH = "/app";
 export const CANCEL_STRIPE_PATH = "/#pricing";
-export const SUCCESS_STRIPE_PATH = "/dashboard";
+export const SUCCESS_STRIPE_PATH = "/app";
 export const BILLING_PATH = "/settings";
 
 export const PAGE_PATH = {

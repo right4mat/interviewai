@@ -8,7 +8,7 @@ import PageLoader from "@/components/shared/Loader";
 import analytics from "./analytics";
 import { User } from "@supabase/supabase-js";
 import { Provider } from "@supabase/supabase-js";
-
+import { AFTER_AUTH_PATH } from "@/path";
 // Whether to merge extra user data from database into `auth.user`
 const MERGE_DB_USER = true;
 
@@ -106,7 +106,7 @@ function useAuthProvider(): AuthContextType {
         .signInWithOAuth({
           provider: name,
           options: {
-            redirectTo: `${window.location.origin}/dashboard`
+            redirectTo: `${window.location.origin}${AFTER_AUTH_PATH}`
           }
         })
         .then(handleError)
@@ -124,7 +124,7 @@ function useAuthProvider(): AuthContextType {
       .signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`
+          emailRedirectTo: `${window.location.origin}${AFTER_AUTH_PATH}`
         }
       })
       .then(handleError);

@@ -46,11 +46,12 @@ export interface GetInterviewReplyRequest {
 
 type GetInterviewReplyResponse = { text: string; audio: string };
 
-type GetQuestionsResponse = { questions: string[] };
+type GetQuestionsResponse = { questions: string[], company: string };
 
 type ExtractResumeResponse = string;
 
 interface ReviewInterviewRequest {
+  company: string;
   jobDescription: string;
   resume?: string;
   interviewers: Interviewer;
@@ -71,6 +72,7 @@ interface ReviewInterviewResponse {
 }
 
 interface SaveInterviewRequest {
+  company: string;
   questions: string[];
   currentQuestionIndex: number;
   interviewer: {
@@ -167,7 +169,7 @@ export const useSaveInterview = () => {
   });
 };
 
-export const useLoadInterview = () => {
+/*export const useLoadInterview = () => {
   return useMutation<SaveInterviewRequest, Error, LoadInterviewRequest>({
     mutationFn: async (variables: LoadInterviewRequest) => {
       const { data: interview, error: interviewError } = await supabase
@@ -201,4 +203,4 @@ export const useLoadInterview = () => {
       };
     }
   });
-};
+};*/
