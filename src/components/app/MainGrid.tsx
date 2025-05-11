@@ -4,13 +4,13 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import ChartUserByCountry from '@/components/dashboard/ChartUserByCountry';
+import ChartUserByCountry from '@/components/app/ChartUserByCountry';
 import CustomizedTreeView from '@/components/shared/CustomizedTreeView';
 import CustomizedDataGrid from '@/components/shared/CustomizedDataGrid';
-import HighlightedCard from '@/components/dashboard/HighlightedCard';
-import PageViewsBarChart from '@/components/dashboard/PageViewsBarChart';
-import SessionsChart from '@/components/dashboard/SessionsChart';
-import StatCard, { StatCardProps } from '@/components/dashboard/StatCard';
+import HighlightedCard from '@/components/app/HighlightedCard';
+import PageViewsBarChart from '@/components/app/PageViewsBarChart';
+import SessionsChart from '@/components/app/SessionsChart';
+import StatCard, { StatCardProps } from '@/components/app/StatCard';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 
 const data: StatCardProps[] = [

@@ -20,6 +20,7 @@ interface QuestionAnswer {
 interface InterviewStore {
   // Setup state
   interviewState: {
+    questions?: string[]; // questions for the interview if new interview this will be undefined and will be loaded once in the interview
     company: string;
     jobDescription: string;
     pdfFile?: File;
@@ -68,6 +69,7 @@ const DEFAULT_SETTINGS: InterviewSettings = {
 export const useInterviewStore = create<InterviewStore>((set) => ({
   // Setup state
   interviewState: {
+    
     company: "",
     jobDescription: "",
     pdfFile: undefined,

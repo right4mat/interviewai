@@ -5,6 +5,7 @@ import { convertPdfToImageArray } from "@/utils/util";
 import { useConfirmMutation } from "@/hooks/useConfirmMutation";
 import supabase from "@/utils/supabase";
 
+import { useAuth } from "@/utils/auth";
 interface ScoreAnswerResponse {
   score: number;
   reasoning: string;
@@ -28,6 +29,8 @@ interface GetQuestionsRequest {
   interviewers: Interviewer;
   difficulty: string;
   type: string;
+  questions?: string[];
+  company?: string;
 }
 
 export interface GetInterviewReplyRequest {
@@ -46,7 +49,7 @@ export interface GetInterviewReplyRequest {
 
 type GetInterviewReplyResponse = { text: string; audio: string };
 
-type GetQuestionsResponse = { questions: string[], company: string };
+type GetQuestionsResponse = { questions: string[]; company: string };
 
 type ExtractResumeResponse = string;
 
@@ -97,6 +100,23 @@ interface LoadInterviewRequest {
   interviewId: string;
 }
 
+interface InterviewListResponse {
+  company: string;
+  job_description_id: number;
+  resume_id: number;
+  settings: {
+    type: "technical" | "behavioral" | "mixed";
+    difficulty: "beginner" | "intermediate" | "advanced";
+  };
+  interviewer: {
+    name: string;
+    role: string;
+  };
+  count: number;
+  avg: number;
+  created_at: string;
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, File>({
     mutationFn: async (pdfFile: File) => {
@@ -124,12 +144,24 @@ export const useScoreAnswer = () => {
 
 export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
   return useQuery<GetQuestionsResponse, Error>({
-    queryKey: ["interviewQuestions", params],
+    queryKey: [
+      "interviewQuestions",
+      params.difficulty,
+      params.type,
+      params.jobDescription,
+      params.resume,
+      params.interviewers.name,
+      params.interviewers.role
+    ],
     queryFn: async () => {
+      if (params.questions) {
+        // if questions are already loaded from save state return them
+        return { questions: params.questions, company: params.company || "" };
+      }
       const response = await apiRequest("interview/get-questions", "POST", params);
       return response;
     },
-    enabled: !!params.jobDescription && !!params.interviewers && !!params.difficulty
+    enabled: !!params.jobDescription && !!params.interviewers && !!params.difficulty && !params.questions
   });
 };
 
@@ -204,3 +236,45 @@ export const useSaveInterview = () => {
     }
   });
 };*/
+
+export const useInterviewList = () => {
+  const { user } = useAuth();
+  return useQuery<InterviewListResponse[], Error>({
+    queryKey: ["interviewList"],
+    queryFn: async () => {
+      if (!user) throw new Error("User not found");
+
+      const { data: stats, error: statsError } = await supabase
+        .from("interviews")
+        .select(
+          `
+          company,
+          job_description_id,
+          resume_id,
+          settings,
+          interviewer,
+          score.avg(),
+          count(),
+          created_at
+        `,
+          {
+            count: "exact"
+          }
+        )
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (statsError) throw statsError;
+
+      // Transform the data to match InterviewListResponse shape
+      return stats as InterviewListResponse[];
+    }
+  });
+};
+
+const extractCompanyName = (jobDescription: string): string => {
+  const match = jobDescription.match(
+    /(?:at|for|with)\s+([A-Z][A-Za-z0-9\s]+?)(?:\.|\,|\s+is|\s+are|\s+we|\s+I|\s+in|\s+to|\s+and|\s+seeking|\s+looking|\s+hiring|$)/
+  );
+  return match ? match[1].trim() : "Unknown Company";
+};

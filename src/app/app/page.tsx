@@ -1,15 +1,16 @@
 // @next
+import Home from "@/blocks/app/Home";
 import dynamic from "next/dynamic";
 
 // @project
 const ScrollFab = dynamic(() => import("@/components/shared/ScrollFab"));
-const InterviewListing = dynamic(() => import("@/views/app/interviewListing"));
+const Home = dynamic(() => import("@/blocks/app/Home"));
 /***************************  PAGE - ROOT  ***************************/
 
 export default function DashboardPage() {
   return (
     <>
-      <InterviewListing />
+      <Home />
       {/* scroll to top section */}
       <ScrollFab />
     </>

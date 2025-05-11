@@ -29,7 +29,7 @@ export default function Interview(): React.ReactElement {
     isMuted,
     isVideoOn,
     isChatOpen,
-    interviewState: { interviewStarted, ...interviewState },
+    interviewState: { interviewStarted, questions, company, ...interviewState },
     toggleMute,
     toggleVideo,
     toggleChat,
@@ -39,13 +39,15 @@ export default function Interview(): React.ReactElement {
     updateInterviewState
   } = useInterviewStore();
 
-  // Fetch interview questions using custom hook
+  // Fetch interview questions using custom hook. If questions are already loaded from save state, they will be used.
   const { data: details, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
     jobDescription: interviewState.jobDescription,
     interviewers: interviewState.interviewer,
     resume: interviewState.resume,
     difficulty: interviewState.settings.difficulty,
-    type: interviewState.settings.type
+    type: interviewState.settings.type,
+    questions: questions,
+    company: company
   });
 
   // Use the combined interview hook
@@ -98,6 +100,7 @@ export default function Interview(): React.ReactElement {
 
   const handleStopInterview = () => {
     saveInterview({
+      company: details?.company || "",
       questions: details?.questions || [],
       currentQuestionIndex,
       interviewer: interviewState.interviewer,
@@ -116,6 +119,7 @@ export default function Interview(): React.ReactElement {
 
   const handleConfirmEndCall = () => {
     saveInterview({
+      company: details?.company || "",
       questions: details?.questions || [],
       currentQuestionIndex,
       settings: interviewState.settings,
