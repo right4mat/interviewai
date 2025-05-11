@@ -202,13 +202,14 @@ export const useSaveInterview = () => {
 };
 
 export const useLoadInterview = () => {
+  const { user } = useAuth();
   return useMutation<SaveInterviewRequest, Error, LoadInterviewRequest>({
     mutationFn: async (variables: LoadInterviewRequest) => {
+      if (!user) throw new Error("User not found");
       const { data: interview, error: interviewError } = await supabase
         .from("interviews")
         .select(
-          `
-          id,
+          `id,
           questions,
           settings,
           interviewer,
@@ -219,13 +220,17 @@ export const useLoadInterview = () => {
             resume
           ),
           question_answers (
+            question,
+            score,
+            reasoning,
+            cleaned_answer,
             current_question_index,
-            question_answers,
             company
-        )
+          )
         `
         )
         .eq("id", variables.interviewId)
+        .eq("user_id", user?.id)
         .single();
 
       if (interviewError) throw interviewError;
@@ -235,14 +240,19 @@ export const useLoadInterview = () => {
 
       // Transform the data to match SaveInterviewRequest shape
       return {
-        questions: interview.questions,
-        currentQuestionIndex: interview.question_answers.current_question_index,
-        interviewer: interview.interviewer,
-        settings: interview.settings,
-        jobDescription: interview.job_descriptions.job_description,
-        resume: interview.resumes?.resume,
-        questionAnswers: interview.question_answers,
-        company: interview.question_answers.company
+        company: interview.question_answers?.[0]?.company || "",
+        questions: interview.questions || [],
+        currentQuestionIndex: interview.question_answers?.[0]?.current_question_index || 0,
+        interviewer: interview.interviewer || { name: "", role: "" },
+        settings: interview.settings || { difficulty: "", type: "" },
+        jobDescription: interview.job_descriptions?.[0]?.job_description || "",
+        resume: interview.resumes?.[0]?.resume,
+        questionAnswers: (interview.question_answers || []).map((qa) => ({
+          question: qa.question || "",
+          score: qa.score,
+          reasoning: qa.reasoning,
+          cleanedAnswer: qa.cleaned_answer
+        }))
       };
     }
   });
