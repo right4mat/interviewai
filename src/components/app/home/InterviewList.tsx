@@ -16,6 +16,9 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import { InterviewListResponse } from "./types";
 import Stack from "@mui/material/Stack";
 import { Gauge } from "@mui/x-charts/Gauge";
+import { useLoadInterview } from "@/services/InterviewServices";
+import { QuestionAnswer, useInterviewStore } from "@/stores/interviewStore";
+import { useRouter } from "next/navigation";
 
 interface InterviewListProps {
   interviews: InterviewListResponse[];
@@ -23,9 +26,46 @@ interface InterviewListProps {
 }
 
 export function InterviewList({ interviews, isLoading }: InterviewListProps) {
-  const handleTryAgain = (interviewId: number) => {
-    // TODO: Implement try again logic
-    console.log("Try again for interview:", interviewId);
+  const router = useRouter();
+  const loadInterview = useLoadInterview();
+  const { updateInterviewState, setStage } = useInterviewStore();
+
+  const handleTryAgain = async (interviewId: number) => {
+    try {
+      const loadedInterview = await loadInterview.mutateAsync({ interviewId: interviewId.toString() });
+      
+      // Update the interview store with the loaded interview data
+      const newState = {
+        questions: loadedInterview.questions,
+        company: loadedInterview.company,
+        jobDescription: loadedInterview.jobDescription,
+        interviewer: loadedInterview.interviewer,
+        settings: {
+          type: loadedInterview.settings.type as "technical" | "behavioral" | "mixed",
+          difficulty: loadedInterview.settings.difficulty as "beginner" | "intermediate" | "advanced"
+        },
+        resume: loadedInterview.resume || "",
+        currentQuestionIndex: loadedInterview.currentQuestionIndex,
+        questionAnswers: loadedInterview.questionAnswers.map(qa => ({
+          question: qa.question,
+          answer: qa.cleanedAnswer || "",
+          score: qa.score,
+          reasoning: qa.reasoning,
+          cleanedAnswer: qa.cleanedAnswer,
+          modelAnswer: "",
+          questionSummary: "",
+        }))
+      };
+      
+      updateInterviewState(newState);
+
+      // Set the stage to interview and navigate to the interview page
+      setStage("interview");
+      router.push("/interview");
+    } catch (error) {
+      console.error("Failed to load interview:", error);
+      // TODO: Add error handling UI feedback
+    }
   };
 
   const handleViewAttempts = (interviewId: number) => {

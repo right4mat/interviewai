@@ -6,7 +6,7 @@ interface InterviewSettings {
   difficulty: "beginner" | "intermediate" | "advanced";
 }
 
-interface QuestionAnswer {
+export interface QuestionAnswer {
   question: string;
   answer: string;
   score?: number;
@@ -14,7 +14,6 @@ interface QuestionAnswer {
   cleanedAnswer?: string;
   modelAnswer?: string;
   questionSummary: string;
-  currentQuestionIndex: number;
 }
 
 interface InterviewStore {
@@ -45,7 +44,7 @@ interface InterviewStore {
   setSettings: (settings: InterviewSettings) => void;
   clearinterviewState: () => void;
   setStage: (stage: "setup" | "interview") => void;
-  updateInterviewState: (state: Partial<InterviewState>) => void;
+  updateInterviewState: (state: Partial<InterviewStore["interviewState"]>) => void;
 
   // Interview actions
   toggleMute: () => void;
@@ -66,21 +65,22 @@ const DEFAULT_SETTINGS: InterviewSettings = {
   difficulty: "intermediate"
 };
 
+const DEFAULT_INTERVIEW_STATE = {
+  company: "",
+  jobDescription: "",
+  pdfFile: undefined,
+  interviewer: DEFAULT_INTERVIEWER,
+  settings: DEFAULT_SETTINGS,
+  resume: "",
+  interviewStarted: false,
+  currentQuestionIndex: 0,
+  questionAnswers: [],
+  stage: "setup" as const
+};
+
 export const useInterviewStore = create<InterviewStore>((set) => ({
   // Setup state
-  interviewState: {
-    
-    company: "",
-    jobDescription: "",
-    pdfFile: undefined,
-    interviewer: DEFAULT_INTERVIEWER,
-    settings: DEFAULT_SETTINGS,
-    resume: "",
-    interviewStarted: false,
-    currentQuestionIndex: 0,
-    questionAnswers: [],
-    stage: "setup"
-  },
+  interviewState: DEFAULT_INTERVIEW_STATE,
 
   isMuted: false,
   isVideoOn: true,
