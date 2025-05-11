@@ -201,21 +201,31 @@ export const useSaveInterview = () => {
   });
 };
 
-/*export const useLoadInterview = () => {
+export const useLoadInterview = () => {
   return useMutation<SaveInterviewRequest, Error, LoadInterviewRequest>({
     mutationFn: async (variables: LoadInterviewRequest) => {
       const { data: interview, error: interviewError } = await supabase
-        .from('interviews')
-        .select(`
-          *,
+        .from("interviews")
+        .select(
+          `
+          id,
+          questions,
+          settings,
+          interviewer,
           job_descriptions (
             job_description
           ),
           resumes (
             resume
-          )
-        `)
-        .eq('id', variables.interviewId)
+          ),
+          question_answers (
+            current_question_index,
+            question_answers,
+            company
+        )
+        `
+        )
+        .eq("id", variables.interviewId)
         .single();
 
       if (interviewError) throw interviewError;
@@ -226,16 +236,17 @@ export const useSaveInterview = () => {
       // Transform the data to match SaveInterviewRequest shape
       return {
         questions: interview.questions,
-        currentQuestionIndex: interview.current_question_index,
+        currentQuestionIndex: interview.question_answers.current_question_index,
         interviewer: interview.interviewer,
         settings: interview.settings,
         jobDescription: interview.job_descriptions.job_description,
         resume: interview.resumes?.resume,
-        questionAnswers: interview.question_answers
+        questionAnswers: interview.question_answers,
+        company: interview.question_answers.company
       };
     }
   });
-};*/
+};
 
 export const useInterviewList = () => {
   const { user } = useAuth();
@@ -245,21 +256,18 @@ export const useInterviewList = () => {
       if (!user) throw new Error("User not found");
 
       const { data: stats, error: statsError } = await supabase
-        .from("interviews")
+        .from("interviews ")
         .select(
-          `
+          `id,
           company,
           job_description_id,
           resume_id,
           settings,
           interviewer,
-          score.avg(),
-          count(),
-          created_at
-        `,
-          {
-            count: "exact"
-          }
+          question_answers(score.avg()),
+          created_at,
+          count()
+        `
         )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -267,14 +275,10 @@ export const useInterviewList = () => {
       if (statsError) throw statsError;
 
       // Transform the data to match InterviewListResponse shape
-      return stats as InterviewListResponse[];
+      return stats.map((stat) => ({
+        ...stat,
+        avg: stat.question_answers?.[0]?.avg
+      }));
     }
   });
-};
-
-const extractCompanyName = (jobDescription: string): string => {
-  const match = jobDescription.match(
-    /(?:at|for|with)\s+([A-Z][A-Za-z0-9\s]+?)(?:\.|\,|\s+is|\s+are|\s+we|\s+I|\s+in|\s+to|\s+and|\s+seeking|\s+looking|\s+hiring|$)/
-  );
-  return match ? match[1].trim() : "Unknown Company";
 };

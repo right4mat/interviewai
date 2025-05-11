@@ -15,6 +15,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ReplayIcon from "@mui/icons-material/Replay";
 import { InterviewListResponse } from "./types";
 import Stack from "@mui/material/Stack";
+import { Gauge } from "@mui/x-charts/Gauge";
+
 interface InterviewListProps {
   interviews: InterviewListResponse[];
   isLoading: boolean;
@@ -78,35 +80,17 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const value = params.row?.avg ?? 0;
         return (
-          <Box sx={{ position: "relative", display: "inline-flex", width: "100%", height: "100%", alignItems: "center" }}>
-            <CircularProgress
-              variant="determinate"
+          <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center" }}>
+            <Gauge
               value={value}
-              size={32}
-              thickness={4}
               sx={{
-                color: brand[500],
-                "& .MuiCircularProgress-circle": {
-                  strokeLinecap: "round"
+                width: 55,
+                height: 55,
+                "& .MuiGauge-root": {
+                  color: brand[500]
                 }
               }}
             />
-            <Box
-              sx={{
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                position: "absolute",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Typography variant="caption" component="div" color="text.secondary">
-                {`${Math.round(value)}%`}
-              </Typography>
-            </Box>
           </Box>
         );
       }

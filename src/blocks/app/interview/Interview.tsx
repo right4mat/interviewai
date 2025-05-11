@@ -117,22 +117,6 @@ export default function Interview(): React.ReactElement {
     setShowEndCallDialog(true);
   };
 
-  const handleConfirmEndCall = () => {
-    saveInterview({
-      company: details?.company || "",
-      questions: details?.questions || [],
-      currentQuestionIndex,
-      settings: interviewState.settings,
-      jobDescription: interviewState.jobDescription,
-      resume: interviewState.resume,
-      interviewer: interviewState.interviewer,
-      questionAnswers
-    }, {
-      onSuccess: handleSaveSuccess
-    });
-    setShowEndCallDialog(false);
-  };
-
   const handleCancelEndCall = () => {
     setShowEndCallDialog(false);
   };

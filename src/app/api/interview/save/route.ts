@@ -6,8 +6,6 @@ import supabase from "../../_supabase";
 import { User } from "@supabase/supabase-js";
 const crypto = require('crypto');
 
-
-
 // Define schema for request validation
 const getQuestionsSchema = z.object({
   questions: z.array(z.string()),
@@ -105,14 +103,12 @@ export const POST = requireAuth(async (req: NextRequest, user: User) => {
     const totalScore = questionAnswers.reduce((sum, qa) => sum + (qa.score || 0), 0);
 
     // Store interview record
-    const { error: interviewError } = await supabase
+    const { data: interview, error: interviewError } = await supabase
       .from('interviews')
       .insert([{
         user_id: user.id,
         job_description_id: jobDescData.id,
-        resume_id: resumeData?.id || null,
-        question_answers: questionAnswers,
-        score: totalScore,
+        resume_id: resumeData?.id || null,        
         settings: {
           difficulty: result.data.settings.difficulty,
           type: result.data.settings.type,
@@ -122,10 +118,24 @@ export const POST = requireAuth(async (req: NextRequest, user: User) => {
           role: result.data.interviewer.role,
         },
         questions: result.data.questions,
-        current_question_index: result.data.currentQuestionIndex,
-      }]);
+      }])
+      .select('id')
+      .single();
 
     if (interviewError) throw interviewError;
+
+    // Store question answers
+    const { error: answersError } = await supabase
+      .from('question_answers')
+      .insert([{
+        interview_id: interview.id,
+        user_id: user.id,
+        question_answers: questionAnswers,
+        score: totalScore,
+        current_question_index: result.data.currentQuestionIndex
+      }]);
+
+    if (answersError) throw answersError;
 
     return NextResponse.json({ 
       status: "success",
