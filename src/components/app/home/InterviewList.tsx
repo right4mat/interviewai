@@ -16,7 +16,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import { InterviewListResponse } from "./types";
 import Stack from "@mui/material/Stack";
 import { Gauge } from "@mui/x-charts/Gauge";
-import { useLoadInterview } from "@/services/InterviewServices";
+import { useLoadInterview, useDeleteInterview } from "@/services/InterviewServices";
 import { QuestionAnswer, useInterviewStore } from "@/stores/interviewStore";
 import { useRouter } from "next/navigation";
 
@@ -28,6 +28,7 @@ interface InterviewListProps {
 export function InterviewList({ interviews, isLoading }: InterviewListProps) {
   const router = useRouter();
   const loadInterview = useLoadInterview();
+  const deleteInterview = useDeleteInterview();
   const { updateInterviewState, setStage } = useInterviewStore();
 
   const handleTryAgain = async (interviewId: number) => {
@@ -50,8 +51,6 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         stage: "interview" as "interview" | "setup"
       };
 
-    
-
       updateInterviewState(newState);
       router.push("/app/interview");
     } catch (error) {
@@ -65,9 +64,14 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
     console.log("View attempts for interview:", interviewId);
   };
 
-  const handleDelete = (interviewId: number) => {
-    // TODO: Implement delete logic
-    console.log("Delete interview:", interviewId);
+  const handleDelete = async (interviewId: number) => {
+    try {
+      await deleteInterview.mutateAsync({ interviewId });
+      // The page will automatically refresh due to react-query cache invalidation
+    } catch (error) {
+      console.error("Failed to delete interview:", error);
+      // TODO: Add error handling UI feedback
+    }
   };
 
   const columns: GridColDef<InterviewListResponse>[] = [
@@ -179,6 +183,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
 
   return (
     <>
+      {deleteInterview.ConfirmDialog}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Interview History
       </Typography>

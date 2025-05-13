@@ -2,9 +2,9 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { GeneralSettingsConfig, GeneralSettings } from "@/components/dashboard/GeneralSettings";
-import { PasswordSettings, PasswordSettingsConfig } from "@/components/dashboard/PasswordSettings";
-import  {BillingSettings, BillingSettingsConfig } from "@/components/dashboard/BillingSettings";
+import { GeneralSettingsConfig, GeneralSettings } from "@/components/app/settings/GeneralSettings";
+import { PasswordSettings, PasswordSettingsConfig } from "@/components/app/settings/PasswordSettings";
+import  {BillingSettings, BillingSettingsConfig } from "@/components/app/settings/BillingSettings";
 import { Container } from "@mui/material";
 
 

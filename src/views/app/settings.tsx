@@ -2,7 +2,7 @@
 
 // @project
 import Settings from "@/blocks/app/Settings";
-import { settings } from "@/views/dashboard/data/settings";
+import { settings } from "@/views/app/data/settings";
 
 /***************************  PAGE - AUTH  ***************************/
 

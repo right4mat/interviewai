@@ -26,7 +26,7 @@ function getDaysInMonth(month: number, year: number) {
 }
 
 export default function Home(): React.ReactElement {
-  const { data: interviews = [], isLoading } = useInterviewList();
+  const { data: interviews = [], isLoading, refetch } = useInterviewList();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const daysInWeek = getDaysInMonth(4, 2024);
@@ -73,4 +73,4 @@ export default function Home(): React.ReactElement {
       <InterviewList interviews={interviews} isLoading={isLoading} />
     </Box>
   );
-} 
+}

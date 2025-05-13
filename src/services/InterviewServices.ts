@@ -4,7 +4,7 @@ import { Interviewer } from "@/types/interview";
 import { convertPdfToImageArray } from "@/utils/util";
 import { useConfirmMutation } from "@/hooks/useConfirmMutation";
 import supabase from "@/utils/supabase";
-
+import { client } from "@/utils/db";
 import { useAuth } from "@/utils/auth";
 interface ScoreAnswerResponse {
   score: number;
@@ -91,7 +91,12 @@ interface LoadInterviewRequest {
   interviewId: number;
 }
 
+interface DeleteInterviewRequest {
+  interviewId: number;
+}
+
 interface InterviewListResponse {
+  id: number;
   company: string;
   job_description_id: number;
   resume_id: number;
@@ -281,6 +286,33 @@ export const useInterviewList = () => {
         ...stat,
         avg: stat.question_answers?.[0]?.avg
       }));
+    }
+  });
+};
+
+export const useDeleteInterview = () => {
+  const { user } = useAuth();
+  return useConfirmMutation({
+    mutationFn: async (variables: DeleteInterviewRequest) => {
+      if (!user) throw new Error("User not found");
+      const { error } = await supabase
+        .from("interviews")
+        .delete()
+        .eq("id", variables.interviewId)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["interviewList"] });
+    },
+    confirmConfig: {
+      title: "Delete Interview",
+      content: "Are you sure you want to delete this interview? This action cannot be undone.",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      confirmColor: "error"
     }
   });
 };

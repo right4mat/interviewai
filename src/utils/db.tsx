@@ -7,7 +7,7 @@ import supabase from "./supabase";
 import { ReactNode } from "react";
 
 // React Query client with configuration
-const client = new QueryClient({
+export const client = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // Data considered fresh for 5 minutes
