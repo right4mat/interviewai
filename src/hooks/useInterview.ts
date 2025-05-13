@@ -75,6 +75,7 @@ export const useInterview = ({
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   // Speech recognition configuration
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
@@ -167,15 +168,16 @@ export const useInterview = ({
 
     audioRef.current = new Audio(response.audio);
     audioRef.current.onended = () => {
-      
       audioRef.current = null;
       if (audioContextRef.current) {
         audioContextRef.current.close();
         audioContextRef.current = null;
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
       setVolumeLevel(0);
       setIsAISpeaking(false);
-    
     };
 
     // Set up audio analysis
@@ -194,7 +196,7 @@ export const useInterview = ({
         analyserRef.current.getByteFrequencyData(dataArray);
         const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
         setVolumeLevel(avg);
-        requestAnimationFrame(updateVolume);
+        animationFrameRef.current = requestAnimationFrame(updateVolume);
       }
     };
 
@@ -204,14 +206,12 @@ export const useInterview = ({
         console.error("Error playing audio:", error);
         setIsAISpeaking(false);
         audioRef.current = null;
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
         setVolumeLevel(0);
       });
       updateVolume();
-      audioRef?.current?.onended &&
-        (audioRef.current.onended = () => {
-          setIsAISpeaking(false);
-          setVolumeLevel(0);
-        });
     });
   };
 
@@ -325,6 +325,15 @@ export const useInterview = ({
     }
   }, [browserSupportsSpeechRecognition, isAISpeaking, currentQuestion, interviewStarted]);
 
+  // Cleanup animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
   /**
    * Stops current audio playback and resets speaking state
    */
@@ -336,6 +345,9 @@ export const useInterview = ({
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
+    }
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
     }
     setIsAISpeaking(false);
     setVolumeLevel(0);

@@ -106,7 +106,6 @@ const ScoreCircle = ({ score }: { score?: number }) => (
 
 const QuestionHistory = ({ qa, index }: { qa: QuestionAnswer, index: number }) => (
   <motion.div
-    key={index+''}
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ delay: index * 0.1 }}
@@ -369,7 +368,7 @@ export default function InterviewProgress({
           <Box ref={questionsContainerRef} sx={{ flex: 1, overflow: "auto", maxHeight: "60vh" }}>
             <AnimatePresence>
               {reversedQuestionAnswers.map((qa, index) => (
-                <QuestionHistory key={index+"qa"} qa={qa} index={index} />
+                <QuestionHistory key={JSON.stringify(qa)} qa={qa} index={index} />
               ))}
             </AnimatePresence>
           </Box>
