@@ -32,8 +32,8 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
 
   const handleTryAgain = async (interviewId: number) => {
     try {
-      const loadedInterview = await loadInterview.mutateAsync({ interviewId: interviewId.toString() });
-      
+      const loadedInterview = await loadInterview.mutateAsync({ interviewId: interviewId });
+
       // Update the interview store with the loaded interview data
       const newState = {
         questions: loadedInterview.questions,
@@ -45,23 +45,15 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
           difficulty: loadedInterview.settings.difficulty as "beginner" | "intermediate" | "advanced"
         },
         resume: loadedInterview.resume || "",
-        currentQuestionIndex: loadedInterview.currentQuestionIndex,
-        questionAnswers: loadedInterview.questionAnswers.map(qa => ({
-          question: qa.question,
-          answer: qa.cleanedAnswer || "",
-          score: qa.score,
-          reasoning: qa.reasoning,
-          cleanedAnswer: qa.cleanedAnswer,
-          modelAnswer: "",
-          questionSummary: "",
-        }))
+        currentQuestionIndex: 0,
+        questionAnswers: [],
+        stage: "interview" as "interview" | "setup"
       };
-      
-      updateInterviewState(newState);
 
-      // Set the stage to interview and navigate to the interview page
-      setStage("interview");
-      router.push("/interview");
+    
+
+      updateInterviewState(newState);
+      router.push("/app/interview");
     } catch (error) {
       console.error("Failed to load interview:", error);
       // TODO: Add error handling UI feedback
@@ -150,30 +142,28 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       flex: 1,
       minWidth: 200,
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
-        const interviewId = params.row.job_description_id;
+        const interviewId = params.row.id;
         return (
-      
-            <ActionButton
-              label="Try Again"
-              variant="outlined"
-              startIcon={<ReplayIcon />}
-              actions={[
-                {
-                  label: "View Attempts",
-                  icon: <VisibilityIcon />,
-                  onClick: () => handleViewAttempts(interviewId),
-                  color: "primary"
-                },
-                {
-                  label: "Delete",
-                  icon: <DeleteIcon />,
-                  onClick: () => handleDelete(interviewId),
-                  color: "error"
-                }
-              ]}
-              onClick={() => handleTryAgain(interviewId)}
-            />
-       
+          <ActionButton
+            label="Try Again"
+            variant="outlined"
+            startIcon={<ReplayIcon />}
+            actions={[
+              {
+                label: "View Attempts",
+                icon: <VisibilityIcon />,
+                onClick: () => handleViewAttempts(interviewId),
+                color: "primary"
+              },
+              {
+                label: "Delete",
+                icon: <DeleteIcon />,
+                onClick: () => handleDelete(interviewId),
+                color: "error"
+              }
+            ]}
+            onClick={() => handleTryAgain(interviewId)}
+          />
         );
       }
     }
@@ -194,7 +184,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       </Typography>
       <Card sx={{ p: 2 }} variant="outlined">
         <CustomizedDataGrid
-          rows={interviews?.map((interview, index) => ({ ...interview, id: index })) || []}
+          rows={interviews || []}
           columns={columns}
           pageSize={10}
           checkboxSelection={false}

@@ -12,6 +12,7 @@ interface ScoreAnswerResponse {
   cleanedAnswer: string;
   questionSummary: string;
   modelAnswer: string;
+  question: string;
 }
 
 interface ScoreAnswerRequest {
@@ -60,12 +61,7 @@ interface ReviewInterviewRequest {
   interviewers: Interviewer;
   difficulty?: string;
   type?: string;
-  questionAnswers: Array<{
-    question: string;
-    score?: number;
-    reasoning?: string;
-    cleanedAnswer?: string;
-  }>;
+  questionAnswers: ScoreAnswerResponse[];
 }
 
 interface ReviewInterviewResponse {
@@ -88,16 +84,11 @@ interface SaveInterviewRequest {
   };
   jobDescription: string;
   resume?: string;
-  questionAnswers: Array<{
-    question: string;
-    score?: number;
-    reasoning?: string;
-    cleanedAnswer?: string;
-  }>;
+  questionAnswers: ScoreAnswerResponse[];
 }
 
 interface LoadInterviewRequest {
-  interviewId: string;
+  interviewId: number;
 }
 
 interface InterviewListResponse {
@@ -161,7 +152,7 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
       const response = await apiRequest("interview/get-questions", "POST", params);
       return response;
     },
-    enabled: !!params.jobDescription && !!params.interviewers && !!params.difficulty && !params.questions
+    enabled: !!params.jobDescription && !!params.interviewers && !!params.difficulty
   });
 };
 
@@ -210,6 +201,7 @@ export const useLoadInterview = () => {
         .from("interviews")
         .select(
           `id,
+          company,
           questions,
           settings,
           interviewer,
@@ -220,12 +212,10 @@ export const useLoadInterview = () => {
             resume
           ),
           question_answers (
-            question,
+            question_answers,
             score,
-            reasoning,
-            cleaned_answer,
-            current_question_index,
-            company
+            review,
+            current_question_index
           )
         `
         )
@@ -240,18 +230,20 @@ export const useLoadInterview = () => {
 
       // Transform the data to match SaveInterviewRequest shape
       return {
-        company: interview.question_answers?.[0]?.company || "",
+        company: interview.company || "",
         questions: interview.questions || [],
         currentQuestionIndex: interview.question_answers?.[0]?.current_question_index || 0,
         interviewer: interview.interviewer || { name: "", role: "" },
         settings: interview.settings || { difficulty: "", type: "" },
-        jobDescription: interview.job_descriptions?.[0]?.job_description || "",
-        resume: interview.resumes?.[0]?.resume,
-        questionAnswers: (interview.question_answers || []).map((qa) => ({
+        jobDescription: interview.job_descriptions?.job_description || "",
+        resume: interview.resumes?.resume,
+        questionAnswers: (interview.question_answers?.[0]?.question_answers).map((qa: any) => ({
           question: qa.question || "",
           score: qa.score,
           reasoning: qa.reasoning,
-          cleanedAnswer: qa.cleaned_answer
+          cleanedAnswer: qa.cleaned_answer,
+          questionSummary: qa.question_summary,
+          modelAnswer: qa.model_answer
         }))
       };
     }
@@ -266,7 +258,7 @@ export const useInterviewList = () => {
       if (!user) throw new Error("User not found");
 
       const { data: stats, error: statsError } = await supabase
-        .from("interviews ")
+        .from("interviews")
         .select(
           `id,
           company,

@@ -67,7 +67,8 @@ Do not include any other text or formatting.
         { role: "user", content: questionsPrompt }
       ],
       temperature: 0.7,
-      max_tokens: 300
+      max_tokens: 300,
+      response_format: { type: "json_object" }
     });
 
     const responseContent = response.choices[0].message.content?.trim() || '';

@@ -167,14 +167,15 @@ export const useInterview = ({
 
     audioRef.current = new Audio(response.audio);
     audioRef.current.onended = () => {
-      setIsAISpeaking(false);
+      
       audioRef.current = null;
       if (audioContextRef.current) {
         audioContextRef.current.close();
         audioContextRef.current = null;
       }
       setVolumeLevel(0);
-      SpeechRecognition.startListening({ continuous: true, language: "en-US" });
+      setIsAISpeaking(false);
+    
     };
 
     // Set up audio analysis
@@ -198,6 +199,7 @@ export const useInterview = ({
     };
 
     audioContextRef.current.resume().then(() => {
+      setIsAISpeaking(true);
       audioRef.current?.play().catch((error) => {
         console.error("Error playing audio:", error);
         setIsAISpeaking(false);
@@ -208,7 +210,7 @@ export const useInterview = ({
       audioRef?.current?.onended &&
         (audioRef.current.onended = () => {
           setIsAISpeaking(false);
-          SpeechRecognition.startListening({ continuous: true, language: "en-US" });
+          setVolumeLevel(0);
         });
     });
   };
@@ -314,12 +316,14 @@ export const useInterview = ({
       return;
     }
 
-    if ((isAISpeaking || !interviewStarted) && listening) {
+    if ((isAISpeaking || !interviewStarted)) {
+      console.log("stopping listening");
       SpeechRecognition.stopListening();
     } else if (!isAISpeaking && currentQuestion && interviewStarted) {
+      console.log("starting listening");
       SpeechRecognition.startListening({ continuous: true, language: "en-US" });
     }
-  }, [browserSupportsSpeechRecognition, listening, isAISpeaking, currentQuestion, interviewStarted]);
+  }, [browserSupportsSpeechRecognition, isAISpeaking, currentQuestion, interviewStarted]);
 
   /**
    * Stops current audio playback and resets speaking state

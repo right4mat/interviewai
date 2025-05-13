@@ -99,6 +99,7 @@ Do not include any text outside of this JSON object.
     } catch (e) {
       console.error("Failed to parse OpenAI response as JSON:", e);
       parsedResponse = {
+        question: question,
         cleanedAnswer: answer,
         questionSummary: question,
         score: 0,
@@ -113,6 +114,7 @@ Do not include any text outside of this JSON object.
     return NextResponse.json({
       status: "success",
       data: {
+        question: question,
         score: validScore,
         reasoning: parsedResponse.reasoning || "No reasoning provided",
         cleanedAnswer: parsedResponse.cleanedAnswer || answer,

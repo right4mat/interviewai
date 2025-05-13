@@ -121,7 +121,7 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
         stage: "setup"
       }
     })),
-  updateInterviewState: (state) => set((state) => ({ interviewState: { ...state.interviewState, ...state } })),
+  updateInterviewState: (newState) => set((state) => ({ interviewState: { ...state.interviewState, ...newState } })),
   setStage: (stage) => set((state) => ({ interviewState: { ...state.interviewState, stage } })),
 
   // Interview actions

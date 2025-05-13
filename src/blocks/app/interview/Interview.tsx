@@ -29,7 +29,7 @@ export default function Interview(): React.ReactElement {
     isMuted,
     isVideoOn,
     isChatOpen,
-    interviewState: { interviewStarted, questions, company, ...interviewState },
+    interviewState,
     toggleMute,
     toggleVideo,
     toggleChat,
@@ -39,6 +39,8 @@ export default function Interview(): React.ReactElement {
     updateInterviewState
   } = useInterviewStore();
 
+
+
   // Fetch interview questions using custom hook. If questions are already loaded from save state, they will be used.
   const { data: details, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
     jobDescription: interviewState.jobDescription,
@@ -46,8 +48,8 @@ export default function Interview(): React.ReactElement {
     resume: interviewState.resume,
     difficulty: interviewState.settings.difficulty,
     type: interviewState.settings.type,
-    questions: questions,
-    company: company
+    questions: interviewState.questions,
+    company: interviewState.company
   });
 
   // Use the combined interview hook
@@ -76,15 +78,33 @@ export default function Interview(): React.ReactElement {
     stopListening: isLoadingQuestions || isMuted,
     startingIndex: interviewState.currentQuestionIndex,
     startingAnswers: interviewState.questionAnswers,
-    interviewStarted
+    interviewStarted: !!interviewState.interviewStarted
   });
 
   // Effect to show review dialog when interview finishes this is messy but it works can fix later
   React.useEffect(() => {
-    if (currentQuestionIndex >= (details?.questions?.length || 999) && interviewStarted) {
+    if (currentQuestionIndex >= (details?.questions?.length || 999) && !!interviewState.interviewStarted) {
+      // finished so lets save the interview
+      saveInterview({
+        company: details?.company || "",
+        questions: details?.questions || [],
+        currentQuestionIndex,
+        interviewer: interviewState.interviewer,
+        settings: interviewState.settings,
+        jobDescription: interviewState.jobDescription,
+        resume: interviewState.resume,
+        questionAnswers: questionAnswers.map((answer) => ({
+          question: answer.question,
+          score: answer.score || 0,
+          reasoning: answer.reasoning || "",
+          cleanedAnswer: answer.cleanedAnswer || "",
+          questionSummary: answer.questionSummary || "",
+          modelAnswer: answer.modelAnswer || ""
+        }))
+      });
       setShowReviewDialog(true);
     }
-  }, [currentQuestionIndex, details?.questions?.length, interviewStarted]);
+  }, [currentQuestionIndex, details?.questions?.length, !!interviewState.interviewStarted]);
 
   const handleStartInterview = () => {
     if (!isLoadingQuestions && details?.questions?.length) {
@@ -99,18 +119,28 @@ export default function Interview(): React.ReactElement {
   };
 
   const handleStopInterview = () => {
-    saveInterview({
-      company: details?.company || "",
-      questions: details?.questions || [],
-      currentQuestionIndex,
-      interviewer: interviewState.interviewer,
-      settings: interviewState.settings,
-      jobDescription: interviewState.jobDescription,
-      resume: interviewState.resume,
-      questionAnswers
-    }, {
-      onSuccess: handleSaveSuccess
-    });
+    saveInterview(
+      {
+        company: details?.company || "",
+        questions: details?.questions || [],
+        currentQuestionIndex,
+        interviewer: interviewState.interviewer,
+        settings: interviewState.settings,
+        jobDescription: interviewState.jobDescription,
+        resume: interviewState.resume,
+        questionAnswers: questionAnswers.map((answer) => ({
+          question: answer.question,
+          score: answer.score || 0,
+          reasoning: answer.reasoning || "",
+          cleanedAnswer: answer.cleanedAnswer || "",
+          questionSummary: answer.questionSummary || "",
+          modelAnswer: answer.modelAnswer || ""
+        }))
+      },
+      {
+        onSuccess: handleSaveSuccess
+      }
+    );
   };
 
   const handleEndCall = () => {
@@ -157,8 +187,6 @@ export default function Interview(): React.ReactElement {
 
       {SaveConfirmDialog}
 
-
-
       {currentQuestionIndex >= (details?.questions?.length || 999) && (
         <ReviewDialog
           open={showReviewDialog}
@@ -176,7 +204,7 @@ export default function Interview(): React.ReactElement {
         {/* Video display section */}
         <Grid size={{ xs: 12, md: 9 }}>
           <VideoDisplay
-            isMuted={isAISpeaking || !isListening || isGettingReply || isScoring || isLoadingQuestions || !interviewStarted}
+            isMuted={isAISpeaking || !isListening || isGettingReply || isLoadingQuestions || !interviewState.interviewStarted}
             isAISpeaking={isAISpeaking}
             isVideoOn={isVideoOn}
             isChatOpen={isChatOpen}
@@ -197,7 +225,7 @@ export default function Interview(): React.ReactElement {
             <Button variant="outlined" size="large" onClick={() => setStage("setup")} startIcon={<ArrowBackIcon />} sx={{ ml: 2 }}>
               Back to Setup
             </Button>
-            {!interviewStarted ? (
+            {!interviewState.interviewStarted ? (
               <Button
                 component="div"
                 variant="contained"
@@ -232,7 +260,7 @@ export default function Interview(): React.ReactElement {
               buildingAnswer={buildingAnswer}
               isScoring={isScoring}
               questionAnswers={questionAnswers}
-              started={interviewStarted}
+              started={interviewState.interviewStarted}
               finished={currentQuestionIndex >= (details?.questions?.length || 999)}
             />
           </Grid>
