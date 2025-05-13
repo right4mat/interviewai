@@ -76,6 +76,8 @@ export const useInterview = ({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const volumeLevelRef = useRef<number>(0);
+  const lastVolumeUpdateRef = useRef<number>(0);
 
   // Speech recognition configuration
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
@@ -176,6 +178,7 @@ export const useInterview = ({
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      volumeLevelRef.current = 0;
       setVolumeLevel(0);
       setIsAISpeaking(false);
     };
@@ -195,7 +198,14 @@ export const useInterview = ({
       if (analyserRef.current) {
         analyserRef.current.getByteFrequencyData(dataArray);
         const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-        setVolumeLevel(avg);
+        volumeLevelRef.current = avg;
+        
+        const now = Date.now();
+        if (now - lastVolumeUpdateRef.current >= 300) { // Only update every 300ms
+          setVolumeLevel(volumeLevelRef.current);
+          lastVolumeUpdateRef.current = now;
+        }
+        
         animationFrameRef.current = requestAnimationFrame(updateVolume);
       }
     };
@@ -209,6 +219,7 @@ export const useInterview = ({
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
         }
+        volumeLevelRef.current = 0;
         setVolumeLevel(0);
       });
       updateVolume();
@@ -350,6 +361,7 @@ export const useInterview = ({
       cancelAnimationFrame(animationFrameRef.current);
     }
     setIsAISpeaking(false);
+    volumeLevelRef.current = 0;
     setVolumeLevel(0);
   };
 
