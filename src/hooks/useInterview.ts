@@ -166,6 +166,8 @@ export const useInterview = ({
 
     if (!response?.audio) return;
 
+    // Ensure speech recognition is stopped before AI starts speaking
+    SpeechRecognition.stopListening();
     setIsAISpeaking(true);
 
     audioRef.current = new Audio(response.audio);
@@ -308,10 +310,10 @@ export const useInterview = ({
 
   // Speech-to-text conversion
   useEffect(() => {
-    if (transcript) {
+    if (transcript && !isAISpeaking) { // Only update transcript if AI is not speaking
       setBuildingAnswer(transcript);
     }
-  }, [transcript]);
+  }, [transcript, isAISpeaking]);
 
   // Reset speech recognition on question change
   useEffect(() => {
@@ -327,14 +329,22 @@ export const useInterview = ({
       return;
     }
 
-    if ((isAISpeaking || !interviewStarted)) {
-      console.log("stopping listening");
+    // Always stop listening if AI is speaking
+    if (isAISpeaking) {
+      console.log("AI speaking - stopping listening");
       SpeechRecognition.stopListening();
-    } else if (!isAISpeaking && currentQuestion && interviewStarted) {
+      return;
+    }
+
+    // Only start listening if interview is active and AI is not speaking
+    if (!isAISpeaking && currentQuestion && interviewStarted && !stopListening) {
       console.log("starting listening");
       SpeechRecognition.startListening({ continuous: true, language: "en-US" });
+    } else {
+      console.log("stopping listening");
+      SpeechRecognition.stopListening();
     }
-  }, [browserSupportsSpeechRecognition, isAISpeaking, currentQuestion, interviewStarted]);
+  }, [browserSupportsSpeechRecognition, isAISpeaking, currentQuestion, interviewStarted, stopListening]);
 
   // Cleanup animation frame on unmount
   useEffect(() => {

@@ -83,7 +83,7 @@ export default function Interview(): React.ReactElement {
 
   // Effect to show review dialog when interview finishes this is messy but it works can fix later
   React.useEffect(() => {
-    if (currentQuestionIndex >= (details?.questions?.length || 999) && !!interviewState.interviewStarted) {
+    if (currentQuestionIndex >= (details?.questions?.length || 999) && !!interviewState.interviewStarted && !isAISpeaking) {
       // finished so lets save the interview
       saveInterview({
         company: details?.company || "",
