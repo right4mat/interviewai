@@ -95,8 +95,8 @@ export const WireframeSphere = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(frameRef.current);
-      if (rendererRef.current) {
-        rendererRef.current.removeChild(rendererRef.current.domElement);
+      if (rendererRef.current && containerRef.current) {
+        containerRef.current.removeChild(rendererRef.current.domElement);
       }
       sceneRef.current = null;
       rendererRef.current = null;
