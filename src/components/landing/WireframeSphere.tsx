@@ -10,6 +10,9 @@ export const WireframeSphere = () => {
   const frameRef = React.useRef<number>(0);
   const pointsRef = React.useRef<THREE.Points | null>(null);
   const cameraRef = React.useRef<THREE.PerspectiveCamera | null>(null);
+  const positionsRef = React.useRef<Float32Array | null>(null);
+  const originalPositionsRef = React.useRef<Float32Array | null>(null);
+  const targetPositionsRef = React.useRef<Float32Array | null>(null);
 
   const cleanup = React.useCallback(() => {
     if (frameRef.current) {
@@ -36,6 +39,9 @@ export const WireframeSphere = () => {
     rendererRef.current = null;
     pointsRef.current = null;
     cameraRef.current = null;
+    positionsRef.current = null;
+    originalPositionsRef.current = null;
+    targetPositionsRef.current = null;
   }, []);
   
   React.useEffect(() => {
@@ -74,7 +80,13 @@ export const WireframeSphere = () => {
     }
 
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    const positionsArray = new Float32Array(positions);
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positionsArray, 3));
+    
+    // Store original positions for reference
+    positionsRef.current = geometry.attributes.position.array as Float32Array;
+    originalPositionsRef.current = positionsArray.slice();
+    targetPositionsRef.current = new Float32Array(positionsArray.length);
 
     const material = new THREE.PointsMaterial({
       color: 0x4a90e2,
@@ -90,13 +102,53 @@ export const WireframeSphere = () => {
 
     // Animation
     let frame = 0;
-    const animate = () => {
-      if (!pointsRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current) {
+    let lastUpdateTime = 0;
+    const transitionDuration = 200; // Duration of transition in ms
+    let transitionStartTime = 0;
+    
+    const animate = (currentTime: number) => {
+      if (!pointsRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current || !positionsRef.current || !originalPositionsRef.current || !targetPositionsRef.current) {
         return;
       }
 
       frameRef.current = requestAnimationFrame(animate);
       frame += 0.002;
+      
+      // Update target positions every 200ms
+      if (currentTime - lastUpdateTime > (200 + Math.random() * 300)) {
+        const originalPositions = originalPositionsRef.current;
+        const targetPositions = targetPositionsRef.current;
+        
+        for (let i = 0; i < originalPositions.length; i += 3) {
+          const originalX = originalPositions[i];
+          const originalY = originalPositions[i + 1];
+          const originalZ = originalPositions[i + 2];
+          
+          // Calculate original radius
+          const radius = Math.sqrt(originalX * originalX + originalY * originalY + originalZ * originalZ);
+          
+          // Add random variation to radius (-0.2 to 0.2)
+          const radiusVariation = 1 + (Math.random() * 0.1 - 0.2);
+          
+          targetPositions[i] = originalX * radiusVariation;
+          targetPositions[i + 1] = originalY * radiusVariation;
+          targetPositions[i + 2] = originalZ * radiusVariation;
+        }
+        
+        lastUpdateTime = currentTime;
+        transitionStartTime = currentTime;
+      }
+
+      // Animate positions
+      const positions = positionsRef.current;
+      const targetPositions = targetPositionsRef.current;
+      const progress = Math.min((currentTime - transitionStartTime) / transitionDuration, 1);
+      
+      for (let i = 0; i < positions.length; i++) {
+        positions[i] += (targetPositions[i] - positions[i]) * progress;
+      }
+      
+      pointsRef.current.geometry.attributes.position.needsUpdate = true;
       
       pointsRef.current.rotation.y = frame;
       pointsRef.current.rotation.x = frame * 0.5;
@@ -104,7 +156,7 @@ export const WireframeSphere = () => {
       rendererRef.current.render(sceneRef.current, cameraRef.current);
     };
 
-    animate();
+    animate(0);
 
     // Handle resize
     const handleResize = () => {
@@ -135,4 +187,4 @@ export const WireframeSphere = () => {
   return <div ref={containerRef} style={{ width: '35vw', height: '35vw' }} />;
 };
 
-export default WireframeSphere; 
+export default WireframeSphere;
