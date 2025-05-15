@@ -1,3 +1,4 @@
+"use client";
 import {ReactNode} from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -5,11 +6,12 @@ import Typography from "@mui/material/Typography";
 
 import LogoIcon from "@/icons/LogoIcon";
 import { features } from "@/features";
-import Link from "@mui/material/Link";
 import { PAGE_PATH } from "@/path";
-import { Button } from "@mui/material";
+import { useT } from "@/i18n/client";
 
 export default function Content(): ReactNode {
+  const { t } = useT('features');
+
   return (
     <Stack sx={{ flexDirection: "column", alignSelf: "center", gap: 4, maxWidth: 450 }}>
       <Box sx={{ display: { xs: "none", md: "flex" } }}>
@@ -22,10 +24,10 @@ export default function Content(): ReactNode {
           {item.icon}
           <div>
             <Typography gutterBottom sx={{ fontWeight: "medium" }}>
-              {item.title}
+              {t(`feature${index + 1}.title`)}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              {item.content}
+              {t(`feature${index + 1}.description`)}
             </Typography>
           </div>
         </Stack>

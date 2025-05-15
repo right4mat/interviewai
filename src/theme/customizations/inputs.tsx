@@ -8,7 +8,7 @@ import { toggleButtonClasses } from '@mui/material/ToggleButton';
 import CheckBoxOutlineBlankRoundedIcon from '@mui/icons-material/CheckBoxOutlineBlankRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
-import { gray, brand } from '../themePrimitives';
+import { gray, brand, red } from '../themePrimitives';
 
 /* eslint-disable import/prefer-default-export */
 export const inputsCustomizations: Components<Theme> = {
@@ -59,31 +59,31 @@ export const inputsCustomizations: Components<Theme> = {
             },
             style: {
               color: 'white',
-              backgroundColor: brand[400],
-              backgroundImage: `linear-gradient(to bottom, ${brand[500]}, ${brand[600]})`,
-              boxShadow: `inset 0 1px 0 ${brand[600]}, inset 0 -1px 0 1px ${brand[700]}`,
-              border: `1px solid ${brand[700]}`,
+              backgroundColor: brand[500],
+              backgroundImage: `linear-gradient(to bottom, ${brand[400]}, ${brand[500]})`,
+              boxShadow: `inset 0 1px 0 ${brand[300]}, inset 0 -1px 0 1px ${brand[700]}`,
+              border: `1px solid ${brand[500]}`,
               '&:hover': {
                 backgroundImage: 'none',
-                backgroundColor: brand[700],
+                backgroundColor: brand[600],
                 boxShadow: 'none',
               },
               '&:active': {
-                backgroundColor: brand[800],
+                backgroundColor: brand[700],
               },
               ...theme.applyStyles('dark', {
-                color: 'black',
-                backgroundColor: brand[50],
-                backgroundImage: `linear-gradient(to bottom, ${brand[100]}, ${brand[50]})`,
-                boxShadow: 'inset 0 -1px 0  hsl(220, 30%, 80%)',
-                border: `1px solid ${brand[50]}`,
+                color: 'white',
+                backgroundColor: brand[600],
+                backgroundImage: `linear-gradient(to bottom, ${brand[500]}, ${brand[600]})`,
+                boxShadow: `inset 0 1px 0 ${brand[400]}, inset 0 -1px 0 1px ${brand[800]}`,
+                border: `1px solid ${brand[600]}`,
                 '&:hover': {
                   backgroundImage: 'none',
-                  backgroundColor: brand[300],
+                  backgroundColor: brand[700],
                   boxShadow: 'none',
                 },
                 '&:active': {
-                  backgroundColor: brand[400],
+                  backgroundColor: brand[800],
                 },
               }),
             },
@@ -111,10 +111,31 @@ export const inputsCustomizations: Components<Theme> = {
           },
           {
             props: {
+              color: 'error',
+              variant: 'contained',
+            },
+            style: {
+              color: 'white',
+              backgroundColor: red[400],
+              backgroundImage: `linear-gradient(to bottom, ${alpha(red[300], 0.8)}, ${red[500]})`,
+              boxShadow: `inset 0 2px 0 ${alpha(red[200], 0.2)}, inset 0 -2px 0 ${alpha(red[600], 0.4)}`,
+              border: `1px solid ${red[400]}`,
+              '&:hover': {
+                backgroundColor: red[600],
+                boxShadow: 'none',
+              },
+              '&:active': {
+                backgroundColor: red[700],
+                backgroundImage: 'none',
+              },
+            },
+          },
+          {
+            props: {
               variant: 'outlined',
             },
             style: {
-              color: (theme.vars || theme).palette.text.primary,
+              color: brand[700],
               border: '1px solid',
               borderColor: brand[200],
               backgroundColor: alpha(brand[50], 0.3),
@@ -126,15 +147,15 @@ export const inputsCustomizations: Components<Theme> = {
                 backgroundColor: brand[200],
               },
               ...theme.applyStyles('dark', {
-                backgroundColor: brand[800],
+                backgroundColor: alpha(brand[900], 0.3),
                 borderColor: brand[700],
-
+                color: brand[100],
                 '&:hover': {
-                  backgroundColor: brand[900],
+                  backgroundColor: alpha(brand[800], 0.5),
                   borderColor: brand[600],
                 },
                 '&:active': {
-                  backgroundColor: brand[900],
+                  backgroundColor: alpha(brand[800], 0.7),
                 },
               }),
             },
@@ -173,23 +194,55 @@ export const inputsCustomizations: Components<Theme> = {
           },
           {
             props: {
+              color: 'error',
+              variant: 'outlined',
+            },
+            style: {
+              color: red[600],
+              border: '1px solid',
+              borderColor: red[200],
+              backgroundColor: red[50],
+              '&:hover': {
+                backgroundColor: red[100],
+                borderColor: red[300],
+              },
+              '&:active': {
+                backgroundColor: alpha(red[200], 0.7),
+              },
+              ...theme.applyStyles('dark', {
+                color: red[300],
+                border: '1px solid',
+                borderColor: red[900],
+                backgroundColor: alpha(red[900], 0.3),
+                '&:hover': {
+                  borderColor: red[700],
+                  backgroundColor: alpha(red[900], 0.6),
+                },
+                '&:active': {
+                  backgroundColor: alpha(red[900], 0.5),
+                },
+              }),
+            },
+          },
+          {
+            props: {
               variant: 'text',
             },
             style: {
-              color: gray[600],
+              color: brand[600],
               '&:hover': {
-                backgroundColor: gray[100],
+                backgroundColor: alpha(brand[100], 0.5),
               },
               '&:active': {
-                backgroundColor: gray[200],
+                backgroundColor: alpha(brand[200], 0.7),
               },
               ...theme.applyStyles('dark', {
-                color: gray[50],
+                color: brand[100],
                 '&:hover': {
-                  backgroundColor: gray[700],
+                  backgroundColor: alpha(brand[800], 0.5),
                 },
                 '&:active': {
-                  backgroundColor: alpha(gray[700], 0.7),
+                  backgroundColor: alpha(brand[800], 0.7),
                 },
               }),
             },
@@ -218,11 +271,35 @@ export const inputsCustomizations: Components<Theme> = {
               }),
             },
           },
+          {
+            props: {
+              color: 'error',
+              variant: 'text',
+            },
+            style: {
+              color: red[600],
+              '&:hover': {
+                backgroundColor: alpha(red[100], 0.5),
+              },
+              '&:active': {
+                backgroundColor: alpha(red[200], 0.7),
+              },
+              ...theme.applyStyles('dark', {
+                color: red[300],
+                '&:hover': {
+                  backgroundColor: alpha(red[900], 0.5),
+                },
+                '&:active': {
+                  backgroundColor: alpha(red[900], 0.3),
+                },
+              }),
+            },
+          },
         ],
       }),
     },
   },
-  MuiIconButton: {
+  /*MuiIconButton: {
     styleOverrides: {
       root: ({ theme }) => ({
         boxShadow: 'none',
@@ -276,7 +353,7 @@ export const inputsCustomizations: Components<Theme> = {
         ],
       }),
     },
-  },
+  },*/
   MuiToggleButtonGroup: {
     styleOverrides: {
       root: ({ theme }) => ({
@@ -368,6 +445,11 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: {
         border: 'none',
+        '&.Mui-error': {
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'transparent', // Remove the notched outline border in error state
+          },
+        },
       },
       input: {
         '&::placeholder': {
@@ -396,9 +478,29 @@ export const inputsCustomizations: Components<Theme> = {
           outline: `3px solid ${alpha(brand[500], 0.5)}`,
           borderColor: brand[400],
         },
+        '&.Mui-error': {
+          borderColor: red[400],
+          '&:hover': {
+            borderColor: red[600],
+          },
+          [`&.${outlinedInputClasses.focused}`]: {
+            outline: `3px solid ${alpha(red[400], 0.5)}`,
+            borderColor: red[600],
+          },
+        },
         ...theme.applyStyles('dark', {
           '&:hover': {
             borderColor: gray[500],
+          },
+          '&.Mui-error': {
+            borderColor: red[600],
+            '&:hover': {
+              borderColor: red[500],
+            },
+            [`&.${outlinedInputClasses.focused}`]: {
+              outline: `3px solid ${alpha(red[600], 0.5)}`,
+              borderColor: red[500],
+            },
           },
         }),
         variants: [
@@ -440,6 +542,12 @@ export const inputsCustomizations: Components<Theme> = {
       root: ({ theme }) => ({
         typography: theme.typography.caption,
         marginBottom: 8,
+        '&.Mui-error': {
+          color: red[600],
+          ...theme.applyStyles('dark', {
+            color: red[300],
+          }),
+        },
       }),
     },
   },

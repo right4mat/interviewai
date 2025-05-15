@@ -7,6 +7,6 @@ const PrivacyPolicy = dynamic(() => import("@/views/privacyPolicy/privacyPolicy"
 
 /***************************  PAGE - ROOT  ***************************/
 
-export default function HomePage(): ReactElement {
+export default function PrivacyPolicyPage(): ReactElement {
   return <PrivacyPolicy />;
 }

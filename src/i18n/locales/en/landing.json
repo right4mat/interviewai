@@ -1,0 +1,142 @@
+{
+  "hero": {
+    "title": "Ace your interviews with ",
+    "subtitle": "AI-powered interview prep",
+    "info": "Practice with our intelligent AI interviewer to build confidence, improve your responses, and land your dream job.",
+    "button": {
+      "text": "Start now"
+    },
+    "terms": "By clicking \"Start now\" you agree to our Terms & Conditions."
+  },
+  "navigation": {
+    "features": "Features", 
+    "testimonials": "Testimonials",
+    "highlights": "Highlights",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "signIn": "Sign in",
+    "signUp": "Sign up"
+  },
+  "features": {
+    "title": "Features",
+    "subtitle": "Everything you need to prepare for your interviews"
+  },
+  "testimonial": {
+    "item1": {
+      "name": "Sarah Johnson",
+      "occupation": "Software Engineer",
+      "testimonial": "InterviewAI helped me land my dream job at a top tech company. The realistic interview scenarios and detailed feedback improved my confidence tremendously. I felt so much more prepared walking into my actual interviews."
+    },
+    "item2": {
+      "name": "Michael Rodriguez", 
+      "occupation": "Career Coach",
+      "testimonial": "I recommend InterviewAI to all my clients. The AI interviewer asks incredibly relevant questions and provides constructive feedback that helps candidates identify their weak points. It's like having a professional interviewer available 24/7."
+    },
+    "item3": {
+      "name": "Emma Chen",
+      "occupation": "Recent Graduate",
+      "testimonial": "As a fresh graduate, I was terrified of interviews. InterviewAI helped me practice repeatedly until I felt confident. The personalized feedback on my communication style and answers was invaluable. I got offers from 3 out of 4 companies I interviewed with!"
+    },
+    "item4": {
+      "name": "David Wilson",
+      "occupation": "HR Director",
+      "testimonial": "The technology behind InterviewAI is impressive. The questions adapt based on your responses, just like a real interview. The platform even picks up on subtle communication cues and provides feedback on body language and tone."
+    },
+    "item5": {
+      "name": "Jessica Patel",
+      "occupation": "Career Switcher",
+      "testimonial": "Switching careers was daunting, but InterviewAI helped me prepare for interviews in a new industry. The industry-specific questions and guidance on transferable skills were exactly what I needed. I successfully transitioned into tech!"
+    },
+    "item6": {
+      "name": "Robert Thompson",
+      "occupation": "Senior Product Manager",
+      "testimonial": "The mock interviews feel incredibly realistic. The AI asks follow-up questions and challenges your answers just like a real interviewer would. After practicing with InterviewAI, my actual interviews felt much more manageable."
+    }
+  },
+  "highlights": {
+    "title": "Why InterviewAI?",
+    "description": "InterviewAI is your personal interview coach, available 24/7 to help you prepare for your next big opportunity.",
+    "items": {
+      "highlight1": {
+        "title": "Realistic Practice",
+        "description": "Experience true-to-life interview scenarios with our AI interviewer that adapts to your responses and industry."
+      },
+      "highlight2": {
+        "title": "Detailed Feedback",
+        "description": "Receive comprehensive feedback on your answers, communication style, and body language after each practice session."
+      },
+      "highlight3": {
+        "title": "Industry-Specific Preparation",
+        "description": "Access questions tailored to your industry, role level, and specific companies you're targeting."
+      },
+      "highlight4": {
+        "title": "Confidence Building",
+        "description": "Practice as many times as you need to build confidence and perfect your responses to common and challenging questions."
+      },
+      "highlight5": {
+        "title": "Easy to Use",
+        "description": "Jump into practice interviews anytime, anywhere. Our intuitive platform makes it simple to start preparing right away."
+      },
+      "highlight6": {
+        "title": "Progress Tracking",
+        "description": "Monitor your improvement over time with detailed analytics and progress reports."
+      }
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Choose the plan that's right for you",
+    "plans": {
+      "basic": {
+        "name": "Basic",
+        "price": "Free",
+        "description": "Perfect for getting started"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$29",
+        "description": "For serious job seekers"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Custom",
+        "description": "For organizations and career centers"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What Our Users Say",
+    "subtitle": "Trusted by job seekers worldwide",
+    "items": [
+      {
+        "name": "John Smith",
+        "role": "Software Developer",
+        "content": "InterviewAI helped me nail my technical interviews. The AI feedback was incredibly helpful in improving my responses!"
+      },
+      {
+        "name": "Sarah Johnson",
+        "role": "Marketing Manager",
+        "content": "The behavioral interview practice was exactly what I needed. I felt so much more confident in my actual interviews."
+      }
+    ]
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know",
+    "items": [
+      {
+        "question": "How does the AI interview simulation work?",
+        "answer": "Our AI conducts realistic interview scenarios, adapting questions based on your responses and providing detailed feedback on your performance."
+      },
+      {
+        "question": "Is the feedback personalized?",
+        "answer": "Yes, our AI analyzes your responses, communication style, and body language to provide tailored feedback for improvement."
+      }
+    ]
+  },
+  "clientele": {
+    "title": "Trusted By",
+    "subtitle": "Job seekers from top companies worldwide"
+  }
+}

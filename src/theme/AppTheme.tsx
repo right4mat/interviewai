@@ -8,8 +8,9 @@ import { dataDisplayCustomizations } from "./customizations/dataDisplay";
 import { feedbackCustomizations } from "./customizations/feedback";
 import { navigationCustomizations } from "./customizations/navigation";
 import { surfacesCustomizations } from "./customizations/surfaces";
-import { colorSchemes, typography, shadows, shape } from "./themePrimitives";
+import { colorSchemes, typography, shadows, shape, globalStyles } from "./themePrimitives";
 import { CssBaseline } from "@mui/material";
+import { dataGridCustomizations } from "./customizations/dataGrid";
 
 interface AppThemeProps {
   children: React.ReactNode;
@@ -18,10 +19,15 @@ interface AppThemeProps {
    */
   disableCustomTheme?: boolean;
   themeComponents?: ThemeOptions["components"];
+  /**
+   * Force a specific color mode
+   */
+  colorMode?: 'light' | 'dark' | 'system';
 }
 
 export default function AppTheme(props: AppThemeProps) {
-  const { children, disableCustomTheme, themeComponents } = props;
+  const { children, disableCustomTheme, themeComponents, colorMode = 'system' } = props;
+  
   const theme = useMemo(() => {
     return disableCustomTheme
       ? {}
@@ -36,22 +42,29 @@ export default function AppTheme(props: AppThemeProps) {
           shadows,
           shape,
           components: {
+            ...globalStyles,
+            ...dataGridCustomizations,
             ...inputsCustomizations,
             ...dataDisplayCustomizations,
             ...feedbackCustomizations,
-            //...navigationCustomizations,
+           // ...navigationCustomizations,
             ...surfacesCustomizations,
             ...themeComponents
           }
         });
   }, [disableCustomTheme, themeComponents]);
+  
   if (disableCustomTheme) {
     return <Fragment>{children}</Fragment>;
   }
 
   return (
-    <ThemeProvider theme={theme} disableTransitionOnChange>
-      <CssBaseline enableColorScheme/>
+    <ThemeProvider 
+      theme={theme} 
+      defaultMode={colorMode}
+      disableTransitionOnChange
+    >
+      <CssBaseline enableColorScheme />
       {children}
     </ThemeProvider>
   );

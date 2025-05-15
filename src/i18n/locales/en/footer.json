@@ -1,0 +1,40 @@
+{
+  "copyright": {
+    "text": "Copyright © {{brandName}} {{year}}",
+    "link": {
+      "label": "Privacy Policy"
+    }
+  },
+  "newsletter": {
+    "title": "Join the newsletter",
+    "description": "Subscribe for weekly updates from {{brandName}}. No spams ever!",
+    "inputLabel": "Email",
+    "inputPlaceholder": "Your email address",
+    "buttonText": "Subscribe"
+  },
+  "sections": {
+    "product": {
+      "title": ""
+    },
+    "company": {
+      "title": "{{brandName}}"
+    },
+    "legal": {
+      "title": "Legal"
+    }
+  },
+  "links": {
+    "aboutUs": "About us",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "bottomLinks": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "social": {
+    "github": "GitHub",
+    "twitter": "X",
+    "linkedin": "LinkedIn"
+  }
+}

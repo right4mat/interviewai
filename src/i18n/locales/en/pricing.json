@@ -1,0 +1,39 @@
+{
+  "title": "Crop Nutrition Compass Plans",
+  "description": "Choose the plan that fits your agricultural management needs",
+  "notes": [
+    "* All plans include a 14-day free trial. You can cancel anytime.",
+    "* For custom enterprise plans, please contact our sales team."
+  ],
+  "plans": {
+    "base": {
+      "title": "BASE",
+      "description": [
+        "Number of Fields: 1",
+        "Sap Analysis Reports: 1",
+        "Basic Nutrient Recommendations",
+        "Seasonal Planning",
+        "Yield Tracking"
+      ],
+      "buttonText": "Current Plan"
+    },
+    "pro": {
+      "title": "PRO",
+      "subheader": "Recommended",
+      "description": [
+        "Number of Fields: Unlimited",
+        "Sap Analysis Reports: Unlimited",
+        "Advanced Nutrient Recommendations",
+        "Seasonal Planning",
+        "Yield Tracking",
+        "Fertilizer Optimization",
+        "Crop Rotation Planner",
+        "Sustainability Metrics",
+        "Historical Data Analysis",
+        "Export Reports",
+        "Priority Support"
+      ],
+      "buttonText": "Select"
+    }
+  }
+}

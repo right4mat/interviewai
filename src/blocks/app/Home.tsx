@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { Grid } from "@mui/material";
+import { Grid, Card, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useInterviewList } from "@/services/InterviewServices";
@@ -9,6 +9,7 @@ import { StatsCard } from "@/components/app/home/StatsCard";
 import { StartPracticeCard } from "@/components/app/home/StartPracticeCard";
 import { InterviewList } from "@/components/app/home/InterviewList";
 import { TrendType } from "@/components/app/home/types";
+import { UploadResumeCard } from "@/components/app/home/UploadResumeCard";
 
 function getDaysInMonth(month: number, year: number) {
   const date = new Date(year, month, 0);
@@ -38,14 +39,6 @@ export default function Home(): React.ReactElement {
   // Prepare stats data
   const stats = [
     {
-      title: "Total Interviews",
-      value: totalInterviews.toString(),
-      interval: "All time",
-      trend: "up" as TrendType,
-      data: interviews.map((i) => i.avg || 0),
-      color: theme.palette.success.main
-    },
-    {
       title: "Average Score",
       value: `${averageScore}%`,
       interval: "All time",
@@ -59,6 +52,9 @@ export default function Home(): React.ReactElement {
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       {/* Stats Row */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <UploadResumeCard />
+        </Grid>
         {stats.map((stat, index) => (
           <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
             <StatsCard {...stat} />

@@ -1,7 +1,11 @@
-import { OutlinedInput, OutlinedInputProps } from "@mui/material";
+"use client";
+import { FormControl, FormLabel, OutlinedInput, OutlinedInputProps, FormHelperText } from "@mui/material";
 
-interface CustomInputProps extends Omit<OutlinedInputProps, 'onChange'> {
+interface CustomInputProps extends Omit<OutlinedInputProps, "onChange"> {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  error?: boolean;
+  helperText?: string;
 }
 
 export default function CustomInput({
@@ -13,20 +17,28 @@ export default function CustomInput({
   multiline = false,
   rows,
   type = "text",
+  required = false,
+  error = false,
+  helperText,
   ...props
 }: CustomInputProps) {
   return (
-    <OutlinedInput
-      placeholder={placeholder}
-      name={name}
-      label={label}
-      fullWidth
-      value={value}
-      onChange={onChange}
-      multiline={multiline}
-      rows={rows}
-      type={type}
-      {...props}
-    />
+    <FormControl fullWidth required={required} error={error}>
+      {label && <FormLabel>{label}</FormLabel>}
+      <OutlinedInput
+        placeholder={placeholder}
+        name={name}
+        label={label}
+        fullWidth
+        value={value}
+        onChange={onChange}
+        multiline={multiline}
+        rows={rows}
+        type={type}
+        error={error}
+        {...props}
+      />
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
+    </FormControl>
   );
-} 
+}

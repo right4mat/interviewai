@@ -1,6 +1,8 @@
+
+
 /** @type {import('next').NextConfig} */
 const cspHeader = `
-    default-src *;
+ default-src *;
     script-src * 'unsafe-eval' 'unsafe-inline';
     style-src * 'unsafe-inline';
     img-src * data: blob:;

@@ -58,20 +58,13 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   return (
     <>
       <ButtonGroup
-
         fullWidth
         variant={buttonProps.variant}
         color={buttonProps.color || 'primary'}
+
+      
         ref={anchorRef}
         aria-label="split button"
-        sx={{
-          '& .MuiButtonGroup-grouped': {
-            minHeight: '32px', // Match the height of small buttons
-            '&:not(:last-of-type)': {
-              borderRight: 'none',
-            },
-          },
-        }}
       >
         <Button
           {...buttonProps}
@@ -79,23 +72,20 @@ const ActionButton: React.FC<ActionButtonProps> = ({
           sx={{
             textTransform: 'none',
             flex: 1,
-            minHeight: '32px', // Match the height of small buttons
             ...buttonProps.sx
           }}
         >
           {label}
         </Button>
         <Button
+       
           aria-controls={open ? 'split-button-menu' : undefined}
           aria-expanded={open ? 'true' : undefined}
           aria-haspopup="menu"
           onClick={handleToggle}
           sx={{
             px: 0.5,
-            flex: 0.5,
-            minHeight: '32px', // Match the height of small buttons
-            minWidth: '32px', // Ensure minimum width for the dropdown button
-            ...buttonProps.sx
+            flex: .5,
           }}
         >
           <ArrowDropDownIcon />

@@ -1,51 +1,47 @@
-import SmartToyIcon from '@mui/icons-material/SmartToy';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import SettingsIcon from '@mui/icons-material/Settings';
+"use client";
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import FeedbackIcon from '@mui/icons-material/Feedback';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
+import TouchAppIcon from '@mui/icons-material/TouchApp';
+import DescriptionIcon from '@mui/icons-material/Description';
 import branding from "@/branding.json"
 import { HighlightsConfig } from "@/components/landing/Highlights";
 
+
 export const highlights: HighlightsConfig = {
-  title: `Why ${branding.brandName}?`,
-  description: `${branding.brandName} is the ultimate AI-powered interview practice platform designed to boost your confidence and readiness for real interviews.`,
+  title: 'highlights.title',
+  description: 'highlights.description',
   highlights: [
     {
-      icon: <SmartToyIcon />,
-      title: 'Realistic AI Interviews',
-      description:
-        'Experience authentic interview scenarios with our advanced AI that adapts questions based on your responses, creating a dynamic and realistic interview environment.',
-    },
-    {
-      icon: <DescriptionIcon />,
-      title: 'Tailored to Your Profile',
-      description:
-        'Upload your resume and job description to receive customized interview questions focused on the specific skills and experiences relevant to your target position.',
-    },
-    {
-      icon: <AssessmentIcon />,
-      title: 'Comprehensive Performance Analysis',
-      description:
-        'Receive detailed scoring across multiple dimensions including content quality, communication skills, and technical accuracy to understand your interview strengths and weaknesses.',
-    },
-    {
-      icon: <FeedbackIcon />,
-      title: 'Personalized Feedback',
-      description:
-        'Get actionable insights and specific recommendations on how to improve your responses, helping you refine your interview strategy and presentation.',
-    },
-    {
-      icon: <SettingsIcon />,
-      title: 'Fully Customizable Experience',
-      description:
-        'Select your preferred interview difficulty level and interviewer type (technical, behavioral, HR) to practice for exactly the kind of interview you are preparing for.',
+      icon: <PeopleAltIcon />,
+      title: 'highlights.items.highlight1.title',
+      description: 'highlights.items.highlight1.description',
     },
     {
       icon: <TrendingUpIcon />,
-      title: 'Track Your Progress',
-      description:
-        'Monitor your improvement over time with detailed analytics and progress tracking, helping you build confidence as you see tangible growth in your interview performance.',
+      title: 'highlights.items.highlight2.title',
+      description: 'highlights.items.highlight2.description',
+    },
+    {
+      icon: <AddBusinessIcon />,
+      title: 'highlights.items.highlight3.title',
+      description: 'highlights.items.highlight3.description',
+    },
+    {
+      icon: <AgricultureIcon />,
+      title: 'highlights.items.highlight4.title',
+      description: 'highlights.items.highlight4.description',
+    },
+    {
+      icon: <TouchAppIcon />,
+      title: 'highlights.items.highlight5.title',
+      description: 'highlights.items.highlight5.description',
+    },
+    {
+      icon: <DescriptionIcon />,
+      title: 'highlights.items.highlight6.title',
+      description: 'highlights.items.highlight6.description',
     },
   ]
 };

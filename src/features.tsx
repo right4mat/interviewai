@@ -1,65 +1,58 @@
 // @project
 import SmartToyIcon from '@mui/icons-material/SmartToy';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import SettingsIcon from '@mui/icons-material/Settings';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import FeedbackIcon from '@mui/icons-material/Feedback';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import PersonIcon from '@mui/icons-material/Person';
+import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import ScienceIcon from '@mui/icons-material/Science';
 
 interface Feature {
   icon: React.ReactNode;
   title: string;
   content: string;
-  description?: string;
-  imageLight?: string;
-  imageDark?: string;
 }
 
 export const features: Feature[] = [
     //start ---- top 4 will appear on signup, login
   {
     icon: <SmartToyIcon />,
-    title: "AI-Powered Interviews",
-    content: "Experience realistic interview scenarios with our advanced AI that adapts questions based on your responses, creating a dynamic and authentic interview environment."
+    title: "features.items.feature1.title",
+    content: "features.items.feature1.description"
+  },
+
+  {
+    icon: <FormatListBulletedIcon />,
+    title: "features.items.feature2.title",
+    content: "features.items.feature2.description"
   },
   {
-    icon: <DescriptionIcon />,
-    title: "Resume & Job Analysis",
-    content: "Upload your resume and job description to receive tailored interview questions that focus on the specific skills and experiences relevant to your target position."
-  },
-  {
-    icon: <SettingsIcon />,
-    title: "Customizable Experience",
-    content: "Select your preferred interview difficulty level and interviewer type (technical, behavioral, HR) to practice for exactly the kind of interview you're preparing for."
-  },
-  {
-    icon: <AssignmentIcon />,
-    title: "Real-time Feedback",
-    content: "Receive instant guidance during your interview session, helping you refine your answers and communication style as you practice."
+    icon: <CloudUploadIcon />,
+    title: "features.items.feature3.title",
+    content: "features.items.feature3.description"
   },
   //end ---- top 4 will appear on signup, login
   //start ---- bottom 4 will appear on dashboard
   {
-    icon: <AssessmentIcon />,
-    title: "Performance Analytics",
-    content: "Get comprehensive scoring across multiple dimensions including content quality, communication skills, and technical accuracy to understand your interview strengths."
+    icon: <AttachMoneyIcon />,
+    title: "features.items.feature4.title",
+    content: "features.items.feature4.description"
   },
   {
-    icon: <FeedbackIcon />,
-    title: "Personalized Insights",
-    content: "After each session, receive detailed feedback with specific suggestions for improvement tailored to your performance and the requirements of your target role."
+    icon: <AgricultureIcon />,
+    title: "features.items.feature5.title",
+    content: "features.items.feature5.description"
   },
   {
-    icon: <TrendingUpIcon />,
-    title: "Progress Tracking",
-    content: "Monitor your improvement over time with detailed analytics that show how your interview skills are developing across multiple practice sessions."
+    icon: <AnalyticsIcon />,
+    title: "features.items.feature6.title",
+    content: "features.items.feature6.description"
   },
   {
-    icon: <PersonIcon />,
-    title: "Industry-Specific Preparation",
-    content: "Access specialized interview modules designed for different industries and roles, ensuring you're prepared for the unique challenges of your field."
+    icon: <ScienceIcon />,
+    title: "features.items.feature7.title",
+    content: "features.items.feature7.description"
   }
   //end ---- bottom 4 will appear on dashboard
 ]

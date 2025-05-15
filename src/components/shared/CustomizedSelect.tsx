@@ -1,4 +1,5 @@
-import { FormControl, Select, MenuItem, SelectChangeEvent, OutlinedInput } from "@mui/material";
+"use client";
+import { FormControl, Select, MenuItem, SelectChangeEvent, OutlinedInput, FormLabel, SxProps, FormHelperText } from "@mui/material";
 
 interface CustomSelectProps {
   name: string;
@@ -6,6 +7,11 @@ interface CustomSelectProps {
   onChange: (e: SelectChangeEvent<string>) => void;
   options: { value: string; label: string }[];
   placeholder?: string;
+  label?: string;
+  sx?: SxProps;
+  required?: boolean;
+  error?: boolean;
+  helperText?: string;
 }
 
 export default function CustomSelect({
@@ -13,16 +19,25 @@ export default function CustomSelect({
   value,
   onChange,
   options,
-  placeholder = "Select an option"
+  placeholder = "Select an option",
+  label,
+  sx,
+  required = false,
+  error = false,
+  helperText
 }: CustomSelectProps) {
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth error={error}>
+      {label && <FormLabel>{label}</FormLabel>}
       <Select
         displayEmpty
         name={name}
         value={value}
         onChange={onChange}
         input={<OutlinedInput />}
+        sx={sx}
+        required={required}
+        error={error}
       >
         <MenuItem disabled value="">
           {placeholder}
@@ -33,6 +48,7 @@ export default function CustomSelect({
           </MenuItem>
         ))}
       </Select>
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   );
 } 

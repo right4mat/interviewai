@@ -16,55 +16,54 @@ export interface PricingData {
   title: string;
   description: string;
   notes: string[];
+  footer: string;
   plans: PricingTier[];
 }
 
 export const pricing: PricingData = {
-  title: "Crop Nutrition Compass Plans",
-  description: "Choose the plan that fits your agricultural management needs",
-  notes: [
-    "* All plans include a 14-day free trial. You can cancel anytime.",
-    "* For custom enterprise plans, please contact our sales team."
-  ],
+  title: "pricing.title",
+  description: "pricing.description",
+  footer: "pricing.footer",
+  notes: ["pricing.notes.0", "pricing.notes.1"],
   plans: [
     {
       id: `price_1R9ndtQeQMvUsn8KSNdLK4yu`,
-      title: "BASE",
+      title: "pricing.plans.base.title",
       price: "Free",
       period: "",
       recommended: false,
       description: [
-        "Number of Fields: 1",
-        "Sap Analysis Reports: 1",
-        "Basic Nutrient Recommendations",
-        "Seasonal Planning",
-        "Yield Tracking"
+        "pricing.plans.base.description.0",
+        "pricing.plans.base.description.1",
+        "pricing.plans.base.description.2",
+        "pricing.plans.base.description.3",
+        "pricing.plans.base.description.4"
       ],
-      buttonText: "Current Plan",
+      buttonText: "pricing.plans.base.buttonText",
       buttonVariant: "outlined",
       buttonColor: "primary"
     },
     {
       id: `price_1R9qRfQeQMvUsn8KcILO4wL5`,
-      title: "PRO",
-      subheader: "Recommended",
+      title: "pricing.plans.pro.title",
+      subheader: "pricing.plans.pro.subheader",
       recommended: true,
       price: "$800",
       period: "per year",
       description: [
-        "Number of Fields: Unlimited",
-        "Sap Analysis Reports: Unlimited",
-        "Advanced Nutrient Recommendations",
-        "Seasonal Planning",
-        "Yield Tracking",
-        "Fertilizer Optimization",
-        "Crop Rotation Planner",
-        "Sustainability Metrics",
-        "Historical Data Analysis",
-        "Export Reports",
-        "Priority Support"
+        "pricing.plans.pro.description.0",
+        "pricing.plans.pro.description.1",
+        "pricing.plans.pro.description.2",
+        "pricing.plans.pro.description.3",
+        "pricing.plans.pro.description.4",
+        "pricing.plans.pro.description.5",
+        "pricing.plans.pro.description.6",
+        "pricing.plans.pro.description.7",
+        "pricing.plans.pro.description.8",
+        "pricing.plans.pro.description.9",
+        "pricing.plans.pro.description.10"
       ],
-      buttonText: "Select",
+      buttonText: "pricing.plans.pro.buttonText",
       buttonVariant: "contained",
       buttonColor: "secondary"
     }

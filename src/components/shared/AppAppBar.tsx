@@ -15,7 +15,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Logo from "@/icons/Logo";
 import { scrollToSection } from "@/utils/util";
 import Link from "next/link";
-import ColorModeIconDropdown from "../theme/ColorModeIconDropdown";
+import { useTranslation } from "react-i18next";
 
 export interface Logo {
   href?: string;
@@ -34,6 +34,7 @@ export interface AuthButton {
 }
 
 export interface AppBarConfig {
+  translationKey: string;
   logo: Logo;
   navigationItems: NavigationItem[];
   authButtons: {
@@ -58,8 +59,9 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   padding: "8px 12px"
 }));
 
-export default function AppAppBar({ navigationItems, authButtons, logo }: AppBarConfig) {
+export default function AppAppBar({ navigationItems, authButtons, logo, translationKey }: AppBarConfig) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation(translationKey);
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -70,13 +72,14 @@ export default function AppAppBar({ navigationItems, authButtons, logo }: AppBar
       position="fixed"
       enableColorOnDark
       sx={{
+        width: "100vw",
         boxShadow: 0,
         bgcolor: "transparent",
         backgroundImage: "none",
         mt: "calc(var(--template-frame-height, 0px) + 28px)"
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <StyledToolbar variant="dense" disableGutters>
           <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}>
             {typeof logo?.href === "string" ? (
@@ -91,16 +94,16 @@ export default function AppAppBar({ navigationItems, authButtons, logo }: AppBar
               </Box>
             )}
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              {navigationItems.map((item) =>
+              {navigationItems.map((item,index) =>
                 typeof item?.href === "string" ? (
-                  <Link key={item.label} href={item.href} passHref>
+                  <Link key={index+''} href={item.href} passHref>
                     <Button component="div" variant="text" color="info" size="small">
-                      {item.label}
+                      {t(item.label)}
                     </Button>
                   </Link>
                 ) : (
-                  <Button key={item.label} variant="text" color="info" size="small" onClick={item.onClick}>
-                    {item.label}
+                  <Button key={index+''} variant="text" color="info" size="small" onClick={item.onClick}>
+                    {t(item.label)}
                   </Button>
                 )
               )}
@@ -115,15 +118,14 @@ export default function AppAppBar({ navigationItems, authButtons, logo }: AppBar
           >
             <Link href={authButtons.signIn.href} passHref>
               <Button component="div" color="primary" variant="text" size="small">
-                {authButtons.signIn.label}
+                {t(authButtons.signIn.label)}
               </Button>
             </Link>
             <Link href={authButtons.signUp.href} passHref>
               <Button component="div" color="primary" variant="contained" size="small">
-                {authButtons.signUp.label}
+                {t(authButtons.signUp.label)}
               </Button>
             </Link>
-            <ColorModeIconDropdown />
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" }, gap: 1 }}>
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
@@ -151,22 +153,22 @@ export default function AppAppBar({ navigationItems, authButtons, logo }: AppBar
                   </IconButton>
                 </Box>
 
-                {navigationItems.map((item) =>
+                {navigationItems.map((item,index) =>
                   typeof item?.href === "string" ? (
-                    <MenuItem key={item.label} onClick={toggleDrawer(false)}>
+                    <MenuItem key={index+''} onClick={toggleDrawer(false)}>
                       <Link href={item.href} style={{ width: "100%", textDecoration: "none", color: "inherit" }}>
-                        {item.label}
+                        {t(item.label)}
                       </Link>
                     </MenuItem>
                   ) : (
                     <MenuItem
-                      key={item.label}
+                      key={index+''}
                       onClick={() => {
                         item.onClick?.();
                         toggleDrawer(false)();
                       }}
                     >
-                      {item.label}
+                      {t(item.label)}
                     </MenuItem>
                   )
                 )}
@@ -174,14 +176,14 @@ export default function AppAppBar({ navigationItems, authButtons, logo }: AppBar
                 <MenuItem>
                   <Link href={authButtons.signUp.href} style={{ width: "100%" }}>
                     <Button color="primary" variant="contained" fullWidth>
-                      {authButtons.signUp.label}
+                      {t(authButtons.signUp.label)}
                     </Button>
                   </Link>
                 </MenuItem>
                 <MenuItem>
                   <Link href={authButtons.signIn.href} style={{ width: "100%" }}>
                     <Button color="primary" variant="outlined" fullWidth>
-                      {authButtons.signIn.label}
+                      {t(authButtons.signIn.label)}
                     </Button>
                   </Link>
                 </MenuItem>

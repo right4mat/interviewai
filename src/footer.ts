@@ -45,54 +45,45 @@ interface FooterContent {
 
 export const footerContent: FooterContent = {
   copyright: {
-    text: `Copyright © ${branding.brandName} ${new Date().getFullYear()}`,
+    text: "copyright.text",
     link: {
-      label: "Privacy Policy",
+      label: "copyright.link.label",
       path: PAGE_PATH.privacyPolicyPage
     }
   },
   newsletter: {
-    title: "Join the newsletter",
-    description: `Subscribe for weekly updates from ${branding.brandName}. No spams ever!`,
-    inputLabel: "Email",
-    inputPlaceholder: "Your email address",
-    buttonText: "Subscribe"
+    title: "newsletter.title",
+    description: "newsletter.description",
+    inputLabel: "newsletter.inputLabel",
+    inputPlaceholder: "newsletter.inputPlaceholder",
+    buttonText: "newsletter.buttonText"
   },
   sections: {
     product: {
-      title: "",
-      links: [
-        /*{ label: 'Features', path: PAGE_PATHS.features },
-        { label: 'Testimonials', path: PAGE_PATHS.testimonials },
-        { label: 'Highlights', path: PAGE_PATHS.highlights },
-        { label: 'Pricing', path: PAGE_PATHS.pricing },
-        { label: 'FAQs', path: PAGE_PATHS.faqs }*/
-      ]
+      title: "sections.product.title",
+      links: []
     },
     company: {
-      title: branding.brandName,
+      title: "sections.company.title",
       links: [
-        { label: "About us", path: PAGE_PATH.aboutPage }
-        /* { label: 'Careers', path: PAGE_PATHS.careers },
-        { label: 'Press', path: PAGE_PATHS.press }*/
+        { label: "links.aboutUs", path: PAGE_PATH.aboutPage }
       ]
     },
     legal: {
-      title: "Legal",
+      title: "sections.legal.title",
       links: [
-        { label: "Terms", path: PAGE_PATH.termsConditionPage },
-        { label: "Privacy", path: PAGE_PATH.privacyPolicyPage }
-        /* { label: 'Contact', path: PAGE_PATHS.contact }*/
+        { label: "links.terms", path: PAGE_PATH.termsConditionPage },
+        { label: "links.privacy", path: PAGE_PATH.privacyPolicyPage }
       ]
     }
   },
   bottomLinks: {
-    privacyPolicy: { label: "Privacy Policy", path: PAGE_PATH.privacyPolicyPage },
-    termsOfService: { label: "Terms of Service", path: PAGE_PATH.termsConditionPage }
+    privacyPolicy: { label: "bottomLinks.privacyPolicy", path: PAGE_PATH.privacyPolicyPage },
+    termsOfService: { label: "bottomLinks.termsOfService", path: PAGE_PATH.termsConditionPage }
   },
   socialLinks: {
-    github: { label: "GitHub", path: branding.company.socialLink?.github, icon: "GitHubIcon" },
-    twitter: { label: "X", path: branding.company.socialLink?.facebook, icon: "TwitterIcon" },
-    linkedin: { label: "LinkedIn", path: branding.company.socialLink?.linkedin, icon: "LinkedInIcon" }
+    github: { label: "social.github", path: branding.company.socialLink?.github, icon: "GitHubIcon" },
+    twitter: { label: "social.twitter", path: branding.company.socialLink?.facebook, icon: "TwitterIcon" },
+    linkedin: { label: "social.linkedin", path: branding.company.socialLink?.linkedin, icon: "LinkedInIcon" }
   }
 };

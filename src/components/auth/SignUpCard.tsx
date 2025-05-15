@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { useForm, Controller } from "react-hook-form";
 import Box from "@mui/material/Box";
@@ -8,7 +9,7 @@ import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
@@ -16,10 +17,12 @@ import Collapse from "@mui/material/Collapse";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import GoogleIcon from "@/images/brandIcons/Google";
-import { PAGE_PATH, AFTER_AUTH_PATH } from "@/path";
+import { AFTER_AUTH_PATH, PAGE_PATH } from "@/path";
 import { useAuth } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import LogoIcon from "@/icons/LogoIcon";
+import { useEffect } from "react";
+import { useT } from "@/i18n/client";
 
 // Define form data type
 interface FormData {
@@ -53,6 +56,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function SignUpCard(): React.ReactElement {
+  const { t } = useT("auth");
   const auth = useAuth();
   const router = useRouter();
   const [open, setOpen] = React.useState<boolean>(false);
@@ -75,6 +79,10 @@ export default function SignUpCard(): React.ReactElement {
     }
   });
 
+  useEffect(() => {
+    router.prefetch(PAGE_PATH.dashboardPage);
+  }, []);
+
   const password = watch("password");
 
   const handleClickOpen = (): void => {
@@ -87,56 +95,51 @@ export default function SignUpCard(): React.ReactElement {
 
   const onSubmit = async (data: FormData): Promise<void> => {
     try {
-      // Sign up with email/password
       await auth.signup(data.email, data.password);
-      // Show success message
       setAlertInfo({
         show: true,
-        message: "Account created successfully!",
+        message: t("signup.success"),
         severity: "success"
       });
-      // On successful signup, redirect to dashboard
-      // Only redirect if router is ready to prevent "NextRouter was not mounted" error
-
       setTimeout(() => {
         router.push(AFTER_AUTH_PATH);
       }, 500);
     } catch (error: unknown) {
-      // Handle error - show to the user
+      const errorMessage = error instanceof Error ? error.message : String(error);
       setAlertInfo({
         show: true,
-        message: `Error signing up: ${error instanceof Error ? error.message : String(error)}`,
+        message: t("signup.error.default", { message: errorMessage }),
         severity: "error"
       });
-      console.error("Error signing up:", error instanceof Error ? error.message : String(error));
+      console.error("Error signing up:", errorMessage);
     }
   };
 
   const handleGoogleSignUp = async (): Promise<void> => {
     try {
       await auth.signinWithProvider("google");
-      // Note: No need to redirect here as it's handled by the provider flow
     } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       setAlertInfo({
         show: true,
-        message: `Error signing up with Google: ${error instanceof Error ? error.message : String(error)}`,
+        message: t("signup.error.google", { message: errorMessage }),
         severity: "error"
       });
-      console.error("Error signing up with Google:", error instanceof Error ? error.message : String(error));
+      console.error("Error signing up with Google:", errorMessage);
     }
   };
 
   const handleFacebookSignUp = async (): Promise<void> => {
     try {
       await auth.signinWithProvider("facebook");
-      // Note: No need to redirect here as it's handled by the provider flow
     } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       setAlertInfo({
         show: true,
-        message: `Error signing up with Facebook: ${error instanceof Error ? error.message : String(error)}`,
+        message: t("signup.error.facebook", { message: errorMessage }),
         severity: "error"
       });
-      console.error("Error signing up with Facebook:", error instanceof Error ? error.message : String(error));
+      console.error("Error signing up with Facebook:", errorMessage);
     }
   };
 
@@ -146,7 +149,7 @@ export default function SignUpCard(): React.ReactElement {
         <LogoIcon />
       </Box>
       <Typography component="h1" variant="h4" sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}>
-        Sign up
+        {t("signup.title")}
       </Typography>
 
       <Collapse in={alertInfo.show}>
@@ -162,15 +165,15 @@ export default function SignUpCard(): React.ReactElement {
         sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 2 }}
       >
         <FormControl>
-          <FormLabel htmlFor="email">Email</FormLabel>
+          <FormLabel htmlFor="email">{t("signup.email")}</FormLabel>
           <Controller
             name="email"
             control={control}
             rules={{
-              required: "Email is required",
+              required: t("signup.validation.email.required"),
               pattern: {
                 value: /\S+@\S+\.\S+/,
-                message: "Please enter a valid email address"
+                message: t("signup.validation.email.invalid")
               }
             }}
             render={({ field }) => (
@@ -191,15 +194,15 @@ export default function SignUpCard(): React.ReactElement {
           />
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor="password">Password</FormLabel>
+          <FormLabel htmlFor="password">{t("signup.password")}</FormLabel>
           <Controller
             name="password"
             control={control}
             rules={{
-              required: "Password is required",
+              required: t("signup.validation.password.required"),
               minLength: {
                 value: 6,
-                message: "Password must be at least 6 characters long"
+                message: t("signup.validation.password.minLength")
               }
             }}
             render={({ field }) => (
@@ -219,13 +222,13 @@ export default function SignUpCard(): React.ReactElement {
           />
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+          <FormLabel htmlFor="confirmPassword">{t("signup.confirmPassword")}</FormLabel>
           <Controller
             name="confirmPassword"
             control={control}
             rules={{
-              required: "Please confirm your password",
-              validate: (value) => value === password || "Passwords do not match"
+              required: t("signup.validation.confirmPassword.required"),
+              validate: (value) => value === password || t("signup.validation.confirmPassword.mismatch")
             }}
             render={({ field }) => (
               <TextField
@@ -243,38 +246,42 @@ export default function SignUpCard(): React.ReactElement {
             )}
           />
         </FormControl>
-        <Controller
+        {/*<Controller
           name="allowExtraEmails"
           control={control}
           render={({ field }) => (
-            <FormControlLabel control={<Checkbox {...field} checked={field.value} color="primary" />} label="Allow extra emails" />
+            <FormControlLabel
+              control={<Checkbox {...field} checked={field.value} color="primary" />}
+              label={t("signup.allowExtraEmails")}
+            />
           )}
-        />
+        />*/}
         <ForgotPassword open={open} handleClose={handleClose} />
-        <Button type="submit" fullWidth variant="contained">
-          Sign up
+        <Button type="submit" fullWidth variant="contained" disabled={auth.isPending} sx={{ mt: 2 }}>
+          {t("signup.buttonAction")}
         </Button>
         <Typography sx={{ textAlign: "center" }}>
-          Already have an account?{" "}
+          {t("signup.signinText")}{" "}
           <span>
-            <Link href={PAGE_PATH.signIn} variant="body2" sx={{ alignSelf: "center" }}>
-              Sign in
+            <Link href={PAGE_PATH.signIn} style={{ textDecoration: 'underline' }}>
+              {t("signup.signinAction")}
             </Link>
           </span>
         </Typography>
       </Box>
-      <Divider>or</Divider>
+      <Divider>{t("signup.or")}</Divider>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Button fullWidth variant="outlined" onClick={handleGoogleSignUp} startIcon={<GoogleIcon />}>
-          Sign up with Google
+        <Button fullWidth variant="outlined" onClick={handleGoogleSignUp} startIcon={<GoogleIcon />} disabled={auth.isPending}>
+          {t("signup.withGoogle")}
         </Button>
         {/* <Button
           fullWidth
           variant="outlined"
           onClick={handleFacebookSignUp}
           startIcon={<FacebookIcon />}
+          disabled={auth.isPending}
         >
-          Sign up with Facebook
+          {t("signup.withFacebook")}
         </Button>*/}
       </Box>
     </Card>

@@ -1,3 +1,4 @@
+"use client";
 import { useMemo, memo, ReactNode } from "react";
 import dynamic from "next/dynamic";
 

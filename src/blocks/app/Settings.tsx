@@ -2,9 +2,9 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { GeneralSettingsConfig, GeneralSettings } from "@/components/app/settings/GeneralSettings";
-import { PasswordSettings, PasswordSettingsConfig } from "@/components/app/settings/PasswordSettings";
-import  {BillingSettings, BillingSettingsConfig } from "@/components/app/settings/BillingSettings";
+import { GeneralSettingsConfig, GeneralSettings } from "@/components/app/GeneralSettings";
+import { PasswordSettings, PasswordSettingsConfig } from "@/components/app/PasswordSettings";
+import  {BillingSettings, BillingSettingsConfig } from "@/components/app/BillingSettings";
 import { Container } from "@mui/material";
 
 
@@ -17,7 +17,7 @@ export interface SettingsConfig {
 
 export default function Settings(settings: SettingsConfig) {
   return (
-    <Container sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
+    <Container maxWidth="md">
       <Typography component="h1" variant="h4" sx={{ mb: 4, pt: 2 }}>
         {settings.title}
       </Typography>

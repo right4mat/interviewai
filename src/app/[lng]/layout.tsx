@@ -13,6 +13,13 @@ import { mainMetadata } from "@/metadata";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import Chat from "@/components/chat/Chat";
+import { ToastContainer } from "react-toastify";
+import { languages } from '../../i18n/settings'
+
+export async function generateStaticParams() {
+  return languages.map((lng) => ({ lng }))
+}
+
 // @types
 
 const gaId = process.env.NEXT_PUBLIC_ANALYTICS_ID || "";
@@ -25,6 +32,7 @@ export const metadata = { ...mainMetadata };
 
 // Root layout component that wraps the entire application
 export default function RootLayout({ children }: { children: ReactNode }) {
+  console.log("RootLayout");
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -41,6 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <ProviderWrapper>
            {   /*<Chat />*/}
               {children}
+              <ToastContainer />
             </ProviderWrapper>
           </ThemeProvider>
         </AppRouterCacheProvider>

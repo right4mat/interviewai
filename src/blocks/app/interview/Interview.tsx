@@ -104,7 +104,7 @@ export default function Interview(): React.ReactElement {
       });
       setShowReviewDialog(true);
     }
-  }, [currentQuestionIndex, details?.questions?.length, !!interviewState.interviewStarted]);
+  }, [isAISpeaking, currentQuestionIndex, details?.questions?.length, !!interviewState.interviewStarted]);
 
   const handleStartInterview = () => {
     if (!isLoadingQuestions && details?.questions?.length) {

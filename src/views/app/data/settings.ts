@@ -1,3 +1,4 @@
+"use client";
 import { SettingsConfig } from "@/blocks/app/Settings";
 import { pricing } from "@/pricing";
 

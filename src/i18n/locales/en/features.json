@@ -1,0 +1,34 @@
+{
+  "feature1": {
+    "title": "AI Interview Practice",
+    "description": "Experience realistic interview scenarios with our advanced AI interviewer that adapts to your responses."
+  },
+  "feature2": {
+    "title": "Job Description Analysis",
+    "description": "Upload job descriptions to receive tailored interview questions and preparation guidance specific to the role."
+  },
+  "feature3": {
+    "title": "Resume Integration",
+    "description": "Upload your resume to get personalized questions based on your experience and background."
+  },
+  "feature4": {
+    "title": "Customizable Settings",
+    "description": "Configure interviewer personality, difficulty level, and interview style to match your needs."
+  },
+  "feature5": {
+    "title": "Detailed Feedback",
+    "description": "Receive comprehensive feedback on your answers, communication style, and areas for improvement."
+  },
+  "feature6": {
+    "title": "Progress Tracking",
+    "description": "Monitor your improvement over time with detailed performance analytics and progress reports."
+  },
+  "feature7": {
+    "title": "Industry-Specific Questions",
+    "description": "Access a vast database of interview questions tailored to your industry and role level."
+  },
+  "feature8": {
+    "title": "Data Security",
+    "description": "Practice with confidence knowing your personal information and interview responses are fully protected."
+  }
+}

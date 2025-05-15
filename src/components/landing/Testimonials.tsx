@@ -1,43 +1,16 @@
+"use client";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
-import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import { useTheme } from "@mui/system";
-import { ReactNode } from "react";
-export interface Testimonial {
-  avatar: ReactNode;
-  brandIcon: ReactNode;
-  name: string;
-  occupation: string;
-  testimonial: string;
-}
+import { useTranslation } from "react-i18next";
+import { TestimonialsConfig } from "@/views/landing/data/testimonials";
 
-export interface TestimonialsConfig {
-  title: string;
-  description: string;
-  testimonials: Testimonial[];
-}
-
-export interface Testimonial {
-  avatar: ReactNode;
-  brandIcon: ReactNode;
-  name: string;
-  occupation: string;
-  testimonial: string;
-}
-
-export interface TestimonialsConfig {
-  title: string;
-  description: string;
-  testimonials: Testimonial[];
-}
-
-export function Testimonials({ testimonials, title, description }: TestimonialsConfig) {
-  const theme = useTheme();
+export function Testimonials({ testimonials }: TestimonialsConfig) {
+  const { t } = useTranslation("landing");
 
   return (
     <Container
@@ -59,10 +32,10 @@ export function Testimonials({ testimonials, title, description }: TestimonialsC
         }}
       >
         <Typography component="h2" variant="h4" gutterBottom sx={{ color: "text.primary" }}>
-          {title}
+          {t('testimonials.title')}
         </Typography>
         <Typography variant="body1" sx={{ color: "text.secondary" }}>
-          {description}
+          {t('testimonials.subtitle')}
         </Typography>
       </Box>
       <Grid container spacing={2}>
@@ -79,7 +52,7 @@ export function Testimonials({ testimonials, title, description }: TestimonialsC
             >
               <CardContent>
                 <Typography variant="body1" gutterBottom sx={{ color: "text.secondary" }}>
-                  {testimonial.testimonial}
+                  {t(testimonial.testimonial)}
                 </Typography>
               </CardContent>
               <Box
@@ -89,7 +62,11 @@ export function Testimonials({ testimonials, title, description }: TestimonialsC
                   justifyContent: "space-between"
                 }}
               >
-                <CardHeader avatar={testimonial.avatar} title={testimonial.name} subheader={testimonial.occupation} />
+                <CardHeader 
+                  avatar={testimonial.avatar} 
+                  title={t(testimonial.name)}
+                  subheader={t(testimonial.occupation)}
+                />
                 <Box sx={{ opacity: 0.5 }}>{testimonial.brandIcon}</Box>
               </Box>
             </Card>

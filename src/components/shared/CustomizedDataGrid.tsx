@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { DataGrid, GridDensity, GridRowParams } from "@mui/x-data-grid";
+import { DataGrid, GridDensity, GridRowParams, GridSlotsComponent, GridRowSelectionModel, GridCallbackDetails } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -89,6 +89,11 @@ export default function CustomizedDataGrid({
   disableColumnResize = true,
   density = "compact",
   onRowClick,
+  getRowId,
+  components,
+  onSelectionModelChange,
+  rowSelectionModel,
+    loading,
   ...props
 }: {
   rows: any[];
@@ -98,9 +103,16 @@ export default function CustomizedDataGrid({
   disableColumnResize: boolean;
   density: GridDensity | undefined; 
   onRowClick?: (params: GridRowParams) => void;
+  getRowId?: (row: any) => string;
+  components?: Partial<GridSlotsComponent>;
+  onSelectionModelChange?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails) => void;
+  rowSelectionModel?: GridRowSelectionModel;
+  loading?: boolean;
 }) {
   return (
     <DataGrid
+      loading={loading}
+      getRowId={getRowId}
       checkboxSelection={checkboxSelection}
       rows={rows}
       columns={columns}
@@ -112,7 +124,8 @@ export default function CustomizedDataGrid({
       disableColumnResize
       density={density}
       slots={{
-        noRowsOverlay: CustomNoRowsOverlay
+        noRowsOverlay: CustomNoRowsOverlay,
+        ...(components || {})
       }}
       slotProps={{
         filterPanel: {
@@ -140,7 +153,9 @@ export default function CustomizedDataGrid({
           }
         }
       }}
-      sx={{ "--DataGrid-overlayHeight": "300px" }}
+      sx={{ "--DataGrid-overlayHeight": "300px", p:0, overflow: "hidden" }}
+      onRowSelectionModelChange={onSelectionModelChange}
+      rowSelectionModel={rowSelectionModel}
       {...props}
     />
   );

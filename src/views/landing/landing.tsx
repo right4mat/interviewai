@@ -15,7 +15,7 @@ import { clientele } from "@/views/landing/data/clientele";
 import { features } from "@/views/landing/data/features";
 import { testimonials } from "@/views/landing/data/testimonials";
 import { highlights } from "@/views/landing/data/highlights";
-import { pricing } from "@/views/landing/data/pricing";
+import { pricing } from "@/pricing";
 import { faq } from "@/views/landing/data/faq";
 import { appBar } from "@/views/landing/data/appAppBar";
 

@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -7,47 +8,29 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { PAGE_PATH } from '@/path';
+import { useT } from '@/i18n/client';
+import { HeroConfig } from '@/views/landing/data/hero';
+import WireframeSphere from './WireframeSphere';
 
 const StyledBox = styled('div')(({ theme }) => ({
-  zIndex: -1,
-  marginTop: -120,
   alignSelf: 'center',
-  width: '90vw',
-  height: 500, // Reduced height for mobile
-  backgroundImage: `url(/assets/images/graphics/hero.png)`,
-  backgroundSize: 'contain',
-  [theme.breakpoints.up('sm')]: {
-    height: 600, // Reduced height for tablet
-  },
-  [theme.breakpoints.up('md')]: {
-    height: 800, // Medium height for desktop
-  },
-  [theme.breakpoints.up('lg')]: {
-    height: 1000, // Original height for large screens
-  },
-  ...theme.applyStyles('dark', {
-    boxShadow: '0 0 24px 12px hsla(210, 100%, 25%, 0.2)',
-    backgroundImage: `url(/assets/images/graphics/hero.png)`,
-    outlineColor: 'hsla(220, 20%, 42%, 0.1)',
-    borderColor: (theme.vars || theme).palette.grey[700],
-  }),
+  width: '50vw',
+  height: '50vh',
+  position: 'relative',
+  [theme.breakpoints.down('md')]: {
+    display: 'none'
+  }
 }));
 
-export interface HeroConfig {
-  title: string;
-  subtitle: string;
-  info: string;
-  button: { text: string; onClick: () => void };
-}
-
 export function Hero({ title, subtitle, info, button }: HeroConfig) {
+  const { t } = useT('landing');
+
   return (
     <Box
       id="hero"
       sx={(theme) => ({
         width: '100%',
         backgroundRepeat: 'no-repeat',
-
         backgroundImage:
           'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)',
         ...theme.applyStyles('dark', {
@@ -59,62 +42,58 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
       <Container
         sx={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
           pt: { xs: 14, sm: 20 },
-          pb: { xs: 0, sm: 0 },
+          pb: { xs: 8, sm: 12 },
         }}
       >
         <Stack
           spacing={2}
           useFlexGap
-          sx={{ alignItems: 'center', width: { xs: '100%', sm: '100%' } }}
+          sx={{ alignItems: 'flex-start', width: { xs: '100%', md: '50%' } }}
         >
           <Typography
             variant="h1"
             sx={{
               display: 'flex',
               flexDirection: { xs: 'column', sm: 'row' },
-              alignItems: 'center',
+              alignItems: 'flex-start',
               fontSize: 'clamp(3rem, 10vw, 3.5rem)',
-              textAlign: 'center',
+              textAlign: 'left',
             }}
           >
-            {title}
-          
+            {t(title)}
           </Typography>
           <Typography
-              variant="h1"
-              sx={(theme) => ({
-                textAlign: 'center',
-                fontSize: 'clamp(3rem, 10vw, 3.5rem)',
-                color: 'primary.main',
-                ...theme.applyStyles('dark', {
-                  color: 'primary.light',
-                }),
-              })}
-            >
-              {subtitle}
-            </Typography>
+            variant="h1"
+            sx={(theme) => ({
+              textAlign: 'left',
+              fontSize: 'clamp(3rem, 10vw, 3.5rem)',
+              color: 'primary.main',
+              ...theme.applyStyles('dark', {
+                color: 'primary.light',
+              }),
+            })}
+          >
+            {t(subtitle)}
+          </Typography>
           <Typography
             sx={{
-              textAlign: 'center',
+              textAlign: 'left',
               color: 'text.secondary',
               width: { sm: '100%', md: '80%' },
             }}
           >
-           
-            {info}
+            {t(info)}
           </Typography>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={1}
             useFlexGap
-            justifyContent="center"
+            justifyContent="flex-start"
             sx={{ pt: 2, width: { xs: '100%', sm: '350px' } }}
           >
-          
-      
             <Button
               variant="contained"
               color="primary"
@@ -122,7 +101,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
               sx={{ minWidth: 'fit-content' }}
               onClick={button.onClick}
             >
-              {button.text}
+              {t('hero.button.text')}
             </Button>
           </Stack>
           <Typography
@@ -130,14 +109,16 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
             color="text.secondary"
             sx={{ textAlign: 'center' }}
           >
-            By clicking &quot;Start now&quot; you agree to our&nbsp;
+            {t('hero.terms')}
             <Link href={PAGE_PATH.termsConditionPage} style={{ color: 'var(--mui-palette-primary-main)' }}>
               Terms & Conditions
             </Link>
             .
           </Typography>
         </Stack>
-        <StyledBox id="image" />
+        <StyledBox>
+          <WireframeSphere />
+        </StyledBox>
       </Container>
     </Box>
   );

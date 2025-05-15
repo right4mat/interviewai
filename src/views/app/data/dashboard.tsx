@@ -1,3 +1,4 @@
+"use client";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
@@ -5,6 +6,7 @@ import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import AgricultureRoundedIcon from "@mui/icons-material/AgricultureRounded";
 import { PAGE_PATH } from "@/path";
 import { logout } from "@/utils/db";
 import { DashboardProps } from "@/blocks/app/Dashboard";
@@ -16,7 +18,8 @@ export const dashboard: DashboardProps = {
     },
     menuContent: {
       mainListItems: [
-        { text: "Home", icon: <HomeRoundedIcon />, href: PAGE_PATH.dashboardPage },
+        { text: "Farms", icon: <AgricultureRoundedIcon />, href: PAGE_PATH.dashboardPage },
+
       ],
       secondaryListItems: [
         { text: "Settings", icon: <SettingsRoundedIcon />, href: PAGE_PATH.settingsPage },
@@ -45,6 +48,7 @@ export const dashboard: DashboardProps = {
     menuContent: {
       mainListItems: [
         { text: "Home", icon: <HomeRoundedIcon />, href: PAGE_PATH.dashboardPage },
+        { text: "Farms", icon: <HomeRoundedIcon />, href: PAGE_PATH.dashboardPage },
    
       ],
       secondaryListItems: [

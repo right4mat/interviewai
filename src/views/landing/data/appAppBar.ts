@@ -1,44 +1,46 @@
+"use client";
 import { scrollToSection } from "@/utils/util";
 import { PAGE_PATH } from "@/path";
 import { AppBarConfig } from "@/components/shared/AppAppBar";
 
 export const appBar: AppBarConfig = {
+  translationKey: "landing",
   logo: {
     onClick: () => scrollToSection("hero"),
   },
   navigationItems: [
     {
-      label: "Features",
+      label: "navigation.features",
       onClick: () => scrollToSection("features"),
     },
     {
-      label: "Testimonials",
+      label: "navigation.testimonials",
       onClick: () => scrollToSection("testimonials"),
     },
     {
-      label: "Highlights",
+      label: "navigation.highlights",
       onClick: () => scrollToSection("highlights"),
     },
     {
-      label: "Pricing",
+      label: "navigation.pricing",
       onClick: () => scrollToSection("pricing"),
     },
     {
-      label: "FAQ",
+      label: "navigation.faq",
       onClick: () => scrollToSection("faq"),
     },
     {
-      label: "Blog",
+      label: "navigation.blog",
       onClick: () => scrollToSection("blog"),
     },
   ],
   authButtons: {
     signIn: {
-      label: "Sign in",
+      label: "navigation.signIn",
       href: PAGE_PATH.signIn,
     },
     signUp: {
-      label: "Sign up",
+      label: "navigation.signUp",
       href: PAGE_PATH.signUp,
     },
   },

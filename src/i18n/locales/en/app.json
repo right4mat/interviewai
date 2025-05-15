@@ -1,0 +1,265 @@
+{
+  "analysisLoading": {
+    "title": "Analyzing results...",
+    "subtitle": "Please wait while we process your nutrient data"
+  },
+  "checkInfo": {
+    "title": "Check Report Data",
+    "subtitle": "Please verify that the data extracted from your report is correct before proceeding with the analysis.",
+    "form": {
+      "block": {
+        "label": "Block Name",
+        "error": "Block name is required"
+      },
+      "sampleId": {
+        "label": "Sample Name",
+        "error": "Sample name is required"
+      },
+      "crop": {
+        "label": "Crop Type",
+        "error": "Crop type is required"
+      },
+      "dateSampled": {
+        "label": "Sample Date",
+        "error": "Sample date is required"
+      },
+      "sampleType": {
+        "label": "Sample Type",
+        "options": {
+          "sap": "Sap",
+          "dryTissue": "Dry Tissue"
+        }
+      },
+      "plantType": {
+        "label": "Plant Type",
+        "options": {
+          "nonGrafted": "Non-Grafted",
+          "grafted": "Grafted"
+        },
+        "helperText": "Note: Not all grafted plants require this selection"
+      },
+      "cropStage": {
+        "label": "Crop Stage",
+        "placeholder": "Select crop stage",
+        "error": "Crop stage is required"
+      },
+      "targetCropStage": {
+        "label": "Target Crop Stage",
+        "placeholder": "Select target crop stage",
+        "error": "Target crop stage is required"
+      }
+    }
+  },
+  "gauges": {
+    "suddenWhilt": {
+      "title": "Sudden Whilt Indicator",
+      "labels": {
+        "recover": "Plant Will Recover",
+        "mightRecover": "Plant Might Recover",
+        "death": "Plant Death Imminent",
+        "minorStress": "Minor Stress",
+        "moderateStress": "Moderate Stress",
+        "significantStress": "Significant Stress",
+        "recoveryUnlikely": "Recovery Unlikely",
+        "severeDamage": "Severe Damage",
+        "criticalCondition": "Critical Condition",
+        "terminalDecline": "Terminal Decline"
+      }
+    },
+    "cropCompass": {
+      "title": "Crop Compass",
+      "labels": {
+        "maxUnbalanced": "Max Unbalanced",
+        "moderateUnbalanced": "Moderate Unbalanced",
+        "maxGrowth": "Max Growth",
+        "floweringFruitSet": "Flowering / Fruit Set",
+        "fruitFillHarvest": "Fruit fill / Early Harvest",
+        "moderateOverbalance": "Moderate Overbalance",
+        "maxOverbalance": "Max Overbalance"
+      }
+    }
+  },
+  "comments": {
+    "title": "Comments"
+  },
+  "commentsSection": {
+    "title": "Comments"
+  },
+  "fertilizerDialog": {
+    "title": {
+      "add": "Add New Row",
+      "edit": "Edit Row"
+    },
+    "form": {
+      "brand": {
+        "label": "Brand",
+        "placeholder": "Search or type brand",
+        "error": "Brand is required"
+      },
+      "fertilizer": {
+        "label": "Fertilizer",
+        "placeholder": "Search or type fertilizer",
+        "error": "Fertilizer is required"
+      },
+      "rate": {
+        "label": "Rate (Kg/ha)",
+        "error": "Rate is required"
+      },
+      "appTime": {
+        "label": "Application Time",
+        "error": "Application Time is required"
+      },
+      "appMethod": {
+        "label": "Application Method",
+        "error": "Application Method is required"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "save": "Save"
+    },
+    "deleteConfirm": {
+      "title": "Confirm Delete",
+      "message": "Are you sure you want to delete this fertilizer entry? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "recommendations": {
+    "information": {
+      "title": "Information",
+      "blockName": "Block Name:",
+      "crop": "Crop:",
+      "sampleId": "Sample ID:",
+      "cropStage": "Crop Stage:"
+    },
+    "report": {
+      "title": "Report"
+    },
+    "cropCompass": {
+      "title": "Crop Compass"
+    }
+  },
+  "header": {
+    "backToFarms": "Back to farms",
+    "farms": "Farms"
+  },
+  "nutrientInput": {
+    "title": "Nutrient Data Input",
+    "subtitle": "Enter your plant tissue analysis data to generate crop compass recommendations. You can either upload a lab report file for automatic extraction or manually input the values. For each nutrient, enter either PPM or percentage values.",
+    "upload": {
+      "button": "Upload Nutrient Data File",
+      "processing": "Processing...",
+      "supportedFormats": "Supported formats: PDF, JPG, PNG",
+      "extracting": "Extracting data from your file...",
+      "error": "Error processing file. Please try again."
+    },
+    "tabs": {
+      "fileUpload": "File Upload",
+      "manualInput": "Manual Input"
+    }
+  },
+  "reportSelection": {
+    "title": "Sample Selection",
+    "subtitle": "Select the samples you want to review from your extracted data. All samples are selected by default. Click on a row to view the detailed analysis for that sample.",
+    "columns": {
+      "sampleName": "Sample Name",
+      "block": "Block",
+      "date": "Date",
+      "crop": "Crop"
+    }
+  },
+  "stepperNavigation": {
+    "steps": {
+      "inputData": "Input Data",
+      "reportSelection": "Report Selection",
+      "review": "Review"
+    },
+    "reviewSteps": {
+      "check": "Check",
+      "recommendations": "Recommendations"
+    },
+    "actions": {
+      "back": "Back",
+      "next": "Next",
+      "save": "Save",
+      "reset": "Reset All Data"
+    },
+    "saveConfirm": {
+      "title": "Save Reports",
+      "message": "Are you sure you want to save all reports? This will complete the review process.",
+      "confirm": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "nutrientDataGrids": {
+    "columns": {
+      "element": "Element",
+      "ppm": "PPM",
+      "percent": "%"
+    }
+  },
+  "recommendationsFerts": {
+    "save": "Save",
+    "columns": {
+      "fertilizer": "Fertilizer",
+      "rate": "Rate (Kg/ha)",
+      "appTime": "App Time",
+      "appMethod": "App Method",
+      "n": "N",
+      "p": "P",
+      "k": "K",
+      "s": "S",
+      "ca": "Ca",
+      "mg": "Mg",
+      "zn": "Zn",
+      "b": "B",
+      "fe": "Fe",
+      "cu": "Cu",
+      "mn": "Mn",
+      "mo": "Mo",
+      "co": "Co",
+      "actions": "Actions",
+      "total": "Total"
+    },
+    "loading": "Loading...",
+    "addNewRow": "Add New Row",
+    "mix": "Mix"
+  },
+  "growthStages": {
+    "maxGrowth": "Max Growth",
+    "flowering": "Flowering / Fruit Set",
+    "fruitFill": "Fruit fill / Early Harvest"
+  },
+  "cropCompass": {
+    "maxOverbalance": "Max Overbalance",
+    "moderateOverbalance": "Moderate Overbalance",
+    "fruitFill": "Fruit fill / Early Harvest",
+    "flowering": "Flowering / Fruit Set",
+    "maxGrowth": "Max Growth",
+    "moderateUnbalanced": "Moderate Unbalanced",
+    "maxUnbalanced": "Max Unbalanced"
+  },
+  "wiltRisk": {
+    "recover": "Plant Will Recover",
+    "minorStress": "Minor Stress",
+    "moderateStress": "Moderate Stress",
+    "significantStress": "Significant Stress",
+    "mightRecover": "Plant Might Recover",
+    "recoveryUnlikely": "Recovery Unlikely",
+    "severeDamage": "Severe Damage",
+    "criticalCondition": "Critical Condition",
+    "terminalDecline": "Terminal Decline",
+    "death": "Plant Death Imminent"
+  },
+  "applicationMethods": {
+    "prePlantBaseBanded": "pre-plant base (banded)",
+    "prePlantBaseBroadcast": "pre-plant base (broadcast)",
+    "sideDressBanded": "side dress (banded)",
+    "sideDressBroadcast": "side dress (broadcast)",
+    "soilSpray": "soil spray",
+    "foliar": "foliar",
+    "fertigation": "fertigation"
+  }
+}

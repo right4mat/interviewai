@@ -1,18 +1,18 @@
 {
-  "brandName": "intervue.ai",
-  "title": "intervue.ai",
+  "brandName": "Crop Nutrition Compass",
+  "title": "Crop Nutrition Compass",
   "company": {
-    "name": "intervue.ai",
-    "url": "https://intervue.ai",
+    "name": "Crop Nutrition Compass",
+    "url": "https://cropnutritioncompass.com",
     "socialLink": {
-      "linkedin": "https://in.linkedin.com/company/intervueai",
+      "linkedin": "https://in.linkedin.com/company/cropnutritioncompass",
       "instagram": "#",
-      "facebook": "https://www.facebook.com/intervueai/",
-      "youtube": "https://www.youtube.com/@intervueai",
-      "github": "https://github.com/intervueai",
-      "dribble": "https://dribbble.com/intervueai",
-      "discord": "https://discord.com/invite/intervueai",
-      "support": "https://support.intervue.ai"
+      "facebook": "https://www.facebook.com/CropNutritionCompass/",
+      "youtube": "https://www.youtube.com/@CropNutritionCompass",
+      "github": "https://github.com/CropNutritionCompass",
+      "dribble": "https://dribbble.com/CropNutritionCompass",
+      "discord": "https://discord.com/invite/CropNutritionCompass",
+      "support": "https://support.cropnutritioncompass.com"
     }
   },
   "logo": {

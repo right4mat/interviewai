@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -6,6 +7,7 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 
 interface HighlightItem {
@@ -22,6 +24,7 @@ export interface HighlightsConfig {
 
 
 export function Highlights({title, description, highlights}: HighlightsConfig) {
+  const { t } = useTranslation('landing');
   return (
     <Box
       id="highlights"
@@ -48,10 +51,10 @@ export function Highlights({title, description, highlights}: HighlightsConfig) {
           }}
         >
           <Typography component="h2" variant="h4" gutterBottom>
-            {title}
+            {t(title)}
           </Typography>
           <Typography variant="body1" sx={{ color: 'grey.400' }}>
-            {description}
+            {t(description)}
           </Typography>
         </Box>
         <Grid container spacing={2}>
@@ -73,10 +76,10 @@ export function Highlights({title, description, highlights}: HighlightsConfig) {
                 <Box sx={{ opacity: '50%' }}>{item.icon}</Box>
                 <div>
                   <Typography gutterBottom sx={{ fontWeight: 'medium' }}>
-                    {item.title}
+                    {t(item.title)}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'grey.400' }}>
-                    {item.description}
+                    {t(item.description)}
                   </Typography>
                 </div>
               </Stack>

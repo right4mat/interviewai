@@ -1,3 +1,4 @@
+"use client";
 // @project
 import branding from "@/branding.json";
 import Mui from "@/images/clientele/Mui";
@@ -11,8 +12,12 @@ import { ClienteleConfig } from "@/components/landing/Clientele";
 import GrainCorp from "@/images/clientele/GrainCorp";
 import Elders from "@/images/clientele/Elders";
 import Wesfarmers from "@/images/clientele/Wesfarmers";
+import BusinessIcon from '@mui/icons-material/Business';
 
 export const clientele: ClienteleConfig = {
-  title: `${branding.brandName} helps 12k+ farmers optimize crop nutrition and maximize their harvest yields.`,
-  clienteleList: [GrainCorp, Elders, Wesfarmers,]
+  clienteleList: [
+    <GrainCorp  imageSize={{width: 200, height: 200}}  />,
+    <Elders   imageSize={{width: 200, height: 200}} />,
+    <Wesfarmers   imageSize={{width: 200, height: 200}} />
+  ]
 };

@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -7,6 +8,7 @@ import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useT } from '@/i18n/client';
 
 export interface FAQItem {
   id: string;
@@ -15,11 +17,11 @@ export interface FAQItem {
 }
 
 export interface FAQConfig {
-  title: string;
   faqs: FAQItem[];
 }
 
-export function FAQ({ faqs, title }: FAQConfig) {
+export function FAQ({ faqs }: FAQConfig) {
+  const { t } = useT('landing');
   const [expanded, setExpanded] = React.useState<string[]>([]);
 
   const handleChange =
@@ -53,10 +55,10 @@ export function FAQ({ faqs, title }: FAQConfig) {
           textAlign: { sm: 'left', md: 'center' },
         }}
       >
-        {title}
+        {t('faq.title')}
       </Typography>
       <Box sx={{ width: '100%' }}>
-        {faqs.map((item) => (
+        {faqs.map((item, index) => (
           <Accordion
             key={item.id}
             expanded={expanded.includes(item.id)}
@@ -68,7 +70,7 @@ export function FAQ({ faqs, title }: FAQConfig) {
               id={`${item.id}-header`}
             >
               <Typography component="span" variant="subtitle2">
-                {item.question}
+                {t(item.question)}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -77,7 +79,7 @@ export function FAQ({ faqs, title }: FAQConfig) {
                 gutterBottom
                 sx={{ maxWidth: { sm: '100%', md: '70%' } }}
               >
-                {item.answer}
+                {t(item.answer)}
               </Typography>
             </AccordionDetails>
           </Accordion>

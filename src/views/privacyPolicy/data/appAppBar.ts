@@ -1,43 +1,45 @@
+"use client";
 import { PAGE_PATH } from "@/path";
 import { AppBarConfig } from "@/components/shared/AppAppBar";
 
 export const appBar: AppBarConfig = {
+  translationKey: "privacyPolicy",
   logo: {
     href: "/",
   },
   navigationItems: [
     {
-      label: "Features",
+      label: "navigation.features",
       href: "/#features",
     },
     {
-      label: "Testimonials",
+      label: "navigation.testimonials",
       href: "/#testimonials",
     },
     {
-      label: "Highlights",
+      label: "navigation.highlights",
       href: "/#highlights",
     },
     {
-      label: "Pricing",
+      label: "navigation.pricing",
       href: "/#pricing",
     },
     {
-      label: "FAQ",
+      label: "navigation.faq",
       href: "/#faq",
     },
     {
-      label: "Blog",
+      label: "navigation.blog",
       href: "/#blog",
     },
   ],
   authButtons: {
     signIn: {
-      label: "Sign in",
+      label: "auth.signIn",
       href: PAGE_PATH.signIn,
     },
     signUp: {
-      label: "Sign up",
+      label: "auth.signUp",
       href: PAGE_PATH.signUp,
     },
   },

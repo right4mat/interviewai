@@ -1,4 +1,6 @@
+"use client";
 import PropTypes from 'prop-types';
+import { useT } from '@/i18n/client';
 // @next
 import NextLink from 'next/link';
 
@@ -26,9 +28,10 @@ interface ChipProps {
 }
 
 interface SmallHero3Props {
+  translationKey: string;
   chip?: ChipProps;
-  headLine: string | React.ReactNode;
-  captionLine?: string;
+  headline: string;
+  caption?: string;
   exploreBtn?: {
     href: string;
     children: React.ReactNode;
@@ -38,7 +41,9 @@ interface SmallHero3Props {
 
 /***************************  SMALL HERO - 3  ***************************/
 
-export default function SmallHero({ chip, headLine, captionLine, exploreBtn }: SmallHero3Props) {
+export default function SmallHero({ chip, translationKey, headline, caption, exploreBtn }: SmallHero3Props) {
+  const { t } = useT(translationKey);
+  
   return (
     <Container sx={{ py: SECTION_COMMON_PY }}>
       <Stack sx={{ alignItems: 'start', gap: { xs: 1.5, md: 4 }, mt: 10 }}>
@@ -69,10 +74,10 @@ export default function SmallHero({ chip, headLine, captionLine, exploreBtn }: S
 
         <Stack direction="row" sx={{ justifyContent: 'space-between', flexWrap: { xs: 'wrap', md: 'unset' }, width: 1, gap: 3 }}>
           <Stack sx={{ gap: 1.5 }}>
-            {typeof headLine === 'string' ? <Typography variant="h1">{headLine}</Typography> : headLine}
-            {captionLine && (
+            <Typography variant="h1">{t(headline)}</Typography>
+            {caption && (
               <Typography variant="h6" sx={{ color: 'text.secondary', width: { md: '85%' } }}>
-                {captionLine}
+                {t(caption)}
               </Typography>
             )}
           </Stack>

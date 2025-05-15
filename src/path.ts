@@ -12,6 +12,8 @@ export const AFTER_AUTH_PATH = "/app";
 export const CANCEL_STRIPE_PATH = "/#pricing";
 export const SUCCESS_STRIPE_PATH = "/app";
 export const BILLING_PATH = "/settings";
+export const FARM_PATH = "farm/";
+export const BLOCK_PATH = "/block/";
 
 export const PAGE_PATH = {
   // auth pages path
@@ -22,9 +24,15 @@ export const PAGE_PATH = {
   signUp: path([AUTH_PATH, "signup"]),
   // dashboard pages path
   dashboardPage: path([DASHBOARD_PATH]),
+  appRoot: path([DASHBOARD_PATH]),
   settingsPage: path([DASHBOARD_PATH, "settings"]),
   usersPage: path([DASHBOARD_PATH, "users"]),
   tasksPage: path([DASHBOARD_PATH, "tasks"]),
+
+  // farm pages path
+  farmsPage: path([DASHBOARD_PATH, FARM_PATH]),
+  createReportsPage: '/create-reports',
+
   aboutPage: "/about",
   feedbackPage: "/feedback",
   // pages path

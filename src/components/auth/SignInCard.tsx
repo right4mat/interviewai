@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { useForm, Controller } from "react-hook-form";
 import Box from "@mui/material/Box";
@@ -8,7 +9,7 @@ import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
@@ -18,12 +19,23 @@ import { AFTER_AUTH_PATH, PAGE_PATH } from "@/path";
 import { useAuth } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import LogoIcon from "@/icons/LogoIcon";
+import { useEffect } from "react";
+import Alert from "@mui/material/Alert";
+import Collapse from "@mui/material/Collapse";
+import { useT } from "@/i18n/client";
 
 // Define form data type
 interface FormData {
   email: string;
   password: string;
   remember: boolean;
+}
+
+// Define alert info type
+interface AlertInfo {
+  show: boolean;
+  message: string;
+  severity: "success" | "error" | "warning" | "info";
 }
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -43,7 +55,13 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function SignInCard() {
+  const { t } = useT("auth");
   const [open, setOpen] = React.useState(false);
+  const [alertInfo, setAlertInfo] = React.useState<AlertInfo>({
+    show: false,
+    message: "",
+    severity: "success"
+  });
   const {
     control,
     handleSubmit,
@@ -58,6 +76,10 @@ export default function SignInCard() {
   const auth = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    router.prefetch(PAGE_PATH.dashboardPage);
+  }, []);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -68,34 +90,51 @@ export default function SignInCard() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      // Sign in with email/password
       await auth.signin(data.email, data.password);
-      // On successful signin, redirect to dashboard
-      // Use router.push inside useEffect to ensure it's only called after component is mounted
-
-      router.push(AFTER_AUTH_PATH);
+      setAlertInfo({
+        show: true,
+        message: t("signin.success"),
+        severity: "success"
+      });
+      setTimeout(() => {
+        router.push(AFTER_AUTH_PATH);
+      }, 500);
     } catch (error: unknown) {
-      // Handle error - you may want to show this to the user
-      console.error("Error signing in:", error instanceof Error ? error.message : String(error));
-      // You could set an error state here to display to the user
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setAlertInfo({
+        show: true,
+        message: t("signin.error.default", { message: errorMessage }),
+        severity: "error"
+      });
+      console.error("Error signing in:", errorMessage);
     }
   };
 
   const handleGoogleSignIn = async () => {
     try {
       await auth.signinWithProvider("google");
-      // Note: No need to redirect here as it's handled by the provider flow
     } catch (error: unknown) {
-      console.error("Error signing in with Google:", error instanceof Error ? error.message : String(error));
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setAlertInfo({
+        show: true,
+        message: t("signin.error.google", { message: errorMessage }),
+        severity: "error"
+      });
+      console.error("Error signing in with Google:", errorMessage);
     }
   };
 
   const handleFacebookSignIn = async () => {
     try {
       await auth.signinWithProvider("facebook");
-      // Note: No need to redirect here as it's handled by the provider flow
     } catch (error: unknown) {
-      console.error("Error signing in with Facebook:", error instanceof Error ? error.message : String(error));
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setAlertInfo({
+        show: true,
+        message: t("signin.error.facebook", { message: errorMessage }),
+        severity: "error"
+      });
+      console.error("Error signing in with Facebook:", errorMessage);
     }
   };
 
@@ -103,7 +142,7 @@ export default function SignInCard() {
   React.useEffect(() => {
     // Check if user is authenticated before redirecting
     if (auth.user) {
-      router.push(AFTER_AUTH_PATH);
+      router.push("/dashboard");
     }
   }, [auth.user, router]);
 
@@ -113,8 +152,15 @@ export default function SignInCard() {
         <LogoIcon />
       </Box>
       <Typography component="h1" variant="h4" sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}>
-        Sign in
+        {t("signin.title")}
       </Typography>
+
+      <Collapse in={alertInfo.show}>
+        <Alert severity={alertInfo.severity} onClose={() => setAlertInfo({ ...alertInfo, show: false })} sx={{ mb: 2 }}>
+          {alertInfo.message}
+        </Alert>
+      </Collapse>
+
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -153,9 +199,9 @@ export default function SignInCard() {
         <FormControl>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <FormLabel htmlFor="password">Password</FormLabel>
-            <Link component="button" type="button" onClick={handleClickOpen} variant="body2" sx={{ alignSelf: "baseline" }}>
-              Forgot your password?
-            </Link>
+            <button type="button" onClick={handleClickOpen} style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>
+              {t("signin.forgotPassAction")}
+            </button>
           </Box>
           <Controller
             name="password"
@@ -183,38 +229,42 @@ export default function SignInCard() {
             )}
           />
         </FormControl>
-        <Controller
+        {/*<Controller
           name="remember"
           control={control}
           render={({ field }) => (
-            <FormControlLabel control={<Checkbox {...field} checked={field.value} color="primary" />} label="Remember me" />
+            <FormControlLabel 
+              control={<Checkbox {...field} checked={field.value} color="primary" />} 
+              label={t("signin.rememberMe")} 
+            />
           )}
-        />
+        />*/ }
         <ForgotPassword open={open} handleClose={handleClose} />
-        <Button type="submit" fullWidth variant="contained">
-          Sign in
+        <Button type="submit" fullWidth variant="contained" disabled={auth.isPending} sx={{ mt: 2 }}>
+          {t("signin.buttonAction")}
         </Button>
         <Typography sx={{ textAlign: "center" }}>
-          Don&apos;t have an account?{" "}
+          {t("signin.signupText")}{" "}
           <span>
-            <Link href={PAGE_PATH.signUp} variant="body2" sx={{ alignSelf: "center" }}>
-              Sign up
+            <Link href={PAGE_PATH.signUp} style={{ textDecoration: 'underline' }}>
+              {t("signin.signupAction")}
             </Link>
           </span>
         </Typography>
       </Box>
-      <Divider>or</Divider>
+      <Divider>{t("signin.or")}</Divider>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Button fullWidth variant="outlined" onClick={handleGoogleSignIn} startIcon={<GoogleIcon />}>
-          Sign in with Google
+        <Button fullWidth variant="outlined" onClick={handleGoogleSignIn} startIcon={<GoogleIcon />} disabled={auth.isPending}>
+          {t("signin.withGoogle")}
         </Button>
         {/* <Button
           fullWidth
           variant="outlined"
           onClick={handleFacebookSignIn}
           startIcon={<FacebookIcon />}
+          disabled={auth.isPending}
         >
-          Sign in with Facebook
+          {t("signin.withFacebook")}
         </Button>*/}
       </Box>
     </Card>

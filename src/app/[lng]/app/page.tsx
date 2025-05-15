@@ -1,5 +1,5 @@
 // @next
-import Home from "@/blocks/app/Home";
+
 import dynamic from "next/dynamic";
 
 // @project

@@ -13,6 +13,7 @@ const MainLayout = dynamic(() => import("@/views/app/layout"));
 /***************************  LAYOUT - AI  ***************************/
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+  console.log("DashboardLayout");
   return (
     <MainLayout>
       {/* Notice we're not wrapping the entire layout in Suspense anymore */}

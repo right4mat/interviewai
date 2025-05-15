@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, ReactNode } from 'react';
+import { useT } from '@/i18n/client';
 
 // @mui
 import Divider from '@mui/material/Divider';
@@ -65,9 +66,8 @@ function useScrollspy(ids: string[], offset = 0): string {
 
 /***************************  SECTIONS - PRIVACY POLICY  ***************************/
 
-
-
 export default function PrivacyPolicyPage({ menuItems }: PrivacyPolicyConfig): ReactNode {
+  const { t } = useT('privacyPolicy');
   const ids = menuItems.map((item) => item.id);
 
   // Adjust offset as per header height
@@ -99,7 +99,11 @@ export default function PrivacyPolicyPage({ menuItems }: PrivacyPolicyConfig): R
                 }}
                 onClick={() => setSelectedID(item.id)}
               >
-                <ListItemText primary={item.heading} primaryTypographyProps={{ variant: 'subtitle1' }} sx={{ my: 0 }} />
+                <ListItemText 
+                  primary={t(item.heading)} 
+                  primaryTypographyProps={{ variant: 'subtitle1' }} 
+                  sx={{ my: 0 }} 
+                />
               </ListItemButton>
             ))}
           </List>
@@ -112,9 +116,9 @@ export default function PrivacyPolicyPage({ menuItems }: PrivacyPolicyConfig): R
               id={item.id}
               sx={{ py: { xs: 1, sm: 1.5, md: 3 }, px: { md: 3 }, gap: 1, '&:first-of-type': { pt: { sm: 0 } } }}
             >
-              <Typography variant="h4">{item.heading}</Typography>
+              <Typography variant="h4">{t(item.heading)}</Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                {item.caption}
+                {t(item.caption)}
               </Typography>
             </Stack>
           ))}

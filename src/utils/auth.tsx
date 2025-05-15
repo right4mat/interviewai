@@ -9,6 +9,7 @@ import analytics from "./analytics";
 import { User } from "@supabase/supabase-js";
 import { Provider } from "@supabase/supabase-js";
 import { AFTER_AUTH_PATH } from "@/path";
+
 // Whether to merge extra user data from database into `auth.user`
 const MERGE_DB_USER = true;
 
@@ -18,6 +19,8 @@ const ANALYTICS_IDENTIFY = true;
 // Define types for our auth context
 interface AuthContextType {
   user: UserWithCustomData | null | false;
+  isPending: boolean;
+  error: Error | null;
   signup: (email: string, password: string) => Promise<User>;
   signin: (email: string, password: string) => Promise<User>;
   signinWithProvider: (name: Provider) => Promise<any>;
@@ -63,6 +66,8 @@ function useAuthProvider(): AuthContextType {
   // Store auth user in state
   // `user` will be object, `null` (loading) or `false` (logged out)
   const [user, setUser] = useState<User | null | false>(null);
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   // Merge extra user data from the database
   // This means extra user data (such as payment plan) is available as part
@@ -92,83 +97,161 @@ function useAuthProvider(): AuthContextType {
     return user;
   };
 
-  const signup = (email: string, password: string) => {
-    return supabase.auth.signUp({ email, password }).then(handleError).then(handleAuth);
+  const signup = async (email: string, password: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      const user = await supabase.auth.signUp({ email, password }).then(handleError).then(handleAuth);
+      return user;
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const signin = (email: string, password: string) => {
-    return supabase.auth.signInWithPassword({ email, password }).then(handleError).then(handleAuth);
+  const signin = async (email: string, password: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      const user = await supabase.auth.signInWithPassword({ email, password }).then(handleError).then(handleAuth);
+      return user;
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const signinWithProvider = (name: Provider) => {
-    return (
-      supabase.auth
+  const signinWithProvider = async (name: Provider) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      return await supabase.auth
         .signInWithOAuth({
           provider: name,
           options: {
-            redirectTo: `${window.location.origin}${AFTER_AUTH_PATH}`
+            redirectTo: `${window.location.origin}/app`
           }
         })
         .then(handleError)
-        // Because `signInWithOAuth` resolves immediately we need to add this so
-        // it never resolves (component will display loading indicator indefinitely).
-        // Once social signin is completed the page will redirect to value of `redirectTo`.
         .then(() => {
           return new Promise(() => null);
+        });
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const signinWithMagicLink = async (email: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      return await supabase.auth
+        .signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/app`
+          }
         })
-    );
+        .then(handleError);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const signinWithMagicLink = (email: string) => {
-    return supabase.auth
-      .signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}${AFTER_AUTH_PATH}`
-        }
-      })
-      .then(handleError);
+  const signout = async () => {
+    setIsPending(true);
+    setError(null);
+    try {
+      return await supabase.auth.signOut().then(handleError);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const signout = () => {
-    return supabase.auth.signOut().then(handleError);
+  const sendPasswordResetEmail = async (email: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      return await supabase.auth
+        .resetPasswordForEmail(email, {
+          //redirectTo: `${window.location.origin}/auth/changepass`
+        })
+        .then(handleError);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const sendPasswordResetEmail = (email: string) => {
-    return supabase.auth
-      .resetPasswordForEmail(email, {
-        //redirectTo: `${window.location.origin}/auth/changepass`
-      })
-      .then(handleError);
+  const confirmPasswordReset = async (password: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      return await supabase.auth.updateUser({ password }).then(handleError);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const confirmPasswordReset = (password: string) => {
-    return supabase.auth.updateUser({ password }).then(handleError);
-  };
-
-  const updatePassword = (password: string) => {
-    return supabase.auth.updateUser({ password }).then(handleError);
+  const updatePassword = async (password: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      return await supabase.auth.updateUser({ password }).then(handleError);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
+    }
   };
 
   // Update auth user and persist data to database
   // Call this function instead of multiple auth/db update functions
   const updateProfile = async (data: Record<string, any>) => {
-    const { email, ...other } = data;
+    setIsPending(true);
+    setError(null);
+    try {
+      const { email, ...other } = data;
 
-    if (!user) {
-      throw new Error("User must be logged in to update profile");
-    }
+      if (!user) {
+        throw new Error("User must be logged in to update profile");
+      }
 
-    // If email changed let them know to click the confirmation links
-    // Will be persisted to the database by our Supabase trigger once process is completed
-    if (email && email !== user.email) {
-      await supabase.auth.updateUser({ email }).then(handleError);
-      throw new Error("To complete this process click the confirmation links sent to your new and old email addresses");
-    }
+      // If email changed let them know to click the confirmation links
+      // Will be persisted to the database by our Supabase trigger once process is completed
+      if (email && email !== user.email) {
+        await supabase.auth.updateUser({ email }).then(handleError);
+        throw new Error("To complete this process click the confirmation links sent to your new and old email addresses");
+      }
 
-    // Persist all other data to the database
-    if (Object.keys(other).length > 0) {
-      await updateUser(user.id, other);
+      // Persist all other data to the database
+      if (Object.keys(other).length > 0) {
+        await updateUser(user.id, other);
+      }
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -212,6 +295,8 @@ function useAuthProvider(): AuthContextType {
 
   return {
     user: finalUser as UserWithCustomData,
+    isPending,
+    error,
     signup,
     signin,
     signinWithProvider,

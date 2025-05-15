@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -6,6 +7,7 @@ import MuiChip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { useT } from '@/i18n/client';
 
 
 interface FeatureItem {
@@ -51,6 +53,7 @@ export function MobileLayout({
   handleItemClick,
   selectedFeature,
 }: MobileLayoutProps) {
+  const { t } = useT('landing');
   return (
     <Box
       sx={{
@@ -63,7 +66,7 @@ export function MobileLayout({
         {selectedFeature && (
           <Chip
             size="medium"
-            label={selectedFeature.title}
+            label={t(selectedFeature.title)}
             onClick={() => handleItemClick(0)}
             selected={true}
           />
@@ -95,10 +98,10 @@ export function MobileLayout({
             gutterBottom
             sx={{ color: 'text.primary', fontWeight: 'medium' }}
           >
-            {selectedFeature.title}
+            {t(selectedFeature.title)}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
-            {selectedFeature.description}
+            {t(selectedFeature.description)}
           </Typography>
         </Box>
       </Card>
@@ -108,20 +111,17 @@ export function MobileLayout({
 
 export interface Feature {
   icon: React.ReactNode;
-  title: string;
-  content: string;
-  description: string; // Changed from optional to required
-  imageLight: string; // Changed from optional to required
-  imageDark: string; // Changed from optional to required
+  imageLight: string;
+  imageDark: string;
 }
 
 export interface FeaturesConfig {
-  title: string;
-  description: string;
   features: Feature[];
 }
 
-export function Features({ features, title, description }: FeaturesConfig) {
+export function Features({ features }: FeaturesConfig) {
+  const { t } = useT('landing');
+  const { t: tFeatures } = useT('features');
   const [selectedItemIndex, setSelectedItemIndex] = React.useState(0);
 
   const handleItemClick = (index: number) => {
@@ -139,13 +139,13 @@ export function Features({ features, title, description }: FeaturesConfig) {
           gutterBottom
           sx={{ color: 'text.primary' }}
         >
-          {title}
+          {t('features.title')}
         </Typography>
         <Typography
           variant="body1"
           sx={{ color: 'text.secondary', mb: { xs: 2, sm: 4 } }}
         >
-          {description}
+          {t('features.subtitle')}
         </Typography>
       </Box>
       <Box
@@ -164,7 +164,7 @@ export function Features({ features, title, description }: FeaturesConfig) {
               height: '100%',
             }}
           >
-            {features.map(({ icon, title, content }, index: number) => (
+            {features.map(({ icon }, index: number) => (
               <Box
                 key={index}
                 component={Button}
@@ -201,8 +201,12 @@ export function Features({ features, title, description }: FeaturesConfig) {
                   ]}
                 >
                   {icon}
-                  <Typography variant="h6">{title}</Typography>
-                  <Typography variant="body2">{content}</Typography>
+                  <Typography variant="h6">
+                    {tFeatures(`feature${index + 1}.title`)}
+                  </Typography>
+                  <Typography variant="body2">
+                    {tFeatures(`feature${index + 1}.description`)}
+                  </Typography>
                 </Box>
               </Box>
             ))}
@@ -210,7 +214,11 @@ export function Features({ features, title, description }: FeaturesConfig) {
           <MobileLayout
             selectedItemIndex={selectedItemIndex}
             handleItemClick={handleItemClick}
-            selectedFeature={selectedFeature as FeatureItem}
+            selectedFeature={{
+              ...selectedFeature,
+              title: tFeatures(`feature${selectedItemIndex + 1}.title`),
+              description: tFeatures(`feature${selectedItemIndex + 1}.description`)
+            }}
           />
         </div>
         <Box

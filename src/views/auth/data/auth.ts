@@ -42,42 +42,37 @@ export interface AuthConfig {
 
 export const auth: AuthConfig = {
   signup: {
-    // Top Title
-    title: "Get yourself an account",
-    // Button text
-    buttonAction: "Sign up",
-    // Footer text and links
+    title: "signup.title",
+    buttonAction: "signup.buttonAction",
     showFooter: true,
-    signinText: "Already have an account?",
-    signinAction: "Sign in",
+    signinText: "signup.signinText",
+    signinAction: "signup.signinAction",
     signinPath: PAGE_PATH.signIn,
-    // Terms and privacy policy agreement
     showAgreement: true,
     termsPath: PAGE_PATH.termsConditionPage,
     privacyPolicyPath: PAGE_PATH.privacyPolicyPage
   },
   signin: {
-    title: "Welcome back",
-    buttonAction: "Sign in",
+    title: "signin.title",
+    buttonAction: "signin.buttonAction",
     showFooter: true,
-    signupAction: "Create an account",
+    signupAction: "signin.signupAction",
     signupPath: PAGE_PATH.signUp,
-    forgotPassAction: "Forgot Password?",
+    forgotPassAction: "signin.forgotPassAction",
     forgotPassPath: PAGE_PATH.forgotPass
   },
   forgotpass: {
-    title: "Get a new password",
-    buttonAction: "Reset password",
+    title: "forgotpass.title",
+    buttonAction: "forgotpass.buttonAction",
     showFooter: true,
-    signinText: "Remember it after all?",
-    signinAction: "Sign in",
+    signinText: "forgotpass.signinText",
+    signinAction: "forgotpass.signinAction",
     signinPath: PAGE_PATH.signIn
   },
   changepass: {
-    title: "Choose a new password",
-    buttonAction: "Change password"
+    title: "changepass.title",
+    buttonAction: "changepass.buttonAction"
   },
-  // Add default configuration
   defaults: {
     providers: ["google", "facebook", "twitter"],
     afterAuthPath: PAGE_PATH.contactPage,

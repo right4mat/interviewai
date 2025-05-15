@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -15,23 +16,25 @@ import LogoIcon from '@/icons/Logo';
 import branding from '@/branding.json';
 import { footerContent } from '@/footer';
 import NextLink from 'next/link';
+import { useT } from '@/i18n/client';
 
 function Copyright() {
+  const { t } = useT('footer');
   return (
     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-      {footerContent.copyright.text}
+      {t(footerContent.copyright.text, { brandName: branding.brandName, year: new Date().getFullYear() })}
       <NextLink href={footerContent.copyright.link.path} passHref legacyBehavior>
         <MuiLink color="text.secondary">
-          {footerContent.copyright.link.label}
+          {t(footerContent.copyright.link.label)}
         </MuiLink>
       </NextLink>
-      &nbsp;
-      {new Date().getFullYear()}
     </Typography>
   );
 }
 
 export default function Footer() {
+  const { t } = useT('footer');
+  
   return (
     <Container
       sx={{
@@ -64,12 +67,12 @@ export default function Footer() {
               {branding.brandName}
             </Typography>
             <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, mt: 2 }}>
-              {footerContent.newsletter.title}
+              {t(footerContent.newsletter.title)}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-              {footerContent.newsletter.description}
+              {t(footerContent.newsletter.description, { brandName: branding.brandName })}
             </Typography>
-            <InputLabel htmlFor="email-newsletter">{footerContent.newsletter.inputLabel}</InputLabel>
+            <InputLabel htmlFor="email-newsletter">{t(footerContent.newsletter.inputLabel)}</InputLabel>
             <Stack direction="row" spacing={1} useFlexGap>
               <TextField
                 id="email-newsletter"
@@ -77,12 +80,12 @@ export default function Footer() {
                 size="small"
                 variant="outlined"
                 fullWidth
-                aria-label={footerContent.newsletter.inputPlaceholder}
-                placeholder={footerContent.newsletter.inputPlaceholder}
+                aria-label={t(footerContent.newsletter.inputPlaceholder)}
+                placeholder={t(footerContent.newsletter.inputPlaceholder)}
                 slotProps={{
                   input: {
                     autoComplete: 'off',
-                    'aria-label': footerContent.newsletter.inputPlaceholder,
+                    'aria-label': t(footerContent.newsletter.inputPlaceholder),
                   },
                 }}
                 sx={{ width: '250px' }}
@@ -93,7 +96,7 @@ export default function Footer() {
                 size="small"
                 sx={{ flexShrink: 0 }}
               >
-                {footerContent.newsletter.buttonText}
+                {t(footerContent.newsletter.buttonText)}
               </Button>
             </Stack>
           </Box>
@@ -106,12 +109,12 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {footerContent.sections.product.title}
+            {t(footerContent.sections.product.title)}
           </Typography>
           {footerContent.sections.product.links.map((link) => (
             <NextLink key={link.label} href={link.path} passHref legacyBehavior>
               <MuiLink color="text.secondary" variant="body2">
-                {link.label}
+                {t(link.label)}
               </MuiLink>
             </NextLink>
           ))}
@@ -124,12 +127,12 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {footerContent.sections.company.title}
+            {t(footerContent.sections.company.title, { brandName: branding.brandName })}
           </Typography>
           {footerContent.sections.company.links.map((link) => (
             <NextLink key={link.label} href={link.path} passHref legacyBehavior>
               <MuiLink color="text.secondary" variant="body2">
-                {link.label}
+                {t(link.label)}
               </MuiLink>
             </NextLink>
           ))}
@@ -142,12 +145,12 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {footerContent.sections.legal.title}
+            {t(footerContent.sections.legal.title)}
           </Typography>
           {footerContent.sections.legal.links.map((link) => (
             <NextLink key={link.label} href={link.path} passHref legacyBehavior>
               <MuiLink color="text.secondary" variant="body2">
-                {link.label}
+                {t(link.label)}
               </MuiLink>
             </NextLink>
           ))}
@@ -166,7 +169,7 @@ export default function Footer() {
         <div>
           <NextLink href={footerContent.bottomLinks.privacyPolicy.path} passHref legacyBehavior>
             <MuiLink color="text.secondary" variant="body2">
-              {footerContent.bottomLinks.privacyPolicy.label}
+              {t(footerContent.bottomLinks.privacyPolicy.label)}
             </MuiLink>
           </NextLink>
           <Typography sx={{ display: 'inline', mx: 0.5, opacity: 0.5 }}>
@@ -174,7 +177,7 @@ export default function Footer() {
           </Typography>
           <NextLink href={footerContent.bottomLinks.termsOfService.path} passHref legacyBehavior>
             <MuiLink color="text.secondary" variant="body2">
-              {footerContent.bottomLinks.termsOfService.label}
+              {t(footerContent.bottomLinks.termsOfService.label)}
             </MuiLink>
           </NextLink>
           <Copyright />
@@ -189,7 +192,7 @@ export default function Footer() {
             color="inherit"
             size="small"
             href={footerContent.socialLinks.github.path}
-            aria-label={footerContent.socialLinks.github.label}
+            aria-label={t(footerContent.socialLinks.github.label)}
             sx={{ alignSelf: 'center' }}
           >
             <GitHubIcon />
@@ -198,7 +201,7 @@ export default function Footer() {
             color="inherit"
             size="small"
             href={footerContent.socialLinks.twitter.path}
-            aria-label={footerContent.socialLinks.twitter.label}
+            aria-label={t(footerContent.socialLinks.twitter.label)}
             sx={{ alignSelf: 'center' }}
           >
             <TwitterIcon />
@@ -207,7 +210,7 @@ export default function Footer() {
             color="inherit"
             size="small"
             href={footerContent.socialLinks.linkedin.path}
-            aria-label={footerContent.socialLinks.linkedin.label}
+            aria-label={t(footerContent.socialLinks.linkedin.label)}
             sx={{ alignSelf: 'center' }}
           >
             <LinkedInIcon />

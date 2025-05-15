@@ -1,11 +1,13 @@
 // @project
-
+"use client";
 export interface HeroProps {
-  headLine: string;
-  captionLine: string;
+  translationKey: string;
+  headline: string;
+  caption: string;
 }
 
 export const hero: HeroProps = {
-  headLine: 'Privacy Policy',
-  captionLine: 'Last updated: April 5, 2025'
+  translationKey: 'privacyPolicy',
+  headline: 'hero.headline',
+  caption: 'hero.caption'
 };
