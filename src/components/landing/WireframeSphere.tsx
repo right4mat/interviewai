@@ -18,17 +18,20 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
   const frameRef = useRef(0);
   const geometryRef = useRef<THREE.BufferGeometry | null>(null);
   const isInitializedRef = useRef(false);
-  const pointAnimationStatesRef = useRef<number[]>([]);
+  const pointAnimationStatesRef = useRef<{ phase: number; amplitude: number }[]>([]);
+  const lastVolumeLevelRef = useRef(0);
 
   React.useEffect(() => {
     if (isInitializedRef.current) return;
     
-    // Create points for sphere
     const positions = [];
     const vertices = 2000;
     
-    // Initialize animation states for each point
-    pointAnimationStatesRef.current = Array(vertices).fill(0);
+    // Initialize animation states for each point with phase and amplitude
+    pointAnimationStatesRef.current = Array(vertices).fill(null).map(() => ({
+      phase: Math.random() * Math.PI * 2, // Random starting phase
+      amplitude: 0 // Initial amplitude
+    }));
 
     // Generate points in a sphere pattern
     for (let i = 0; i < vertices; i++) {
@@ -58,21 +61,31 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
   useFrame((state, delta) => {
     if (!pointsRef.current || !positionsRef.current || !originalPositionsRef.current || !geometryRef.current) return;
 
-    frameRef.current += 0.002; // Constant rotation speed
+    frameRef.current += 0.002; // Base rotation speed
     const frame = frameRef.current;
 
     const positions = positionsRef.current;
     const originalPositions = originalPositionsRef.current;
     const animationStates = pointAnimationStatesRef.current;
 
-    // Randomly select points to animate based on volume level
-    if (isAISpeaking) {
-      const pointsToAnimate = Math.floor(volumeLevel * 100);
-      for (let i = 0; i < pointsToAnimate; i++) {
-        const randomIndex = Math.floor(Math.random() * animationStates.length);
-        if (animationStates[randomIndex] === 0) {
-          animationStates[randomIndex] = 1;
-        }
+    // Calculate volume level change
+    const volumeChange = isAISpeaking ? volumeLevel - lastVolumeLevelRef.current : 0;
+    lastVolumeLevelRef.current = volumeLevel;
+
+    // Update animation states based on volume level and change
+    for (let i = 0; i < animationStates.length; i++) {
+      const state = animationStates[i];
+      
+      if (isAISpeaking) {
+        // Increase amplitude based on volume level and change
+        const targetAmplitude = Math.min(volumeLevel * 0.2, 1);
+        state.amplitude = THREE.MathUtils.lerp(state.amplitude, targetAmplitude, 0.1);
+        
+        // Advance phase based on volume change
+        state.phase += 0.1 + Math.abs(volumeChange) * 0.2;
+      } else {
+        // Gradually reduce amplitude when not speaking
+        state.amplitude *= 0.95;
       }
     }
 
@@ -82,22 +95,16 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
       const originalX = originalPositions[i];
       const originalY = originalPositions[i + 1];
       const originalZ = originalPositions[i + 2];
+      const state = animationStates[pointIndex];
 
       let radiusMultiplier = 1;
 
       if (isGettingReply) {
         radiusMultiplier = 1 + Math.sin(frame) * 0.2;
       } else {
-        // Smoothly animate points
-        if (animationStates[pointIndex] > 0) {
-          radiusMultiplier = 1 + Math.sin(animationStates[pointIndex]) * 0.1;
-          animationStates[pointIndex] += 0.1;
-          if (animationStates[pointIndex] >= Math.PI) {
-            animationStates[pointIndex] = 0;
-          }
-        } else {
-          radiusMultiplier = 1 + Math.sin(frame * 0.5) * 0.05;
-        }
+        // Create wave-like effect using phase and amplitude
+        const wave = Math.sin(state.phase + frame) * state.amplitude;
+        radiusMultiplier = 1 + wave * 0.1;
       }
 
       positions[i] = originalX * radiusMultiplier;
@@ -108,7 +115,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
     geometryRef.current.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometryRef.current.attributes.position.needsUpdate = true;
 
-    // Constant rotation speed
+    // Adjust rotation speed
     const rotationSpeed = isGettingReply ? 0.2 : 0.05;
     pointsRef.current.rotation.y = frame * rotationSpeed;
     pointsRef.current.rotation.x = frame * (rotationSpeed * 0.5);
@@ -123,6 +130,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
           array={positionsRef.current || new Float32Array()}
           itemSize={3}
           needsUpdate={true}
+          args={[new Float32Array(), 3]}
         />
       </bufferGeometry>
       <pointsMaterial
