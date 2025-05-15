@@ -1,35 +1,57 @@
 "use client";
 import * as React from 'react';
 import * as THREE from 'three';
-import { styled } from '@mui/material/styles';
 
-const StyledBox = styled('div')(({ theme }) => ({
-  alignSelf: 'center',
-  width: '50vw',
-  height: '50vh',
-  position: 'relative',
-  [theme.breakpoints.down('md')]: {
-    display: 'none'
-  }
-}));
 
 export const WireframeSphere = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const sceneRef = React.useRef<THREE.Scene | null>(null);
   const rendererRef = React.useRef<THREE.WebGLRenderer | null>(null);
   const frameRef = React.useRef<number>(0);
-  const mountedRef = React.useRef(false);
+  const pointsRef = React.useRef<THREE.Points | null>(null);
+  const cameraRef = React.useRef<THREE.PerspectiveCamera | null>(null);
+
+  const cleanup = React.useCallback(() => {
+    if (frameRef.current) {
+      cancelAnimationFrame(frameRef.current);
+    }
+    
+    if (rendererRef.current && containerRef.current) {
+      containerRef.current.removeChild(rendererRef.current.domElement);
+      rendererRef.current.dispose();
+    }
+
+    if (pointsRef.current) {
+      pointsRef.current.geometry.dispose();
+      if (pointsRef.current.material instanceof THREE.Material) {
+        pointsRef.current.material.dispose();
+      }
+    }
+
+    if (sceneRef.current) {
+      sceneRef.current.clear();
+    }
+
+    sceneRef.current = null;
+    rendererRef.current = null;
+    pointsRef.current = null;
+    cameraRef.current = null;
+  }, []);
   
   React.useEffect(() => {
-    // Prevent double initialization in dev mode
-    if (!containerRef.current || mountedRef.current) return;
-    
-    mountedRef.current = true;
+    if (!containerRef.current || rendererRef.current) return;
 
     const scene = new THREE.Scene();
     sceneRef.current = scene;
+    
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    cameraRef.current = camera;
+    
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
     rendererRef.current = renderer;
     
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
@@ -61,6 +83,7 @@ export const WireframeSphere = () => {
     });
 
     const points = new THREE.Points(geometry, material);
+    pointsRef.current = points;
     scene.add(points);
     
     camera.position.z = 2;
@@ -68,25 +91,30 @@ export const WireframeSphere = () => {
     // Animation
     let frame = 0;
     const animate = () => {
+      if (!pointsRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current) {
+        return;
+      }
+
       frameRef.current = requestAnimationFrame(animate);
       frame += 0.002;
       
-      points.rotation.y = frame;
-      points.rotation.x = frame * 0.5;
+      pointsRef.current.rotation.y = frame;
+      pointsRef.current.rotation.x = frame * 0.5;
       
-      renderer.render(scene, camera);
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
     };
 
     animate();
 
     // Handle resize
     const handleResize = () => {
-      if (!containerRef.current || !rendererRef.current) return;
+      if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
+      
       const width = containerRef.current.clientWidth;
       const height = containerRef.current.clientHeight;
       
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
+      cameraRef.current.aspect = width / height;
+      cameraRef.current.updateProjectionMatrix();
       rendererRef.current.setSize(width, height);
     };
 
@@ -94,17 +122,17 @@ export const WireframeSphere = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(frameRef.current);
-      if (rendererRef.current && containerRef.current) {
-        containerRef.current.removeChild(rendererRef.current.domElement);
-      }
-      sceneRef.current = null;
-      rendererRef.current = null;
-      mountedRef.current = false;
+      cleanup();
     };
-  }, []);
+  }, [cleanup]);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
+  React.useEffect(() => {
+    return () => {
+      cleanup();
+    };
+  }, [cleanup]);
+
+  return <div ref={containerRef} style={{ width: '35vw', height: '35vw' }} />;
 };
 
 export default WireframeSphere; 
