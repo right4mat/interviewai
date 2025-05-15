@@ -4,7 +4,7 @@ import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
 import VideoControls from "./VideoControls";
-import AnimatedAvatar from "./AnimatedAvatar";
+import { WireframeSphere } from "../../landing/WireframeSphere";
 import { useColorScheme, useTheme } from "@mui/material/styles";
 
 interface VideoDisplayProps {
@@ -56,12 +56,23 @@ export default function VideoDisplay({
     >
       {/* Main AI Avatar */}
       <Box sx={{ position: "relative", width: "100%", height: "100%", bgcolor: isDarkMode ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.6)" }}>
-        <AnimatedAvatar
-          volumeLevel={volumeLevel}
-          isGettingReply={isGettingReply}
-          participantName={participantName}
-          isAISpeaking={isAISpeaking}
-        />
+        <Box sx={{ 
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center"
+        }}>
+          <WireframeSphere
+            volumeLevel={volumeLevel}
+            isGettingReply={isGettingReply}
+            participantName={participantName}
+            isAISpeaking={isAISpeaking}
+          />
+        </Box>
         
         {/* Bottom right user video/avatar */}
         <Box

@@ -1,75 +1,39 @@
 "use client";
-import * as React from 'react';
-import * as THREE from 'three';
+import * as React from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import * as THREE from "three";
 
+interface WireframeSphereProps {
+  participantName: string;
+  isAISpeaking: boolean;
+  isGettingReply: boolean;
+  volumeLevel: number;
+}
 
-export const WireframeSphere = () => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const sceneRef = React.useRef<THREE.Scene | null>(null);
-  const rendererRef = React.useRef<THREE.WebGLRenderer | null>(null);
-  const frameRef = React.useRef<number>(0);
-  const pointsRef = React.useRef<THREE.Points | null>(null);
-  const cameraRef = React.useRef<THREE.PerspectiveCamera | null>(null);
-  const positionsRef = React.useRef<Float32Array | null>(null);
-  const originalPositionsRef = React.useRef<Float32Array | null>(null);
-  const targetPositionsRef = React.useRef<Float32Array | null>(null);
+function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSphereProps, "participantName">) {
+  const pointsRef = useRef<THREE.Points>(null);
+  const positionsRef = useRef<Float32Array | null>(null);
+  const originalPositionsRef = useRef<Float32Array | null>(null);
+  const frameRef = useRef(0);
+  const geometryRef = useRef<THREE.BufferGeometry | null>(null);
+  const isInitializedRef = useRef(false);
+  const pointAnimationStatesRef = useRef<number[]>([]);
 
-  const cleanup = React.useCallback(() => {
-    if (frameRef.current) {
-      cancelAnimationFrame(frameRef.current);
-    }
-    
-    if (rendererRef.current && containerRef.current) {
-      containerRef.current.removeChild(rendererRef.current.domElement);
-      rendererRef.current.dispose();
-    }
-
-    if (pointsRef.current) {
-      pointsRef.current.geometry.dispose();
-      if (pointsRef.current.material instanceof THREE.Material) {
-        pointsRef.current.material.dispose();
-      }
-    }
-
-    if (sceneRef.current) {
-      sceneRef.current.clear();
-    }
-
-    sceneRef.current = null;
-    rendererRef.current = null;
-    pointsRef.current = null;
-    cameraRef.current = null;
-    positionsRef.current = null;
-    originalPositionsRef.current = null;
-    targetPositionsRef.current = null;
-  }, []);
-  
   React.useEffect(() => {
-    if (!containerRef.current || rendererRef.current) return;
-
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
+    if (isInitializedRef.current) return;
     
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    cameraRef.current = camera;
-    
-    const renderer = new THREE.WebGLRenderer({ 
-      antialias: true, 
-      alpha: true,
-      powerPreference: 'high-performance'
-    });
-    rendererRef.current = renderer;
-    
-    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    containerRef.current.appendChild(renderer.domElement);
-
     // Create points for sphere
     const positions = [];
     const vertices = 2000;
+    
+    // Initialize animation states for each point
+    pointAnimationStatesRef.current = Array(vertices).fill(0);
 
+    // Generate points in a sphere pattern
     for (let i = 0; i < vertices; i++) {
       const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos((Math.random() * 2) - 1);
+      const phi = Math.acos(Math.random() * 2 - 1);
       const radius = 1;
 
       const x = radius * Math.sin(phi) * Math.cos(theta);
@@ -79,112 +43,111 @@ export const WireframeSphere = () => {
       positions.push(x, y, z);
     }
 
-    const geometry = new THREE.BufferGeometry();
     const positionsArray = new Float32Array(positions);
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positionsArray, 3));
-    
-    // Store original positions for reference
-    positionsRef.current = geometry.attributes.position.array as Float32Array;
+    positionsRef.current = positionsArray;
     originalPositionsRef.current = positionsArray.slice();
-    targetPositionsRef.current = new Float32Array(positionsArray.length);
 
-    const material = new THREE.PointsMaterial({
-      color: 0x4a90e2,
-      size: 0.02,
-      sizeAttenuation: true
-    });
+    if (geometryRef.current) {
+      geometryRef.current.setAttribute('position', new THREE.Float32BufferAttribute(positionsArray, 3));
+      geometryRef.current.computeBoundingSphere();
+    }
 
-    const points = new THREE.Points(geometry, material);
-    pointsRef.current = points;
-    scene.add(points);
-    
-    camera.position.z = 2;
+    isInitializedRef.current = true;
+  }, []);
 
-    // Animation
-    let frame = 0;
-    let lastUpdateTime = 0;
-    const transitionDuration = 200; // Duration of transition in ms
-    let transitionStartTime = 0;
-    
-    const animate = (currentTime: number) => {
-      if (!pointsRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current || !positionsRef.current || !originalPositionsRef.current || !targetPositionsRef.current) {
-        return;
-      }
+  useFrame((state, delta) => {
+    if (!pointsRef.current || !positionsRef.current || !originalPositionsRef.current || !geometryRef.current) return;
 
-      frameRef.current = requestAnimationFrame(animate);
-      frame += 0.002;
-      
-      // Update target positions every 200ms
-      if (currentTime - lastUpdateTime > (200 + Math.random() * 300)) {
-        const originalPositions = originalPositionsRef.current;
-        const targetPositions = targetPositionsRef.current;
-        
-        for (let i = 0; i < originalPositions.length; i += 3) {
-          const originalX = originalPositions[i];
-          const originalY = originalPositions[i + 1];
-          const originalZ = originalPositions[i + 2];
-          
-          // Calculate original radius
-          const radius = Math.sqrt(originalX * originalX + originalY * originalY + originalZ * originalZ);
-          
-          // Add random variation to radius (-0.2 to 0.2)
-          const radiusVariation = 1.1 + (Math.random() * 0.1 - 0.2);
-          
-          targetPositions[i] = originalX * radiusVariation;
-          targetPositions[i + 1] = originalY * radiusVariation;
-          targetPositions[i + 2] = originalZ * radiusVariation;
+    frameRef.current += 0.002; // Constant rotation speed
+    const frame = frameRef.current;
+
+    const positions = positionsRef.current;
+    const originalPositions = originalPositionsRef.current;
+    const animationStates = pointAnimationStatesRef.current;
+
+    // Randomly select points to animate based on volume level
+    if (isAISpeaking) {
+      const pointsToAnimate = Math.floor(volumeLevel * 100);
+      for (let i = 0; i < pointsToAnimate; i++) {
+        const randomIndex = Math.floor(Math.random() * animationStates.length);
+        if (animationStates[randomIndex] === 0) {
+          animationStates[randomIndex] = 1;
         }
-        
-        lastUpdateTime = currentTime;
-        transitionStartTime = currentTime;
+      }
+    }
+
+    // Update positions based on animation states
+    for (let i = 0; i < positions.length; i += 3) {
+      const pointIndex = i / 3;
+      const originalX = originalPositions[i];
+      const originalY = originalPositions[i + 1];
+      const originalZ = originalPositions[i + 2];
+
+      let radiusMultiplier = 1;
+
+      if (isGettingReply) {
+        radiusMultiplier = 1 + Math.sin(frame) * 0.2;
+      } else {
+        // Smoothly animate points
+        if (animationStates[pointIndex] > 0) {
+          radiusMultiplier = 1 + Math.sin(animationStates[pointIndex]) * 0.1;
+          animationStates[pointIndex] += 0.1;
+          if (animationStates[pointIndex] >= Math.PI) {
+            animationStates[pointIndex] = 0;
+          }
+        } else {
+          radiusMultiplier = 1 + Math.sin(frame * 0.5) * 0.05;
+        }
       }
 
-      // Animate positions
-      const positions = positionsRef.current;
-      const targetPositions = targetPositionsRef.current;
-      const progress = Math.min((currentTime - transitionStartTime) / transitionDuration, 1);
-      
-      for (let i = 0; i < positions.length; i++) {
-        positions[i] += (targetPositions[i] - positions[i]) * progress;
-      }
-      
-      pointsRef.current.geometry.attributes.position.needsUpdate = true;
-      
-      pointsRef.current.rotation.y = frame;
-      pointsRef.current.rotation.x = frame * 0.5;
-      
-      rendererRef.current.render(sceneRef.current, cameraRef.current);
-    };
+      positions[i] = originalX * radiusMultiplier;
+      positions[i + 1] = originalY * radiusMultiplier;
+      positions[i + 2] = originalZ * radiusMultiplier;
+    }
 
-    animate(0);
+    geometryRef.current.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometryRef.current.attributes.position.needsUpdate = true;
 
-    // Handle resize
-    const handleResize = () => {
-      if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
-      
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
-      
-      cameraRef.current.aspect = width / height;
-      cameraRef.current.updateProjectionMatrix();
-      rendererRef.current.setSize(width, height);
-    };
+    // Constant rotation speed
+    const rotationSpeed = isGettingReply ? 0.2 : 0.05;
+    pointsRef.current.rotation.y = frame * rotationSpeed;
+    pointsRef.current.rotation.x = frame * (rotationSpeed * 0.5);
+  });
 
-    window.addEventListener('resize', handleResize);
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry ref={geometryRef}>
+        <bufferAttribute
+          attach="attributes-position"
+          count={positionsRef.current ? positionsRef.current.length / 3 : 0}
+          array={positionsRef.current || new Float32Array()}
+          itemSize={3}
+          needsUpdate={true}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        color={isGettingReply ? 0xff4444 : 0x4a90e2}
+        size={0.02}
+        sizeAttenuation={true}
+        transparent={true}
+        opacity={0.8}
+      />
+    </points>
+  );
+}
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cleanup();
-    };
-  }, [cleanup]);
-
-  React.useEffect(() => {
-    return () => {
-      cleanup();
-    };
-  }, [cleanup]);
-
-  return <div ref={containerRef} style={{ width: '35vw', height: '35vw' }} />;
+export const WireframeSphere = ({ isAISpeaking, isGettingReply, volumeLevel, participantName }: WireframeSphereProps) => {
+  return (
+    <div style={{ width: "35vw", height: "35vw", opacity: isGettingReply ? 0.9 : 0.8 }}>
+      <Canvas
+        camera={{ position: [0, 0, 2], fov: 75 }}
+        gl={{ antialias: true, alpha: true }}
+        style={{ background: 'transparent' }}
+      >
+        <Points isAISpeaking={isAISpeaking} isGettingReply={isGettingReply} volumeLevel={volumeLevel} />
+      </Canvas>
+    </div>
+  );
 };
 
 export default WireframeSphere;
