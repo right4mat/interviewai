@@ -128,7 +128,7 @@ export const WireframeSphere = () => {
           const radius = Math.sqrt(originalX * originalX + originalY * originalY + originalZ * originalZ);
           
           // Add random variation to radius (-0.2 to 0.2)
-          const radiusVariation = 1 + (Math.random() * 0.1 - 0.2);
+          const radiusVariation = 1.1 + (Math.random() * 0.1 - 0.2);
           
           targetPositions[i] = originalX * radiusVariation;
           targetPositions[i + 1] = originalY * radiusVariation;
