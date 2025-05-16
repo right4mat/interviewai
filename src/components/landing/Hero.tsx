@@ -12,10 +12,11 @@ import { PAGE_PATH } from "@/path";
 import { useT } from "@/i18n/client";
 import { HeroConfig } from "@/views/landing/data/hero";
 import { TypeAnimation } from "react-type-animation";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Badge from "./badge";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import WireframeSphereLanding from "./WireframeSphereLanding";
+
 const interviewQuestionsByIndustry = {
   general: [
     "Tell me about yourself.",
@@ -65,8 +66,18 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
   const { t } = useT("landing");
   const [currentVolume, setCurrentVolume] = React.useState(0.5);
   const [isExcited, setIsExcited] = React.useState(false);
+  const [isStartingInterview, setIsStartingInterview] = React.useState(false);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const industry = searchParams.get("industry") || "general";
+
+  const handleButtonClick = () => {
+    setIsStartingInterview(true);
+    router.push(PAGE_PATH.appRoot);
+  };
+
+  
+  
   return (
     <Box
       id="hero"
@@ -162,7 +173,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   size="large" 
                   startIcon={<PlayArrowIcon />}
                   sx={{ minWidth: "fit-content", fontWeight: "bold" }} 
-                  onClick={button.onClick}
+                  onClick={handleButtonClick}
                   onMouseEnter={() => setIsExcited(true)}
                   onMouseLeave={() => setIsExcited(false)}
                 >
@@ -181,7 +192,14 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <WireframeSphereLanding participantName="John Doe" isAISpeaking={false} isGettingReply={true} volumeLevel={currentVolume} isExcited={isExcited} />
+            <WireframeSphereLanding 
+              participantName="John Doe" 
+              isAISpeaking={false} 
+              isGettingReply={true} 
+              volumeLevel={currentVolume} 
+              isExcited={isExcited} 
+              isStartingInterview={isStartingInterview} 
+            />
           </Grid>
         </Grid>
       </Container>

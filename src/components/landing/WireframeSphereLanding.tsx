@@ -11,6 +11,7 @@ interface WireframeSphereProps {
   isGettingReply: boolean;
   volumeLevel: number;
   isExcited?: boolean;
+  isStartingInterview?: boolean;
 }
 
 // Convert brand colors to THREE.Color array for shimmering
@@ -22,7 +23,7 @@ const brandColors = [
   new THREE.Color(brand[600])
 ];
 
-function Points({ isAISpeaking, isGettingReply, volumeLevel, isExcited }: Omit<WireframeSphereProps, "participantName">) {
+function Points({ isAISpeaking, isGettingReply, volumeLevel, isExcited, isStartingInterview }: Omit<WireframeSphereProps, "participantName">) {
   const pointsRef = useRef<THREE.Points>(null);
   const positionsRef = useRef<Float32Array | null>(null);
   const originalPositionsRef = useRef<Float32Array | null>(null);
@@ -35,6 +36,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel, isExcited }: Omit<W
   const lastRadiusRef = useRef<Float32Array | null>(null);
   const cursorPositionRef = useRef({ x: 0, y: 0 });
   const targetRotationRef = useRef({ x: 0, y: 0 });
+  const interviewStartTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -98,6 +100,23 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel, isExcited }: Omit<W
 
     frameRef.current += 0.01;
     const frame = frameRef.current;
+
+    // Handle interview start animation
+    if (isStartingInterview) {
+      if (interviewStartTimeRef.current === null) {
+        interviewStartTimeRef.current = frame;
+      }
+      const elapsedTime = frame - interviewStartTimeRef.current;
+      if (elapsedTime < 1.5) {
+        pointsRef.current.scale.set(1 + elapsedTime / 1.5, 1 + elapsedTime / 1.5, 1 + elapsedTime / 1.5);
+      } else if (elapsedTime < 2.0) {
+        const shrinkFactor = 1 - ((elapsedTime - 1.5) / 0.5) * (1 / 3);
+        pointsRef.current.scale.set(shrinkFactor, shrinkFactor, shrinkFactor);
+      } else {
+        pointsRef.current.scale.set(2 / 3, 2 / 3, 2 / 3);
+        interviewStartTimeRef.current = null; // Reset after animation
+      }
+    }
 
     // Apply cursor-based rotation with elastic effect
     const { x: targetX, y: targetY } = targetRotationRef.current;
@@ -244,7 +263,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel, isExcited }: Omit<W
   );
 }
 
-export const WireframeSphere = ({ isAISpeaking, isGettingReply, volumeLevel, participantName, isExcited }: WireframeSphereProps) => {
+export const WireframeSphere = ({ isAISpeaking, isGettingReply, volumeLevel, participantName, isExcited, isStartingInterview }: WireframeSphereProps) => {
   return (
     <div style={{ width: "35vw", height: "35vw", opacity: isGettingReply ? 0.9 : 0.8 }}>
       <Canvas
@@ -252,7 +271,7 @@ export const WireframeSphere = ({ isAISpeaking, isGettingReply, volumeLevel, par
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
       >
-        <Points isAISpeaking={isAISpeaking} isGettingReply={isGettingReply} volumeLevel={volumeLevel} isExcited={isExcited} />
+        <Points isAISpeaking={isAISpeaking} isGettingReply={isGettingReply} volumeLevel={volumeLevel} isExcited={isExcited} isStartingInterview={isStartingInterview} />
       </Canvas>
     </div>
   );
