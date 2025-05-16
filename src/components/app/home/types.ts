@@ -22,6 +22,6 @@ export interface StatCardProps {
   value: string;
   interval: string;
   trend: TrendType;
-  data: number[];
+  data?: number[];
   color: string;
 } 

@@ -43,7 +43,7 @@ export default function Home(): React.ReactElement {
       value: `${averageScore}%`,
       interval: "All time",
       trend: (averageScore >= 70 ? "up" : averageScore >= 50 ? "neutral" : "down") as TrendType,
-      data: interviews.map((i) => i.avg || 0),
+      data: [], // We don't need to pass detailed data anymore since we're using a slider
       color: theme.palette.primary.main
     }
   ];

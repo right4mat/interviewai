@@ -4,58 +4,39 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
-import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
-import { areaElementClasses } from "@mui/x-charts/LineChart";
+import LinearProgress from "@mui/material/LinearProgress";
 import { StatCardProps } from "./types";
-import { AreaGradient } from "./AreaGradient";
 
-const trendValues: Record<string, string> = { up: "+25%", down: "-25%", neutral: "+5%" };
-const labelColors: Record<string, "success" | "error" | "default"> = {
-  up: "success",
-  down: "error",
-  neutral: "default"
-};
+export function StatsCard({ title, value, interval, trend, color }: StatCardProps) {
+  // Calculate the progress value from the data
+  // Assuming value is in format like "75%"
+  const progressValue = parseInt(value, 10) || 0;
 
-export function StatsCard({ title, value, interval, trend, data, color }: StatCardProps) {
   return (
     <Card variant="outlined" sx={{ height: "100%", flexGrow: 1 }}>
       <CardContent>
-        <Typography component="h2" variant="subtitle2" gutterBottom>
+        <Typography component="h2" variant="subtitle1" gutterBottom>
           {title}
         </Typography>
-        <Stack direction="column" sx={{ justifyContent: "space-between", flexGrow: "1", gap: 1 }}>
-          <Stack sx={{ justifyContent: "space-between" }}>
-            <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
-              <Typography variant="h4" component="p">
-                {value}
-              </Typography>
-              <Chip size="small" color={labelColors[trend]} label={trendValues[trend]} />
-            </Stack>
-            <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              {interval}
-            </Typography>
-          </Stack>
-          {data.length > 0 && (
-            <Box sx={{ width: "100%", height: 50 }}>
-              <SparkLineChart
-                colors={[color]}
-                data={data}
-                area
-                showHighlight
-                showTooltip
-                sx={{
-                  [`& .${areaElementClasses.root}`]: {
-                    fill: `url(#area-gradient-${title})`
-                  }
-                }}
-              >
-                <AreaGradient color={color} id={`area-gradient-${title}`} />
-              </SparkLineChart>
-            </Box>
-          )}
-        </Stack>
+        <Typography variant="h4" component="p" gutterBottom>
+          {value}
+        </Typography>
+        <Box sx={{ width: "100%", mt: 2 }}>
+          <LinearProgress
+            variant="determinate"
+            value={progressValue}
+            sx={{
+              height: 12,
+              borderRadius: 6,
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: 6,
+                backgroundColor: color,
+              },
+            }}
+          />
+        </Box>
       </CardContent>
     </Card>
   );
