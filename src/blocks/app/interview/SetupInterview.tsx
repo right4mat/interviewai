@@ -21,6 +21,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useExtractResume } from "@/services/InterviewServices";
 import CircularProgress from "@mui/material/CircularProgress";
+import Fade from "@mui/material/Fade";
 
 const SetupInterview: React.FC = () => {
   const { interviewState, setJobDescription, setPdfFile, setResume, setInterviewer, setSettings, setStage } = useInterviewStore();
@@ -211,36 +212,38 @@ const SetupInterview: React.FC = () => {
         </Grid>
 
         <Grid size={{ xs: 12 }}>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            {currentStep.label}
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            {currentStep.description}
-          </Typography>
+          <Fade in key={activeStep} timeout={500}>
+            <Box>
+              <Typography variant="h5" fontWeight="bold" gutterBottom>
+                {currentStep.label}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                {currentStep.description}
+              </Typography>
 
-          {currentStep.content}
+              {currentStep.content}
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-            <Button
-              variant="outlined"
-              startIcon={<ArrowBackIcon />}
-              onClick={handleBack}
-              disabled={activeStep === 0}
-             
-            >
-              Back
-            </Button>
+              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<ArrowBackIcon />}
+                  onClick={handleBack}
+                  disabled={activeStep === 0}
+                >
+                  Back
+                </Button>
 
-            <Button
-              variant={!currentStep.isValid ? "outlined" : "contained"}
-              endIcon={activeStep < steps.length - 1 ? <ArrowForwardIcon /> : undefined}
-              onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
-              disabled={!currentStep.isValid}
-            
-            >
-              {activeStep === steps.length - 1 ? "Complete Setup" : "Continue"}
-            </Button>
-          </Box>
+                <Button
+                  variant={!currentStep.isValid ? "outlined" : "contained"}
+                  endIcon={activeStep < steps.length - 1 ? <ArrowForwardIcon /> : undefined}
+                  onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
+                  disabled={!currentStep.isValid}
+                >
+                  {activeStep === steps.length - 1 ? "Complete Setup" : "Continue"}
+                </Button>
+              </Box>
+            </Box>
+          </Fade>
         </Grid>
       </Grid>
     </Container>
