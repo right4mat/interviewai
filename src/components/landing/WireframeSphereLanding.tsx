@@ -137,12 +137,16 @@ function Points({
       }
       const elapsedTime = frame - interviewStartTimeRef.current;
       if (elapsedTime < 1.5) {
-        pointsRef.current.scale.set(1 + elapsedTime / 1.5, 1 + elapsedTime / 1.5, 1 + elapsedTime / 1.5);
+        const baseScale = isExcited ? 1.1 : 1; // Use excited scale as base if excited
+        const expansionScale = baseScale + elapsedTime / 1.5;
+        pointsRef.current.scale.set(expansionScale, expansionScale, expansionScale);
       } else if (elapsedTime < 2.0) {
-        const shrinkFactor = 1 - ((elapsedTime - 1.5) / 0.5) * (1 / 3);
+        const baseScale = isExcited ? 1.1 : 1; // Use excited scale as base if excited
+        const shrinkFactor = baseScale - ((elapsedTime - 1.5) / 0.5) * (baseScale / 3);
         pointsRef.current.scale.set(shrinkFactor, shrinkFactor, shrinkFactor);
       } else {
-        pointsRef.current.scale.set(2 / 3, 2 / 3, 2 / 3);
+        const finalScale = isExcited ? 2/3 * 1.1 : 2/3; // Final scale is 2/3 of base scale
+        pointsRef.current.scale.set(finalScale, finalScale, finalScale);
         interviewStartTimeRef.current = null; // Reset after animation
       }
     }
