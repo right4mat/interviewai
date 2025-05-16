@@ -129,31 +129,38 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
       const distance = Math.sqrt(originalX ** 2 + originalY ** 2 + originalZ ** 2);
       const slowWave = Math.sin(frame * 0.5 + distance * 2) * 0.003;
       const mediumWave = Math.sin(frame * 0.8 + distance * 3) * 0.002;
-      const baseOffset = slowWave + mediumWave;
       
+      // Always have a breathing effect
+      const breathingAmplitude = isGettingReply ? 0.04 : 0.015; // More pronounced when getting reply
+      const breathingFrequency = isGettingReply ? 1.2 : 0.7; // Faster breathing when getting reply
+      const breathingEffect = Math.sin(frame * breathingFrequency) * breathingAmplitude;
+      
+      const baseOffset = slowWave + mediumWave + breathingEffect;
       let targetRadius = 1 + baseOffset;
 
+      // Always apply shimmering colors effect
+      const uniqueOffset = Math.sin(frame * 2 + i * 0.1);
+      const colorIndex = Math.floor(((uniqueOffset + 1) / 2) * brandColors.length);
+      const nextColorIndex = (colorIndex + 1) % brandColors.length;
+      const lerpFactor = ((uniqueOffset + 1) / 2) * brandColors.length - colorIndex;
+      
+      const currentColor = brandColors[colorIndex];
+      const nextColor = brandColors[nextColorIndex];
+      
+      // Interpolate between colors
+      const finalColor = new THREE.Color().lerpColors(currentColor, nextColor, lerpFactor);
+      
+      colors[i] = finalColor.r;
+      colors[i + 1] = finalColor.g;
+      colors[i + 2] = finalColor.b;
+      
       if (isGettingReply) {
-        // Smooth pulsing effect synchronized with color changes
-        const uniqueOffset = Math.sin(frame * 2 + i * 0.1);
+        // Add more pronounced pulsing when getting reply
         const pulsePhase = Math.sin(frame * 1.5 + distance * 2);
         targetRadius += pulsePhase * 0.02;
-        
-        // Create unique shimmering pattern for each point
-        const colorIndex = Math.floor(((uniqueOffset + 1) / 2) * brandColors.length);
-        const nextColorIndex = (colorIndex + 1) % brandColors.length;
-        const lerpFactor = ((uniqueOffset + 1) / 2) * brandColors.length - colorIndex;
-        
-        const currentColor = brandColors[colorIndex];
-        const nextColor = brandColors[nextColorIndex];
-        
-        // Interpolate between colors
-        const finalColor = new THREE.Color().lerpColors(currentColor, nextColor, lerpFactor);
-        
-        colors[i] = finalColor.r;
-        colors[i + 1] = finalColor.g;
-        colors[i + 2] = finalColor.b;
-      } else if (isAISpeaking) {
+      }
+      
+      if (isAISpeaking) {
         // Add effect from each active pulse wave with smoother transitions
         for (const wave of pulseWavesRef.current) {
           const waveEffect = Math.sin(distance * 6 - wave.position * 2) * 
@@ -170,12 +177,6 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
         const combinedOsc = (fastOsc + mediumOsc + slowOsc) * 0.15 + 0.1;
         const volumeResponse = combinedOsc * (volumeLevel/2) * 0.008;
         targetRadius += volumeResponse;
-        
-        // Reset to base color
-        const baseColor = new THREE.Color(0x4a90e2);
-        colors[i] = baseColor.r;
-        colors[i + 1] = baseColor.g;
-        colors[i + 2] = baseColor.b;
       }
 
       // Smooth interpolation between current and target radius
