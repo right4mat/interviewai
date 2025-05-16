@@ -11,10 +11,11 @@ import Link from "next/link";
 import { PAGE_PATH } from "@/path";
 import { useT } from "@/i18n/client";
 import { HeroConfig } from "@/views/landing/data/hero";
-import WireframeSphere from "./WireframeSphere";
 import { TypeAnimation } from "react-type-animation";
 import { useSearchParams } from "next/navigation";
-
+import Badge from "./badge";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import WireframeSphereLanding from "./WireframeSphereLanding";
 const interviewQuestionsByIndustry = {
   general: [
     "Tell me about yourself.",
@@ -63,6 +64,7 @@ const interviewQuestionsByIndustry = {
 export function Hero({ title, subtitle, info, button }: HeroConfig) {
   const { t } = useT("landing");
   const [currentVolume, setCurrentVolume] = React.useState(0.5);
+  const [isExcited, setIsExcited] = React.useState(false);
   const searchParams = useSearchParams();
   const industry = searchParams.get("industry") || "general";
   return (
@@ -120,8 +122,16 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   minHeight: "4em" // Add minimum height to prevent layout shifts
                 }}
               >
-                <TypeAnimation sequence={interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]} wrapper="span" speed={50} repeat={1} cursor={false} preRenderFirstString={false} />
+                <TypeAnimation
+                  sequence={interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]}
+                  wrapper="span"
+                  speed={50}
+                  repeat={1}
+                  cursor={false}
+                  preRenderFirstString={false}
+                />
               </Typography>
+
               <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
                 <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: "bold" }}>
                   <span style={{ fontSize: "1.2em" }}>🚀</span> Upload your resume & job description for tailored interviews
@@ -136,17 +146,31 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   <span style={{ fontSize: "1.2em" }}>🎮</span> Customize difficulty level and interview type
                 </Typography>
               </Stack>
+
               <Stack
                 direction={{ xs: "column", sm: "row" }}
-                spacing={1}
+                spacing={4}
                 useFlexGap
                 justifyContent="flex-start"
+                alignItems="center"
                 sx={{ pt: 2, width: { xs: "100%", sm: "350px" } }}
               >
-                <Button variant="contained" color="primary" size="small" sx={{ minWidth: "fit-content" }} onClick={button.onClick}>
+                <Badge size="small" />
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  size="large" 
+                  startIcon={<PlayArrowIcon />}
+                  sx={{ minWidth: "fit-content", fontWeight: "bold" }} 
+                  onClick={button.onClick}
+                  onMouseEnter={() => setIsExcited(true)}
+                  onMouseLeave={() => setIsExcited(false)}
+                >
                   {t("hero.button.text")}
                 </Button>
               </Stack>
+            </Stack>
+            <Stack spacing={2} flexDirection="row" justifyContent="flex-start" alignItems="center" sx={{ mt: 4 }} >
               <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center" }}>
                 {t("hero.terms")}
                 <Link href={PAGE_PATH.termsConditionPage} style={{ color: "var(--mui-palette-primary-main)" }}>
@@ -157,7 +181,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <WireframeSphere participantName="John Doe" isAISpeaking={false} isGettingReply={true} volumeLevel={currentVolume} />
+            <WireframeSphereLanding participantName="John Doe" isAISpeaking={false} isGettingReply={true} volumeLevel={currentVolume} isExcited={isExcited} />
           </Grid>
         </Grid>
       </Container>
