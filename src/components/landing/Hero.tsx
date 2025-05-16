@@ -117,23 +117,23 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   textAlign: "left",
                   color: "text.secondary",
                   width: { sm: "100%", md: "80%" },
-                  minHeight: "3em" // Add minimum height to prevent layout shifts
+                  minHeight: "4em" // Add minimum height to prevent layout shifts
                 }}
               >
                 <TypeAnimation sequence={interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]} wrapper="span" speed={50} repeat={1} cursor={false} preRenderFirstString={false} />
               </Typography>
               <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
-                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  🚀 Upload your resume & job description for tailored interviews
+                <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: "bold" }}>
+                  <span style={{ fontSize: "1.2em" }}>🚀</span> Upload your resume & job description for tailored interviews
                 </Typography>
-                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  💬 Receive real-time feedback on your responses and communication
+                <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: "bold" }}>
+                  <span style={{ fontSize: "1.2em" }}>💬</span> Receive real-time feedback on your responses and communication
                 </Typography>
-                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  🎯 Track your progress and improvement over time
+                <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: "bold" }}>
+                  <span style={{ fontSize: "1.2em" }}>🎯</span> Track your progress and improvement over time
                 </Typography>
-                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  🎮 Customize difficulty level and interview type
+                <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: "bold" }}>
+                  <span style={{ fontSize: "1.2em" }}>🎮</span> Customize difficulty level and interview type
                 </Typography>
               </Stack>
               <Stack
