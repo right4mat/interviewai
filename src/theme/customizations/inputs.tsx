@@ -357,7 +357,6 @@ export const inputsCustomizations: Components<Theme> = {
   MuiToggleButtonGroup: {
     styleOverrides: {
       root: ({ theme }) => ({
-        borderRadius: '10px',
         boxShadow: `0 4px 16px ${alpha(gray[400], 0.2)}`,
         [`& .${toggleButtonGroupClasses.selected}`]: {
           color: brand[500],
@@ -376,7 +375,6 @@ export const inputsCustomizations: Components<Theme> = {
       root: ({ theme }) => ({
         padding: '12px 16px',
         textTransform: 'none',
-        borderRadius: '10px',
         fontWeight: 500,
         ...theme.applyStyles('dark', {
           color: gray[400],
