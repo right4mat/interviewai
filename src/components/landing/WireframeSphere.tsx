@@ -32,6 +32,8 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
   const lastVolumeLevelRef = useRef(0);
   const pulseWavesRef = useRef<{ position: number; strength: number }[]>([]);
   const lastRadiusRef = useRef<Float32Array | null>(null);
+  const rotationRef = useRef({ x: 0, y: 0 });
+  const lastSpeakingStateRef = useRef(isAISpeaking);
 
   React.useEffect(() => {
     if (isInitializedRef.current) return;
@@ -81,6 +83,20 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
 
     frameRef.current += 0.01;
     const frame = frameRef.current;
+
+    // Handle rotation based on speaking state changes
+    if (!isAISpeaking) {
+      // Update stored rotation when not speaking
+      rotationRef.current.y += 0.001; // Reduced from 0.1 * delta * 60
+      rotationRef.current.x += 0.0005; // Reduced from 0.05 * delta * 60
+    }
+
+    // Apply current rotation
+    pointsRef.current.rotation.y = rotationRef.current.y;
+    pointsRef.current.rotation.x = rotationRef.current.x;
+
+    // Update last speaking state
+    lastSpeakingStateRef.current = isAISpeaking;
 
     const positions = positionsRef.current;
     const originalPositions = originalPositionsRef.current;
@@ -179,10 +195,6 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
     geometryRef.current.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     geometryRef.current.attributes.position.needsUpdate = true;
     geometryRef.current.attributes.color.needsUpdate = true;
-
-    // Constant slow rotation
-    pointsRef.current.rotation.y = frame * 0.1;
-    pointsRef.current.rotation.x = frame * 0.05;
   });
 
   return (
