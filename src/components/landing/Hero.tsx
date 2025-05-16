@@ -13,39 +13,58 @@ import { useT } from "@/i18n/client";
 import { HeroConfig } from "@/views/landing/data/hero";
 import WireframeSphere from "./WireframeSphere";
 import { TypeAnimation } from "react-type-animation";
+import { useSearchParams } from "next/navigation";
 
-const interviewQuestions = [
-  "Tell me about yourself.",
-  3000,
-  "What are your biggest strengths and weaknesses?",
-  3000,
-  "Why do you want to work here?",
-  3000,
-  "Describe a time you failed. How did you handle it?",
-  3000,
-  "Tell me about a time you had a conflict with a coworker. How did you resolve it?",
-  3000,
-  "Where do you see yourself in 5 years?",
-  3000,
-  "Why should we hire you?",
-  3000,
-  "Tell me about a time you had to learn something quickly.",
-  3000,
-  "How do you prioritize when you have multiple deadlines?",
-  3000,
-  "Do you have any questions for us?"
-];
+const interviewQuestionsByIndustry = {
+  general: [
+    "Tell me about yourself.",
+    3000,
+    "What are your biggest strengths and weaknesses?",
+    3000,
+    "Why do you want to work here?",
+    3000,
+    "Describe a time you failed. How did you handle it?",
+    3000,
+    "Tell me about a time you had a conflict with a coworker. How did you resolve it?",
+    3000,
+    "Where do you see yourself in 5 years?",
+    3000,
+    "Why should we hire you?",
+    3000,
+    "Tell me about a time you had to learn something quickly.",
+    3000,
+    "How do you prioritize when you have multiple deadlines?",
+    3000,
+    "Do you have any questions for us?"
+  ],
+  softwareEngineering: [
+    "Can you explain a challenging technical problem you solved and how you approached it?",
+    3000,
+    "How do you ensure the quality and maintainability of your code?",
+    3000,
+    "Tell me about a time you had a disagreement with a teammate over a technical solution. How was it resolved?",
+    3000,
+    "How do you stay up to date with new technologies and industry trends?",
+    3000,
+    "Describe a time when you had to learn a new language or framework quickly to complete a project.",
+    3000,
+    "How do you prioritize tasks when working on multiple projects or tight deadlines?",
+    3000,
+    "What's your process for debugging a complex issue in production?",
+    3000,
+    "How do you handle technical debt in your projects?",
+    3000,
+    "Can you describe a time when you made a significant performance optimization?",
+    3000,
+    "What's the most important aspect of writing scalable and efficient code?"
+  ]
+};
 
 export function Hero({ title, subtitle, info, button }: HeroConfig) {
   const { t } = useT("landing");
   const [currentVolume, setCurrentVolume] = React.useState(0.5);
-  const intervalRef = React.useRef<NodeJS.Timeout>();
-  const [isAISpeaking, setIsAISpeaking] = React.useState(false);
-  const [isGettingReply, setIsGettingReply] = React.useState(false);
-  const [displayText, setDisplayText] = React.useState(t(info));
-  const [questionIndex, setQuestionIndex] = React.useState(0);
-  const [initialAnimationComplete, setInitialAnimationComplete] = React.useState(false);
-
+  const searchParams = useSearchParams();
+  const industry = searchParams.get("industry") || "general";
   return (
     <Box
       id="hero"
@@ -97,10 +116,11 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                 sx={{
                   textAlign: "left",
                   color: "text.secondary",
-                  width: { sm: "100%", md: "80%" }
+                  width: { sm: "100%", md: "80%" },
+                  minHeight: "3em" // Add minimum height to prevent layout shifts
                 }}
               >
-                <TypeAnimation sequence={interviewQuestions} wrapper="span" speed={50} repeat={1} cursor={false} preRenderFirstString={false} />
+                <TypeAnimation sequence={interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]} wrapper="span" speed={50} repeat={1} cursor={false} preRenderFirstString={false} />
               </Typography>
               <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
                 <Typography variant="body1" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
