@@ -119,6 +119,17 @@ function Points({
     frameRef.current += 0.01;
     const frame = frameRef.current;
 
+    // Apply scale when excited
+    if (isExcited && pointsRef.current) {
+      const excitedScale = 1.1; // 10% larger when excited
+      pointsRef.current.scale.lerp(new THREE.Vector3(excitedScale, excitedScale, excitedScale), 0.05);
+    } else if (pointsRef.current) {
+      // Reset to normal scale when not excited (unless in interview start animation)
+      if (!isStartingInterview) {
+        pointsRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.05);
+      }
+    }
+
     // Handle interview start animation
     if (isStartingInterview) {
       if (interviewStartTimeRef.current === null) {

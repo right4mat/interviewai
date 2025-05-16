@@ -87,8 +87,8 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
     // Handle rotation based on speaking state changes
     if (!isAISpeaking) {
       // Update stored rotation when not speaking
-      rotationRef.current.y += 0.001; // Reduced from 0.1 * delta * 60
-      rotationRef.current.x += 0.0005; // Reduced from 0.05 * delta * 60
+      rotationRef.current.y += 0.0003; // Reduced from 0.001
+      rotationRef.current.x += 0.0001; // Reduced from 0.0005
     }
 
     // Apply current rotation
@@ -177,6 +177,12 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
         const combinedOsc = (fastOsc + mediumOsc + slowOsc) * 0.15 + 0.1;
         const volumeResponse = combinedOsc * (volumeLevel/2) * 0.008;
         targetRadius += volumeResponse;
+        
+        // Add vibration effect when speaking, with intensity based on volume
+        const vibrationIntensity = volumeLevel * 0.0002; // Dramatically reduced from 0.0008
+        const vibrationSpeed = 6 + volumeLevel * 0.5; // Reduced from 8 + volumeLevel * 1
+        const vibration = Math.sin(frame * vibrationSpeed + i * 0.1) * vibrationIntensity;
+        targetRadius += vibration;
       }
 
       // Smooth interpolation between current and target radius
