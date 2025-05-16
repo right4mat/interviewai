@@ -65,7 +65,7 @@ export function BillingSettings({headings, labels, buttons, pricing}: BillingSet
 
   return (
     <>
-      <Card sx={{ p: 3 }}>
+      <Card sx={{ p: 3 }} variant="outlined">
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <PaymentIcon sx={{ mr: 1, color: "text.secondary" }} />
         <Typography variant="h6" color="text.secondary">{headings.subscriptionPlans}</Typography>

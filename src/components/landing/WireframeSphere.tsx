@@ -18,8 +18,8 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
   const frameRef = useRef(0);
   const geometryRef = useRef<THREE.BufferGeometry | null>(null);
   const isInitializedRef = useRef(false);
-  const pointAnimationStatesRef = useRef<{ phase: number; amplitude: number }[]>([]);
   const lastVolumeLevelRef = useRef(0);
+  const pulseWavesRef = useRef<{ position: number; strength: number }[]>([]);
 
   React.useEffect(() => {
     if (isInitializedRef.current) return;
@@ -27,12 +27,6 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
     const positions = [];
     const vertices = 2000;
     
-    // Initialize animation states for each point with phase and amplitude
-    pointAnimationStatesRef.current = Array(vertices).fill(null).map(() => ({
-      phase: Math.random() * Math.PI * 2, // Random starting phase
-      amplitude: 0 // Initial amplitude
-    }));
-
     // Generate points in a sphere pattern
     for (let i = 0; i < vertices; i++) {
       const theta = Math.random() * Math.PI * 2;
@@ -61,50 +55,60 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
   useFrame((state, delta) => {
     if (!pointsRef.current || !positionsRef.current || !originalPositionsRef.current || !geometryRef.current) return;
 
-    frameRef.current += 0.002; // Base rotation speed
+    frameRef.current += 0.01;
     const frame = frameRef.current;
 
     const positions = positionsRef.current;
     const originalPositions = originalPositionsRef.current;
-    const animationStates = pointAnimationStatesRef.current;
 
-    // Calculate volume level change
-    const volumeChange = isAISpeaking ? volumeLevel - lastVolumeLevelRef.current : 0;
+    // Detect significant volume changes to create new pulse waves
+    const volumeChange = volumeLevel - lastVolumeLevelRef.current;
+    if (isAISpeaking && volumeChange > 0.1) {
+      pulseWavesRef.current.push({
+        position: 0,
+        strength: Math.min(volumeChange * 2, 1)
+      });
+    }
     lastVolumeLevelRef.current = volumeLevel;
 
-    // Update animation states based on volume level and change
-    for (let i = 0; i < animationStates.length; i++) {
-      const state = animationStates[i];
-      
-      if (isAISpeaking) {
-        // Increase amplitude based on volume level and change
-        const targetAmplitude = Math.min(volumeLevel * 0.2, 1);
-        state.amplitude = THREE.MathUtils.lerp(state.amplitude, targetAmplitude, 0.1);
-        
-        // Advance phase based on volume change
-        state.phase += 0.1 + Math.abs(volumeChange) * 0.2;
-      } else {
-        // Gradually reduce amplitude when not speaking
-        state.amplitude *= 0.95;
-      }
-    }
+    // Update and clean up pulse waves
+    pulseWavesRef.current = pulseWavesRef.current.filter(wave => {
+      wave.position += 0.15; // Wave speed
+      return wave.position < Math.PI; // Remove waves that have completed
+    });
 
-    // Update positions based on animation states
+    // Update positions based on pulse waves and volume
     for (let i = 0; i < positions.length; i += 3) {
-      const pointIndex = i / 3;
       const originalX = originalPositions[i];
       const originalY = originalPositions[i + 1];
       const originalZ = originalPositions[i + 2];
-      const state = animationStates[pointIndex];
-
-      let radiusMultiplier = 1;
+      
+      // Calculate base position with subtle constant animation
+      const baseOffset = Math.sin(frame + Math.sqrt(originalX ** 2 + originalY ** 2 + originalZ ** 2) * 2) * 0.02;
+      
+      let radiusMultiplier = 1 + baseOffset;
 
       if (isGettingReply) {
-        radiusMultiplier = 1 + Math.sin(frame) * 0.2;
-      } else {
-        // Create wave-like effect using phase and amplitude
-        const wave = Math.sin(state.phase + frame) * state.amplitude;
-        radiusMultiplier = 1 + wave * 0.1;
+        // Simple pulse for reply state
+        radiusMultiplier += Math.sin(frame * 3) * 0.05;
+      } else if (isAISpeaking) {
+        // Add effect from each active pulse wave
+        for (const wave of pulseWavesRef.current) {
+          const distance = Math.sqrt(originalX ** 2 + originalY ** 2 + originalZ ** 2);
+          const waveEffect = Math.sin(distance * 8 - wave.position * 2) * 
+                           Math.exp(-wave.position * 0.5) * // Decay over distance
+                           wave.strength * 0.1; // Scale the effect
+          radiusMultiplier += waveEffect;
+        }
+        
+        // Enhanced immediate volume response with multi-frequency animation
+        const fastOsc = Math.sin(frame * 12 + Math.sqrt(originalX ** 2 + originalY ** 2 + originalZ ** 2) * 4);
+        const mediumOsc = Math.sin(frame * 8 + Math.sqrt(originalX ** 2 + originalZ ** 2) * 3);
+        const slowOsc = Math.sin(frame * 4 + Math.sqrt(originalY ** 2 + originalZ ** 2) * 2);
+        
+        const combinedOsc = (fastOsc * 0.3 + mediumOsc * 0.5 + slowOsc * 0.2) * 0.5 + 0.5;
+        const volumeResponse = combinedOsc * (volumeLevel/2) * 0.05;
+        radiusMultiplier += volumeResponse;
       }
 
       positions[i] = originalX * radiusMultiplier;
@@ -115,10 +119,9 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
     geometryRef.current.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometryRef.current.attributes.position.needsUpdate = true;
 
-    // Adjust rotation speed
-    const rotationSpeed = isGettingReply ? 0.2 : 0.05;
-    pointsRef.current.rotation.y = frame * rotationSpeed;
-    pointsRef.current.rotation.x = frame * (rotationSpeed * 0.5);
+    // Constant slow rotation
+    pointsRef.current.rotation.y = frame * 0.1;
+    pointsRef.current.rotation.x = frame * 0.05;
   });
 
   return (
