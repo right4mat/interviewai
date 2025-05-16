@@ -73,7 +73,10 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
 
   const handleButtonClick = () => {
     setIsStartingInterview(true);
-    router.push(PAGE_PATH.appRoot);
+    router.prefetch(PAGE_PATH.appRoot)
+    setTimeout(() => {
+      router.push(PAGE_PATH.appRoot);
+    }, 150);
   };
 
   
@@ -199,7 +202,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
               volumeLevel={currentVolume} 
               isExcited={isExcited} 
               isStartingInterview={isStartingInterview} 
-              onHover={() => setIsExcited(true)}
+              onHover={(bool) => setIsExcited(bool)}
               onClick={handleButtonClick}
             />
           </Grid>

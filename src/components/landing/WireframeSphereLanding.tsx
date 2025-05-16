@@ -328,7 +328,7 @@ export const WireframeSphere = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
+          pointerEvents: "auto", // Changed from "none" to "auto" to enable hover events
           width: "5rem",
           height: "5rem",
           borderRadius: "50%",
