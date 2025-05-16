@@ -20,6 +20,7 @@ import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { Interviewer } from '@/types/interview';
+import FormLabel from '@mui/material/FormLabel';
 
 
 interface InterviewSettings {
@@ -166,10 +167,9 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
         <Grid container spacing={2}>
           <Grid size={{xs: 12, sm: 6}}>
             <FormControl fullWidth size="small">
-              <InputLabel>Interview Type</InputLabel>
+              <FormLabel>Interview Type</FormLabel>
               <Select
                 value={settings.type}
-                label="Interview Type"
                 onChange={(e) => setSettings({ ...settings, type: e.target.value as InterviewSettings['type'] })}
               >
                 <MenuItem value="technical">Technical</MenuItem>
@@ -180,10 +180,9 @@ const InterviewerSetup: React.FC<InterviewerSetupProps> = ({
           </Grid>
           <Grid size={{xs: 12, sm: 6}}>
             <FormControl fullWidth size="small">
-              <InputLabel>Difficulty Level</InputLabel>
+            <FormLabel>Difficulty Level</FormLabel>
               <Select
                 value={settings.difficulty}
-                label="Difficulty Level"
                 onChange={(e) => setSettings({ ...settings, difficulty: e.target.value as InterviewSettings['difficulty'] })}
               >
                 <MenuItem value="beginner">Beginner</MenuItem>

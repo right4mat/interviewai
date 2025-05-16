@@ -35,7 +35,7 @@ const UploadArea = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
   textAlign: 'center',
   cursor: 'pointer',
-  backgroundColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.01)' : 'rgba(255, 255, 255, 0.01)',
+  backgroundColor: 'white',
   transition: 'border-color 0.2s ease-in-out',
   '&:hover': {
     borderColor: theme.palette.primary.main,

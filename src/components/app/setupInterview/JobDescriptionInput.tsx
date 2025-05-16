@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CustomizedInput from '@/components/shared/CustomizedInput';
+import CustomInput from '@/components/shared/CustomizedInput';
 
 interface JobDescriptionInputProps {
   value: string;
@@ -12,12 +12,15 @@ const JobDescriptionInput: React.FC<JobDescriptionInputProps> = ({ value, onChan
   return (
     <Box sx={{ mb: 2 }}>
 
-      <CustomizedInput
+      <CustomInput
+      sx={{
+        backgroundColor: 'white',
+      }}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Paste the job description here..."
-        multiline
         rows={8}
+        multiline
         fullWidth
         required
       />

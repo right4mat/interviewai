@@ -509,7 +509,7 @@ export const inputsCustomizations: Components<Theme> = {
               size: 'small',
             },
             style: {
-              height: '2.25rem',
+              height: ({ multiline }: { multiline?: boolean }) => multiline ? 'auto' : '2.25rem',
             },
           },
           {
@@ -517,7 +517,7 @@ export const inputsCustomizations: Components<Theme> = {
               size: 'medium',
             },
             style: {
-              height: '2.5rem',
+              height: ({ multiline }: { multiline?: boolean }) => multiline ? 'auto' : '2.5rem',
             },
           },
         ],

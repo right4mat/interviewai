@@ -226,13 +226,7 @@ const SetupInterview: React.FC = () => {
               startIcon={<ArrowBackIcon />}
               onClick={handleBack}
               disabled={activeStep === 0}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 500,
-                px: 3,
-                py: 1
-              }}
+             
             >
               Back
             </Button>
@@ -242,14 +236,7 @@ const SetupInterview: React.FC = () => {
               endIcon={activeStep < steps.length - 1 ? <ArrowForwardIcon /> : undefined}
               onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
               disabled={!currentStep.isValid}
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 600,
-                px: 3,
-                py: 1,
-                boxShadow: 2
-              }}
+            
             >
               {activeStep === steps.length - 1 ? "Complete Setup" : "Continue"}
             </Button>
