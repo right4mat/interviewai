@@ -199,6 +199,8 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
               volumeLevel={currentVolume} 
               isExcited={isExcited} 
               isStartingInterview={isStartingInterview} 
+              onHover={() => setIsExcited(true)}
+              onClick={handleButtonClick}
             />
           </Grid>
         </Grid>
