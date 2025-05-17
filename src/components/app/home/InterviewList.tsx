@@ -81,7 +81,10 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       field: "company",
       headerName: "Company",
       flex: 1,
-      minWidth: 150
+      minWidth: 150,
+      renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
+        return params.row?.company || "Not mentioned";
+      }
     },
     {
       field: "settings.type",
@@ -135,7 +138,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
     },
     {
       field: "created_at",
-      headerName: "Last Attempt",
+      headerName: "Created At",
       flex: 0.8,
       minWidth: 120,
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
@@ -150,26 +153,28 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const interviewId = params.row.id;
         return (
-          <ActionButton
-            label="Try Again"
-            variant="outlined"
-            startIcon={<ReplayIcon />}
-            actions={[
-              {
-                label: "View Attempts",
-                icon: <VisibilityIcon />,
-                onClick: () => handleViewAttempts(interviewId),
-                color: "primary"
-              },
-              {
-                label: "Delete",
-                icon: <DeleteIcon />,
-                onClick: () => handleDelete(interviewId),
-                color: "error"
-              }
-            ]}
-            onClick={() => handleTryAgain(interviewId)}
-          />
+          <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" sx={{ width: "100%" , height: "100%" }}>
+            <ActionButton
+              label="Try Again"
+              variant="outlined"
+              startIcon={<ReplayIcon />}
+              actions={[
+                {
+                  label: "View Attempts",
+                  icon: <VisibilityIcon />,
+                  onClick: () => handleViewAttempts(interviewId),
+                  color: "primary"
+                },
+                {
+                  label: "Delete",
+                  icon: <DeleteIcon />,
+                  onClick: () => handleDelete(interviewId),
+                  color: "error"
+                }
+              ]}
+              onClick={() => handleTryAgain(interviewId)}
+            />
+          </Stack>
         );
       }
     }
