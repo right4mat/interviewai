@@ -2,21 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { useGetInterviewReply, useScoreAnswer } from "@/services/appServices";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Interviewer } from "@/types/interview";
+import { Interviewer, QuestionAnswer } from "@/types/interview";
 
-/**
- * Interface representing a question and its corresponding answer in the interview
- * Includes the original question/answer pair along with AI-generated analysis
- */
-interface QuestionAnswer {
-  question: string;
-  answer: string;
-  score?: number;
-  reasoning?: string;
-  cleanedAnswer?: string;
-  modelAnswer?: string;
-  questionSummary: string;
-}
+
 
 /**
  * Props required to initialize the interview hook

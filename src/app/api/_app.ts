@@ -122,6 +122,47 @@ async function getOrCreateJobDescription(data: JobDescriptionData) {
   return jobDescData;
 }
 
+async function findExistingInterview(data: {
+  userId: string;
+  jobDescriptionId: number;
+  resumeId: number | null;
+  settings: {
+    difficulty: string;
+    type: string;
+  };
+  interviewer: {
+    name: string;
+    role: string;
+  };
+  questions: string[];
+}) {
+  const { userId, jobDescriptionId, resumeId, settings, interviewer, questions } = data;
+  
+  // Check for an existing interview that matches the criteria
+  let query = supabase
+    .from("interviews")
+    .select("id",{ count: "exact", head: false })
+    .limit(1)
+    .eq("user_id", userId)
+    .eq("job_description_id", jobDescriptionId)
+    .eq("settings->>difficulty", settings.difficulty)
+    .eq("settings->>type", settings.type)
+    .eq("interviewer->>name", interviewer.name)
+    .eq("interviewer->>role", interviewer.role)
+    .filter("questions", "cs", JSON.stringify(questions));
+
+  // Adjust query based on whether resumeId is null
+  if (resumeId === null) {
+    query = query.is("resume_id", null);
+  } else {
+    query = query.eq("resume_id", resumeId);
+  }
+
+  const existingInterview = await query.maybeSingle().then(handle);
+
+  return existingInterview ? { id: existingInterview.id } : null;
+}
+
 async function createInterview(data: InterviewData) {
   const { userId, jobDescriptionId, resumeId, settings, interviewer, questions } = data;
   
@@ -174,5 +215,6 @@ export {
   getResume,
   getOrCreateJobDescription,
   createInterview,
-  saveQuestionAnswers
+  saveQuestionAnswers,
+  findExistingInterview
 };

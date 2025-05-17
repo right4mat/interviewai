@@ -45,7 +45,7 @@ type GetInterviewReplyResponse = { text: string; audio: string };
 
 type GetQuestionsResponse = { questions: string[]; company: string };
 
-type ExtractResumeResponse = {resumeId:number};
+type ExtractResumeResponse = { resumeId: number };
 
 interface ReviewInterviewRequest {
   company: string;
@@ -182,8 +182,8 @@ export const useSaveInterview = () => {
     },
     confirmConfig: {
       title: "Stop Interview",
-      content: "Are you sure you want to stop and save this interview?",
-      confirmLabel: "Stop and Save",
+      content: "Are you sure you want to stop this interview?",
+      confirmLabel: "Stop",
       cancelLabel: "Cancel",
       confirmColor: "primary"
     }
@@ -263,9 +263,10 @@ export const useInterviewList = () => {
           resume_id,
           settings,
           interviewer,
-          question_answers(score.avg()),
+          question_answers(score.avg(),score.count()),
           created_at,
-          count()
+           count()
+         
         `
         )
         .eq("user_id", user.id)
@@ -276,7 +277,8 @@ export const useInterviewList = () => {
       // Transform the data to match InterviewListResponse shape
       return stats.map((stat) => ({
         ...stat,
-        avg: stat.question_answers?.[0]?.avg
+        avg: stat.question_answers?.[0]?.avg,
+        count: stat.question_answers?.[0]?.count
       }));
     }
   });
@@ -287,11 +289,7 @@ export const useDeleteInterview = () => {
   return useConfirmMutation({
     mutationFn: async (variables: DeleteInterviewRequest) => {
       if (!user) throw new Error("User not found");
-      const { error } = await supabase
-        .from("interviews")
-        .delete()
-        .eq("id", variables.interviewId)
-        .eq("user_id", user.id);
+      const { error } = await supabase.from("interviews").delete().eq("id", variables.interviewId).eq("user_id", user.id);
 
       if (error) throw error;
       return true;

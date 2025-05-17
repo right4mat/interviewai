@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
 import { User } from "@supabase/supabase-js";
-import { getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers } from "../../_app";
+import { getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers, findExistingInterview } from "../../_app";
 
 // Define schema for request validation
 const getQuestionsSchema = z.object({
@@ -17,7 +17,7 @@ const getQuestionsSchema = z.object({
     type: z.string().optional().default("mixed")
   }),
   jobDescription: z.string().min(1, "Job description is required"),
-  resumeId: z.number().optional(),
+  resumeId: z.number().or(z.null()).optional(),
   questionAnswers: z.array(
     z.object({
       question: z.string(),
@@ -69,8 +69,8 @@ export const POST = requireAuth(async (req: NextRequest, user: User) => {
     // Calculate total score
     const totalScore = questionAnswers.reduce((sum, qa) => sum + (qa.score || 0), 0);
 
-    // Create interview
-    const interview = await createInterview({
+    // Check if there's an existing interview that matches the criteria
+    const existingInterview = await findExistingInterview({
       userId: user.id,
       jobDescriptionId: jobDescData.id,
       resumeId: resumeData?.id || null,
@@ -84,6 +84,27 @@ export const POST = requireAuth(async (req: NextRequest, user: User) => {
       },
       questions
     });
+
+    // Use existing interview or create a new one
+    let interview;
+    if (existingInterview) {
+      interview = existingInterview;
+    } else {
+      interview = await createInterview({
+        userId: user.id,
+        jobDescriptionId: jobDescData.id,
+        resumeId: resumeData?.id || null,
+        settings: {
+          difficulty: settings.difficulty,
+          type: settings.type
+        },
+        interviewer: {
+          name: interviewer.name,
+          role: interviewer.role
+        },
+        questions
+      });
+    }
 
     // Save question answers
     await saveQuestionAnswers({

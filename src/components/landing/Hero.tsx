@@ -19,8 +19,6 @@ import WireframeSphereLanding from "./WireframeSphereLanding";
 
 const interviewQuestionsByIndustry = {
   general: [
-    "Tell me about yourself.",
-    3000,
     "What are your biggest strengths and weaknesses?",
     3000,
     "Why do you want to work here?",
@@ -133,7 +131,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   textAlign: "left",
                   color: "text.secondary",
                   width: { sm: "100%", md: "80%" },
-                  minHeight: "4.5em" // Add minimum height to prevent layout shifts
+                  minHeight: "5em" // Add minimum height to prevent layout shifts
                 }}
               >
                 <TypeAnimation

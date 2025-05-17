@@ -92,7 +92,8 @@ export default function Interview(): React.ReactElement {
         jobDescription: interviewState.jobDescription,
         resumeId: interviewState.resumeId,
         questionAnswers
-      });
+      })
+
       setShowReviewDialog(true);
     }
   }, [isAISpeaking, currentQuestionIndex, details?.questions?.length, !!interviewState.interviewStarted]);
@@ -173,6 +174,7 @@ export default function Interview(): React.ReactElement {
 
       {currentQuestionIndex >= (details?.questions?.length || 999) && (
         <ReviewDialog
+          company={details?.company || ""}
           open={showReviewDialog}
           onClose={handleCloseReview}
           questionAnswers={questionAnswers}

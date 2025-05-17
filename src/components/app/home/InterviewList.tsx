@@ -49,7 +49,8 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         resumeId: loadedInterview?.resumeId,
         currentQuestionIndex: 0,
         questionAnswers: [],
-        stage: "interview" as "interview" | "setup"
+        stage: "interview" as "interview" | "setup",
+        interviewStarted: false
       };
 
       updateInterviewState(newState);

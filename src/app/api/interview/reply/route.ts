@@ -12,7 +12,7 @@ const openai = new OpenAI({
 const replySchema = z.object({
   company: z.string(),
   jobDescription: z.string().min(1, "Job description is required"),
-  resumeId: z.number().optional(),
+  resumeId: z.number().or(z.null()).optional(),
   interviewers: z.object({
     name: z.string().min(1, "Interviewer name is required"),
     role: z.string().min(1, "Interviewer role is required")
