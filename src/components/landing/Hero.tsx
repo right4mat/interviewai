@@ -133,14 +133,14 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   textAlign: "left",
                   color: "text.secondary",
                   width: { sm: "100%", md: "80%" },
-                  minHeight: "4em" // Add minimum height to prevent layout shifts
+                  minHeight: "4.5em" // Add minimum height to prevent layout shifts
                 }}
               >
                 <TypeAnimation
-                  sequence={interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]}
+                  sequence={[t("hero.info"),3000, ...interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]]}
                   wrapper="span"
                   speed={50}
-                  repeat={1}
+                  repeat={6}
                   cursor={false}
                   preRenderFirstString={false}
                 />

@@ -13,14 +13,11 @@ import { DashboardProps } from "@/blocks/app/Dashboard";
 
 export const dashboard: DashboardProps = {
   sideMenu: {
-    avatar:{
-     href: PAGE_PATH.settingsPage,
+    avatar: {
+      href: PAGE_PATH.settingsPage
     },
     menuContent: {
-      mainListItems: [
-        { text: "Farms", icon: <AgricultureRoundedIcon />, href: PAGE_PATH.dashboardPage },
-
-      ],
+      mainListItems: [{ text: "Home", icon: <HomeRoundedIcon />, href: PAGE_PATH.dashboardPage }],
       secondaryListItems: [
         { text: "Settings", icon: <SettingsRoundedIcon />, href: PAGE_PATH.settingsPage },
         { text: "About", icon: <InfoRoundedIcon />, href: PAGE_PATH.aboutPage },
@@ -30,7 +27,7 @@ export const dashboard: DashboardProps = {
     optionsMenu: {
       profileItems: [
         { text: "Profile", href: PAGE_PATH.settingsPage },
-       { text: "Settings", href: PAGE_PATH.settingsPage }
+        { text: "Settings", href: PAGE_PATH.settingsPage }
       ],
       accountItems: [],
       settingsItems: []
@@ -39,18 +36,13 @@ export const dashboard: DashboardProps = {
       title: "Upgrade your plan",
       description: "Check our documentation",
       buttonText: "Upgrade Now",
-      icon: <AutoAwesomeRoundedIcon fontSize="small" />,
-     
+      icon: <AutoAwesomeRoundedIcon fontSize="small" />
     }
   },
   appNavbar: {
     title: "",
     menuContent: {
-      mainListItems: [
-        { text: "Home", icon: <HomeRoundedIcon />, href: PAGE_PATH.dashboardPage },
-        { text: "Farms", icon: <HomeRoundedIcon />, href: PAGE_PATH.dashboardPage },
-   
-      ],
+      mainListItems: [{ text: "Home", icon: <HomeRoundedIcon />, href: PAGE_PATH.dashboardPage }],
       secondaryListItems: [
         { text: "Settings", icon: <SettingsRoundedIcon />, href: PAGE_PATH.settingsPage },
         { text: "About", icon: <InfoRoundedIcon />, href: PAGE_PATH.aboutPage },
@@ -61,7 +53,7 @@ export const dashboard: DashboardProps = {
       title: "Upgrade your plan",
       description: "Check our documentation",
       buttonText: "Upgrade Now",
-      icon: <AutoAwesomeRoundedIcon fontSize="small" />,
-    } 
+      icon: <AutoAwesomeRoundedIcon fontSize="small" />
+    }
   }
 };

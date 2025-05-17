@@ -264,7 +264,8 @@ export const colorSchemes = {
       divider: alpha(gray[300], 0.4),
       background: {
         default: brand[50], // Using brand lightest color
-        paper: brand[100] // Using brand very light color
+        paper: brand[100], // Using brand very light color
+        card: '#fff'
       },
       text: {
         primary: brand[700],

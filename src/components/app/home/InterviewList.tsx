@@ -13,6 +13,7 @@ import ActionButton from "@/components/shared/ActionButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReplayIcon from "@mui/icons-material/Replay";
+import HistoryIcon from "@mui/icons-material/History";
 import { InterviewListResponse } from "./types";
 import Stack from "@mui/material/Stack";
 import { Gauge } from "@mui/x-charts/Gauge";
@@ -184,19 +185,21 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
   return (
     <>
       {deleteInterview.ConfirmDialog}
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Interview History
-      </Typography>
-      <Card sx={{ p: 2 }} variant="outlined">
-        <CustomizedDataGrid
-          rows={interviews || []}
-          columns={columns}
-          pageSize={10}
-          checkboxSelection={false}
-          disableColumnResize={true}
-          density="standard"
-        />
-      </Card>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <HistoryIcon />
+        <Typography component="h2" variant="h6" sx={{ ml: 1 }}>
+          Interview History
+        </Typography>
+      </Box>
+
+      <CustomizedDataGrid
+        rows={interviews || []}
+        columns={columns}
+        pageSize={10}
+        checkboxSelection={false}
+        disableColumnResize={true}
+        density="standard"
+      />
     </>
   );
 }
