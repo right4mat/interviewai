@@ -120,7 +120,8 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         </Box>
       ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
-        return params.row?.settings?.type || "";
+        const type = params.row?.settings?.type;
+        return <Chip label={type || ""} sx={{ textTransform: "capitalize" }} size="medium" />;
       }
     },
     {
@@ -142,7 +143,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const difficulty = params.row?.settings?.difficulty;
         const color = difficulty === "advanced" ? "error" : difficulty === "intermediate" ? "default" : "success";
-        return <Chip label={difficulty || ""} color={color} sx={{ textTransform: "capitalize" }} size="large" />;
+        return <Chip label={difficulty || ""} color={color} sx={{ textTransform: "capitalize" }} size="medium" />;
       }
     },
     {
@@ -236,6 +237,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         return (
           <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" sx={{ width: "100%" , height: "100%" }}>
             <ActionButton
+            sx={{fontWeight:"bold"}}
               label="Try Again"
               variant="outlined"
               startIcon={<ReplayIcon />}
