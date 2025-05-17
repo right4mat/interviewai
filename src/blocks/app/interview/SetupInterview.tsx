@@ -19,7 +19,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import PeopleIcon from "@mui/icons-material/People";
 import CheckIcon from "@mui/icons-material/Check";
 import { useInterviewStore } from "@/stores/interviewStore";
-import { useExtractResume } from "@/services/InterviewServices";
+import { useExtractResume } from "@/services/appServices";
 import CircularProgress from "@mui/material/CircularProgress";
 import Fade from "@mui/material/Fade";
 

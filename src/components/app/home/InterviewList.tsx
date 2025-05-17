@@ -17,7 +17,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import { InterviewListResponse } from "./types";
 import Stack from "@mui/material/Stack";
 import { Gauge } from "@mui/x-charts/Gauge";
-import { useLoadInterview, useDeleteInterview } from "@/services/InterviewServices";
+import { useLoadInterview, useDeleteInterview } from "@/services/appServices";
 import { QuestionAnswer, useInterviewStore } from "@/stores/interviewStore";
 import { useRouter } from "next/navigation";
 

@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
-import { useGetInterviewQuestions, useSaveInterview } from "@/services/InterviewServices";
+import { useGetInterviewQuestions, useSaveInterview } from "@/services/appServices";
 import VideoDisplay from "@/components/app/interview/VideoDisplay";
 import Button from "@mui/material/Button";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";

@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import { Grid, Card, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useInterviewList } from "@/services/InterviewServices";
+import { useInterviewList } from "@/services/appServices";
 import { StatsCard } from "@/components/app/home/StatsCard";
 import { StartPracticeCard } from "@/components/app/home/StartPracticeCard";
 import { InterviewList } from "@/components/app/home/InterviewList";
