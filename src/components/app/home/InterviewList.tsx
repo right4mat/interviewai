@@ -14,6 +14,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReplayIcon from "@mui/icons-material/Replay";
 import HistoryIcon from "@mui/icons-material/History";
+import BusinessIcon from "@mui/icons-material/Business";
+import CategoryIcon from "@mui/icons-material/Category";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import StarIcon from "@mui/icons-material/Star"; // New icon for Average Score
+import TimelineIcon from "@mui/icons-material/Timeline"; // Changed icon for Attempts
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { InterviewListResponse } from "./types";
 import Stack from "@mui/material/Stack";
 import { Gauge } from "@mui/x-charts/Gauge";
@@ -82,6 +88,17 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       headerName: "Company",
       flex: 1,
       minWidth: 150,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true, 
+      renderHeader: () => (
+        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+          <BusinessIcon sx={{ mr: 0.5 }} />
+          <Typography variant="body2" sx={{ color: "text.secondary" }} fontWeight={"bold"}>
+            Company
+          </Typography>
+        </Box>
+      ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         return params.row?.company || "Not mentioned";
       }
@@ -89,8 +106,19 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
     {
       field: "settings.type",
       headerName: "Type",
-      flex: 0.8,
+      flex: 1,
       minWidth: 120,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true, 
+      renderHeader: () => (
+        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+          <CategoryIcon sx={{ mr: 0.5 }} />
+          <Typography variant="body2" sx={{ color: "text.secondary" }} fontWeight={"bold"}>
+            Type
+          </Typography>
+        </Box>
+      ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         return params.row?.settings?.type || "";
       }
@@ -98,30 +126,62 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
     {
       field: "settings.difficulty",
       headerName: "Difficulty",
-      flex: 0.8,
-      minWidth: 120,
+      flex: .8,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true, 
+
+      renderHeader: () => (
+        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+          <BarChartIcon sx={{ mr: 0.5 }} />
+          <Typography variant="body2" fontWeight={"bold"}>
+            Difficulty
+          </Typography>
+        </Box>
+      ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const difficulty = params.row?.settings?.difficulty;
         const color = difficulty === "advanced" ? "error" : difficulty === "intermediate" ? "default" : "success";
-        return <Chip label={difficulty || ""} color={color} sx={{ textTransform: "capitalize" }} />;
+        return <Chip label={difficulty || ""} color={color} sx={{ textTransform: "capitalize" }} size="large" />;
       }
     },
     {
       field: "count",
       headerName: "Attempts",
-      flex: 0.5,
-      minWidth: 100,
-      type: "number"
+      flex: 1,
+      type: "number",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true, 
+      align:"center",
+      renderHeader: () => (
+        <Box sx={{ display: "flex", alignItems: "flex-start", color: "text.secondary", minWidth: "100%", mr:4 }}>
+          <TimelineIcon sx={{ mr: 0.5 }} />
+          <Typography variant="body2"  fontWeight={"bold"} align="left">
+                Attempts
+          </Typography>
+        </Box>
+      )
     },
     {
       field: "avg",
       headerName: "Average Score",
       flex: 1,
-      minWidth: 150,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true, 
+      renderHeader: () => (
+        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+          <StarIcon sx={{ mr: 0.5 }} />
+          <Typography variant="body2" fontWeight={"bold"}>
+            Average Score
+          </Typography>
+        </Box>
+      ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const value = params.row?.avg ?? 0;
         return (
-          <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center" }}>
+          <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center",  color: "text.secondary" }}>
             <Gauge
               value={value}
               sx={{
@@ -139,8 +199,19 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
     {
       field: "created_at",
       headerName: "Created At",
-      flex: 0.8,
+      flex: 1,
       minWidth: 120,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true, 
+      renderHeader: () => (
+        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+          <CalendarTodayIcon sx={{ mr: 0.5 }} />
+          <Typography variant="body2" fontWeight={"bold"}>
+            Created At
+          </Typography>
+        </Box>
+      ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         return moment(params.row.created_at).format("MMM DD, YYYY");
       }
@@ -150,6 +221,16 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       headerName: "Actions",
       flex: 1,
       minWidth: 200,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true, 
+      renderHeader: () => (
+        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+          <Typography variant="body2"  fontWeight={"bold"}>
+            Actions
+          </Typography>
+        </Box>
+      ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const interviewId = params.row.id;
         return (
@@ -180,14 +261,6 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
     }
   ];
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <>
       {deleteInterview.ConfirmDialog}
@@ -199,6 +272,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       </Box>
 
       <CustomizedDataGrid
+        loading={isLoading}
         rows={interviews || []}
         columns={columns}
         pageSize={10}
