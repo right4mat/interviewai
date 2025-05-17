@@ -35,8 +35,8 @@ const SetupInterview: React.FC = () => {
     if (file) {
       try {
         const result = await extractResume.mutateAsync(file);
-        if (result) {
-          setResume(result || "");
+        if (result?.resumeId) {
+          setResume(result.resumeId);
         }
       } catch (error) {
         console.error("Failed to extract text from pdf:", error);

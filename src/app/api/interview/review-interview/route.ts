@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
+import { getResume } from "../../_app";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -10,7 +11,7 @@ const openai = new OpenAI({
 // Define schema for request validation
 const getQuestionsSchema = z.object({
   jobDescription: z.string().min(1, "Job description is required"),
-  resume: z.string().optional(),
+  resumeId: z.number().optional(),
   interviewers: z.object({
     name: z.string().min(1, "Interviewer name is required"),
     role: z.string().min(1, "Interviewer role is required")
@@ -19,9 +20,10 @@ const getQuestionsSchema = z.object({
   type: z.string().optional().default("mixed"),
   questionAnswers: z.array(z.object({
     question: z.string(),
-    score: z.number().optional(),
-    reasoning: z.string().optional(), 
-    cleanedAnswer: z.string().optional(),
+    score: z.number(),
+    reasoning: z.string(), 
+    cleanedAnswer: z.string(),
+    answer: z.string(),
   }))
 });
 
@@ -39,7 +41,9 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       }, { status: 400 });
     }
 
-    const { jobDescription, questionAnswers } = result.data;
+    const { jobDescription, questionAnswers, resumeId } = result.data;
+
+    const resume = resumeId ? await getResume(resumeId, user.id) : undefined;
 
     const totalScore = questionAnswers.reduce((sum, qa) => sum + (qa.score || 0), 0);
     const averageScore = totalScore / questionAnswers.length;
@@ -48,6 +52,8 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
 Please provide a critical review of this interview performance. Format your response with clear sections and line breaks between paragraphs.
 
 Job Description: ${jobDescription}
+
+Resume: ${resume?.resume}
 
 Questions and Answers:
 ${questionAnswers.map(qa => `

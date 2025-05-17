@@ -18,7 +18,7 @@ import { InterviewListResponse } from "./types";
 import Stack from "@mui/material/Stack";
 import { Gauge } from "@mui/x-charts/Gauge";
 import { useLoadInterview, useDeleteInterview } from "@/services/appServices";
-import { QuestionAnswer, useInterviewStore } from "@/stores/interviewStore";
+import { useInterviewStore } from "@/stores/interviewStore";
 import { useRouter } from "next/navigation";
 
 interface InterviewListProps {
@@ -46,7 +46,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
           type: loadedInterview.settings.type as "technical" | "behavioral" | "mixed",
           difficulty: loadedInterview.settings.difficulty as "beginner" | "intermediate" | "advanced"
         },
-        resume: loadedInterview.resume || "",
+        resumeId: loadedInterview?.resumeId,
         currentQuestionIndex: 0,
         questionAnswers: [],
         stage: "interview" as "interview" | "setup"

@@ -1,88 +1,178 @@
 import supabase from "./_supabase";
+import { handle } from "./_db";
+const crypto = require("crypto");
 
-// Define types for database entities
-interface User {
-  id: string;
-  [key: string]: any;
+interface ResumeData {
+  userId: string;
+  resumeContent: string;
 }
 
-interface Customer {
-  id: string;
-  stripeCustomerId?: string;
-  [key: string]: any;
+interface JobDescriptionData {
+  userId: string;
+  jobDescription: string;
 }
 
-interface SupabaseResponse {
-  data: any;
-  error: any;
+interface InterviewData {
+  userId: string;
+  jobDescriptionId: number;
+  resumeId: number | null;
+  settings: {
+    difficulty: string;
+    type: string;
+  };
+  interviewer: {
+    name: string;
+    role: string;
+  };
+  questions: string[];
 }
 
-/**** USERS ****/
-
-// Get user by uid
-function getUser(uid: string): Promise<User> {
-  return Promise.resolve(
-    supabase.from("users").select("*").eq("id", uid).single().then(handle)
-  );
+interface QuestionAnswerData {
+  userId: string;
+  interviewId: number;
+  questionAnswers: Array<{
+    question: string;
+    score: number;
+    reasoning: string;
+    cleanedAnswer: string;
+    questionSummary: string;
+    modelAnswer: string;
+    answer: string;
+  }>;
+  totalScore: number;
+  currentQuestionIndex: number;
 }
 
-// Get customer by uid
-function getCustomer(uid: string): Promise<Customer | null> {
-  return Promise.resolve(
-    supabase
-      .from("customers")
-      .select()
-      .eq("id", uid)
-      .maybeSingle()
-      .then(handle)
-  );
+async function createResume(data: ResumeData) {
+  const { userId, resumeContent } = data;
+  
+  // Generate hash for the resume content
+  const resumeHash = crypto.createHash("sha256").update(resumeContent).digest("hex");
+  
+  // Check if resume with this hash already exists for the user
+  const existingResume = await supabase
+    .from("resumes")
+    .select("id")
+    .eq("hash", resumeHash)
+    .eq("user_id", userId)
+    .single()
+    .then(handle);
+    
+  if (existingResume) {
+    return { id: existingResume.id };
+  }
+  
+  // Insert new resume
+  const newResume = await supabase
+    .from("resumes")
+    .insert([
+      {
+        user_id: userId,
+        resume: resumeContent,
+        hash: resumeHash
+      }
+    ])
+    .select("id")
+    .single()
+    .then(handle);
+  
+  return { id: newResume.id };
 }
 
-// Get customer by Stripe customer ID
-function getCustomerByStripeCid(id: string): Promise<Customer> {
-  return Promise.resolve(
-    supabase
-      .from("customers")
-      .select()
-      .eq("stripeCustomerId", id)
+async function getResume(id: number, userId: string) {
+  return await supabase
+    .from("resumes")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .single()
+    .then(handle);
+}
+
+async function getOrCreateJobDescription(data: JobDescriptionData) {
+  const { userId, jobDescription } = data;
+  
+  // Generate hash for job description
+  const jobDescriptionHash = crypto.createHash("sha256").update(jobDescription).digest("hex");
+
+  // Get or create job description record
+  let jobDescData = await supabase
+    .from("job_descriptions")
+    .select("id")
+    .eq("hash", jobDescriptionHash)
+    .eq("user_id", userId)
+    .maybeSingle()
+    .then(handle);
+
+  if (!jobDescData) {
+    jobDescData = await supabase
+      .from("job_descriptions")
+      .insert([
+        {
+          user_id: userId,
+          job_description: jobDescription,
+          hash: jobDescriptionHash
+        }
+      ])
+      .select("id")
       .single()
-      .then(handle)
-  );
+      .then(handle);
+  }
+
+  return jobDescData;
 }
 
-// Create a new customer
-function createCustomer(id: string, data: Partial<Customer>): Promise<any> {
-  return Promise.resolve(
-    supabase
-      .from("customers")
-      .insert([{ id, ...data }])
-      .then(handle)
-  );
+async function createInterview(data: InterviewData) {
+  const { userId, jobDescriptionId, resumeId, settings, interviewer, questions } = data;
+  
+  // Store interview record
+  const interview = await supabase
+    .from("interviews")
+    .insert([
+      {
+        user_id: userId,
+        job_description_id: jobDescriptionId,
+        resume_id: resumeId,
+        settings: {
+          difficulty: settings.difficulty,
+          type: settings.type
+        },
+        interviewer: {
+          name: interviewer.name,
+          role: interviewer.role
+        },
+        questions: questions
+      }
+    ])
+    .select("id")
+    .single()
+    .then(handle);
+
+  return interview;
 }
 
-// Update customer by Stripe customer ID
-function updateCustomerByStripeCid(id: string, data: Partial<Customer>): Promise<any> {
-  return Promise.resolve(
-    supabase
-      .from("customers")
-      .update(data)
-      .eq("stripeCustomerId", id)
-      .then(handle)
-  );
-}
-
-/**** HELPERS ****/
-
-// Get response data or throw error if there is one
-function handle(response: SupabaseResponse): any {
-  if (response.error) throw response.error;
-  return response.data;
+async function saveQuestionAnswers(data: QuestionAnswerData) {
+  const { userId, interviewId, questionAnswers, totalScore, currentQuestionIndex } = data;
+  
+  // Store question answers
+  return await supabase
+    .from("question_answers")
+    .insert([
+      {
+        interview_id: interviewId,
+        user_id: userId,
+        question_answers: questionAnswers,
+        score: totalScore,
+        current_question_index: currentQuestionIndex
+      }
+    ])
+    .then(handle);
 }
 
 export {
-  getUser,
-  getCustomer,
-  getCustomerByStripeCid,
-  createCustomer,
-  updateCustomerByStripeCid,
+  createResume,
+  getResume,
+  getOrCreateJobDescription,
+  createInterview,
+  saveQuestionAnswers
 };

@@ -26,7 +26,7 @@ interface UseInterviewProps {
   questions: string[];
   jobDescription: string;
   interviewer: Interviewer;
-  resume: string;
+  resumeId?: number;
   difficulty: string;
   type: "technical" | "behavioral" | "mixed";
   stopListening: boolean;
@@ -44,7 +44,7 @@ export const useInterview = ({
   questions,
   jobDescription,
   interviewer,
-  resume,
+  resumeId,
   difficulty,
   type,
   stopListening,
@@ -241,13 +241,13 @@ export const useInterview = ({
         jobDescription,
         type,
         difficulty,
-        resume
+        resumeId
       }).then(handleScoreSuccess),
 
       getReplyAsync({
         company,
         jobDescription,
-        resume,
+        resumeId,
         interviewers: interviewer,
         difficulty,
         nextQuestion,
@@ -281,7 +281,7 @@ export const useInterview = ({
     getReplyAsync({
       company,
       jobDescription,
-      resume,
+      resumeId,
       interviewers: interviewer,
       difficulty,
       nextQuestion: "",
@@ -300,7 +300,7 @@ export const useInterview = ({
     jobDescription,
     interviewer,
     difficulty,
-    resume,
+    resumeId,
     nextQuestion,
     currentAnswer,
     questions,

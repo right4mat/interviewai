@@ -1,19 +1,11 @@
 import { apiRequest } from "@/utils/util";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Interviewer } from "@/types/interview";
+import { Interviewer, QuestionAnswer } from "@/types/interview";
 import { convertPdfToImageArray } from "@/utils/util";
 import { useConfirmMutation } from "@/hooks/useConfirmMutation";
 import supabase from "@/utils/supabase";
 import { client } from "@/utils/db";
 import { useAuth } from "@/utils/auth";
-interface ScoreAnswerResponse {
-  score: number;
-  reasoning: string;
-  cleanedAnswer: string;
-  questionSummary: string;
-  modelAnswer: string;
-  question: string;
-}
 
 interface ScoreAnswerRequest {
   question: string;
@@ -21,12 +13,12 @@ interface ScoreAnswerRequest {
   jobDescription: string;
   type: string;
   difficulty: string;
-  resume: string;
+  resumeId?: number;
 }
 
 interface GetQuestionsRequest {
   jobDescription: string;
-  resume: string;
+  resumeId?: number;
   interviewers: Interviewer;
   difficulty: string;
   type: string;
@@ -35,8 +27,9 @@ interface GetQuestionsRequest {
 }
 
 export interface GetInterviewReplyRequest {
+  company: string;
   jobDescription: string;
-  resume: string;
+  resumeId?: number;
   interviewers: Interviewer;
   difficulty: string;
   nextQuestion: string;
@@ -52,16 +45,16 @@ type GetInterviewReplyResponse = { text: string; audio: string };
 
 type GetQuestionsResponse = { questions: string[]; company: string };
 
-type ExtractResumeResponse = string;
+type ExtractResumeResponse = {resumeId:number};
 
 interface ReviewInterviewRequest {
   company: string;
   jobDescription: string;
-  resume?: string;
+  resumeId?: number;
   interviewers: Interviewer;
-  difficulty?: string;
-  type?: string;
-  questionAnswers: ScoreAnswerResponse[];
+  difficulty: string;
+  type: string;
+  questionAnswers: QuestionAnswer[];
 }
 
 interface ReviewInterviewResponse {
@@ -83,8 +76,8 @@ interface SaveInterviewRequest {
     type: string;
   };
   jobDescription: string;
-  resume?: string;
-  questionAnswers: ScoreAnswerResponse[];
+  resumeId?: number;
+  questionAnswers: QuestionAnswer[];
 }
 
 interface LoadInterviewRequest {
@@ -99,7 +92,7 @@ interface InterviewListResponse {
   id: number;
   company: string;
   job_description_id: number;
-  resume_id: number;
+  resume_id: number | null;
   settings: {
     type: "technical" | "behavioral" | "mixed";
     difficulty: "beginner" | "intermediate" | "advanced";
@@ -130,7 +123,7 @@ export const useExtractResume = () => {
 };
 
 export const useScoreAnswer = () => {
-  return useMutation<ScoreAnswerResponse, Error, ScoreAnswerRequest>({
+  return useMutation<QuestionAnswer, Error, ScoreAnswerRequest>({
     mutationFn: async (variables: ScoreAnswerRequest) => {
       const response = await apiRequest("interview/score-answer", "POST", variables);
       return response;
@@ -145,7 +138,7 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
       params.difficulty,
       params.type,
       params.jobDescription,
-      params.resume,
+      params.resumeId,
       params.interviewers.name,
       params.interviewers.role
     ],
@@ -210,11 +203,9 @@ export const useLoadInterview = () => {
           questions,
           settings,
           interviewer,
+          resume_id,
           job_descriptions (
             job_description
-          ),
-          resumes (
-            resume
           ),
           question_answers (
             question_answers,
@@ -241,9 +232,10 @@ export const useLoadInterview = () => {
         interviewer: interview.interviewer || { name: "", role: "" },
         settings: interview.settings || { difficulty: "", type: "" },
         jobDescription: interview.job_descriptions?.job_description || "",
-        resume: interview.resumes?.resume,
+        resumeId: interview.resume_id,
         questionAnswers: (interview.question_answers?.[0]?.question_answers).map((qa: any) => ({
           question: qa.question || "",
+          answer: qa.answer || "",
           score: qa.score,
           reasoning: qa.reasoning,
           cleanedAnswer: qa.cleaned_answer,

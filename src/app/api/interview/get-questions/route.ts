@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
+import { getResume } from "../../_app";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -10,7 +11,7 @@ const openai = new OpenAI({
 // Define schema for request validation
 const getQuestionsSchema = z.object({
   jobDescription: z.string().min(1, "Job description is required"),
-  resume: z.string().optional(),
+  resumeId: z.number().optional(),
   interviewers: z.object({
     name: z.string().min(1, "Interviewer name is required"),
     role: z.string().min(1, "Interviewer role is required")
@@ -33,7 +34,9 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       }, { status: 400 });
     }
 
-    const { jobDescription, resume, interviewers, difficulty, type} = result.data;
+    const { jobDescription, resumeId, interviewers, difficulty, type} = result.data;
+
+    const resume = resumeId ? await getResume(resumeId, user.id) : undefined;
 
     const questionsPrompt = `
 Generate a list of interview questions for a 30-minute interview.

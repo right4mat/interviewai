@@ -80,6 +80,7 @@ function handle(response: SupabaseResponse): any {
 }
 
 export {
+  handle,
   getUser,
   getCustomer,
   getCustomerByStripeCid,

@@ -8,19 +8,11 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { brand } from "@/theme/themePrimitives";
 import { useReviewInterview } from "@/services/appServices";
-import { Interviewer } from "@/types/interview";
+import { Interviewer, QuestionAnswer } from "@/types/interview";
 import { Gauge } from "@mui/x-charts/Gauge";
 import Grid from "@mui/material/Grid";
 
-interface QuestionAnswer {
-  question: string;
-  answer: string;
-  score?: number;
-  reasoning?: string;
-  cleanedAnswer?: string;
-  modelAnswer?: string;
-  questionSummary: string;
-}
+
 
 interface ReviewDialogProps {
   open: boolean;
@@ -28,9 +20,10 @@ interface ReviewDialogProps {
   questionAnswers: QuestionAnswer[];
   jobDescription: string;
   interviewers: Interviewer;
-  resume: string;
+  resumeId?: number;
   type: string;
   difficulty: string;
+  company: string;
 }
 
 export default function ReviewDialog({
@@ -39,14 +32,16 @@ export default function ReviewDialog({
   questionAnswers,
   jobDescription,
   interviewers,
-  resume,
+  resumeId,
   type,
-  difficulty
+  difficulty,
+  company
 }: ReviewDialogProps) {
   const { data, isLoading, error } = useReviewInterview({
+    company: company,
     jobDescription: jobDescription,
     interviewers: interviewers,
-    resume: resume,
+    resumeId: resumeId,
     questionAnswers: questionAnswers,
     type: type,
     difficulty: difficulty

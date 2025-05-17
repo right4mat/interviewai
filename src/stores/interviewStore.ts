@@ -1,19 +1,9 @@
 import { create } from "zustand";
-import { Interviewer } from "@/types/interview";
+import { Interviewer, QuestionAnswer } from "@/types/interview";
 
 interface InterviewSettings {
   type: "technical" | "behavioral" | "mixed";
   difficulty: "beginner" | "intermediate" | "advanced";
-}
-
-export interface QuestionAnswer {
-  question: string;
-  answer: string;
-  score?: number;
-  reasoning?: string;
-  cleanedAnswer?: string;
-  modelAnswer?: string;
-  questionSummary: string;
 }
 
 interface InterviewStore {
@@ -25,7 +15,7 @@ interface InterviewStore {
     pdfFile?: File;
     interviewer: Interviewer;
     settings: InterviewSettings;
-    resume: string;
+    resumeId?: number;
     interviewStarted: boolean;
     currentQuestionIndex: number;
     questionAnswers: QuestionAnswer[];
@@ -39,7 +29,7 @@ interface InterviewStore {
 
   setJobDescription: (description: string) => void;
   setPdfFile: (file: File | undefined) => void;
-  setResume: (text: string) => void;
+  setResume: (id: number) => void;
   setInterviewer: (interviewer: Interviewer) => void;
   setSettings: (settings: InterviewSettings) => void;
   clearinterviewState: () => void;
@@ -71,7 +61,7 @@ const DEFAULT_INTERVIEW_STATE = {
   pdfFile: undefined,
   interviewer: DEFAULT_INTERVIEWER,
   settings: DEFAULT_SETTINGS,
-  resume: "",
+  resumeId: undefined,
   interviewStarted: false,
   currentQuestionIndex: 0,
   questionAnswers: [],
@@ -86,23 +76,23 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
   isVideoOn: true,
   isChatOpen: true,
 
-  setResume: (text) =>
+  setResume: (id: number) =>
     set((state) => ({
-      interviewState: { ...state.interviewState, resume: text }
+      interviewState: { ...state.interviewState, resumeId: id }
     })),
-  setJobDescription: (description) =>
+  setJobDescription: (description: string) =>
     set((state) => ({
       interviewState: { ...state.interviewState, jobDescription: description }
     })),
-  setPdfFile: (file) =>
+  setPdfFile: (file: File | undefined) =>
     set((state) => ({
       interviewState: { ...state.interviewState, pdfFile: file }
     })),
-  setInterviewer: (interviewer) =>
+  setInterviewer: (interviewer: Interviewer) =>
     set((state) => ({
       interviewState: { ...state.interviewState, interviewer }
     })),
-  setSettings: (settings) =>
+  setSettings: (settings: InterviewSettings) =>
     set((state) => ({
       interviewState: { ...state.interviewState, settings }
     })),
@@ -114,7 +104,7 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
         pdfFile: undefined,
         interviewer: DEFAULT_INTERVIEWER,
         settings: DEFAULT_SETTINGS,
-        resume: "",
+        resumeId: undefined,
         interviewStarted: false,
         currentQuestionIndex: 0,
         questionAnswers: [],

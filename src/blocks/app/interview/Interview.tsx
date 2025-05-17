@@ -39,13 +39,11 @@ export default function Interview(): React.ReactElement {
     updateInterviewState
   } = useInterviewStore();
 
-
-
   // Fetch interview questions using custom hook. If questions are already loaded from save state, they will be used.
   const { data: details, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
     jobDescription: interviewState.jobDescription,
     interviewers: interviewState.interviewer,
-    resume: interviewState.resume,
+    resumeId: interviewState?.resumeId,
     difficulty: interviewState.settings.difficulty,
     type: interviewState.settings.type,
     questions: interviewState.questions,
@@ -72,7 +70,7 @@ export default function Interview(): React.ReactElement {
     questions: details?.questions || [],
     jobDescription: interviewState.jobDescription,
     interviewer: interviewState.interviewer,
-    resume: interviewState.resume,
+    resumeId: interviewState?.resumeId,
     difficulty: interviewState.settings.difficulty,
     type: interviewState.settings.type,
     stopListening: isLoadingQuestions || isMuted,
@@ -92,15 +90,8 @@ export default function Interview(): React.ReactElement {
         interviewer: interviewState.interviewer,
         settings: interviewState.settings,
         jobDescription: interviewState.jobDescription,
-        resume: interviewState.resume,
-        questionAnswers: questionAnswers.map((answer) => ({
-          question: answer.question,
-          score: answer.score || 0,
-          reasoning: answer.reasoning || "",
-          cleanedAnswer: answer.cleanedAnswer || "",
-          questionSummary: answer.questionSummary || "",
-          modelAnswer: answer.modelAnswer || ""
-        }))
+        resumeId: interviewState.resumeId,
+        questionAnswers
       });
       setShowReviewDialog(true);
     }
@@ -127,15 +118,8 @@ export default function Interview(): React.ReactElement {
         interviewer: interviewState.interviewer,
         settings: interviewState.settings,
         jobDescription: interviewState.jobDescription,
-        resume: interviewState.resume,
-        questionAnswers: questionAnswers.map((answer) => ({
-          question: answer.question,
-          score: answer.score || 0,
-          reasoning: answer.reasoning || "",
-          cleanedAnswer: answer.cleanedAnswer || "",
-          questionSummary: answer.questionSummary || "",
-          modelAnswer: answer.modelAnswer || ""
-        }))
+        resumeId: interviewState.resumeId,
+        questionAnswers
       },
       {
         onSuccess: handleSaveSuccess
@@ -194,7 +178,7 @@ export default function Interview(): React.ReactElement {
           questionAnswers={questionAnswers}
           jobDescription={interviewState.jobDescription}
           interviewers={interviewState.interviewer}
-          resume={interviewState.resume}
+          resumeId={interviewState?.resumeId}
           type={interviewState.settings.type}
           difficulty={interviewState.settings.difficulty}
         />

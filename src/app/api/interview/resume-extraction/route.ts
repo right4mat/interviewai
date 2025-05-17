@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import requireAuth from "../../_require-auth";
 import openai from "../../_openAI";
 import { z } from "zod";
+import { createResume } from "../../_app";
 
 export const maxDuration = 60; // This function can run for a maximum of 60 seconds
 
@@ -67,9 +68,18 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       );
     }
 
+    // Save resume to database using the createResume function
+    const { id: resumeId } = await createResume({
+      userId: user.id,
+      resumeContent: content
+    });
+
+    // Return only the resume row ID
     return NextResponse.json({
       status: "success",
-      data: content
+      data: {
+        resumeId
+      }
     });
 
   } catch (error: any) {

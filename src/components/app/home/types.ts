@@ -1,7 +1,8 @@
 export interface InterviewListResponse {
+  id: number;
   company: string;
   job_description_id: number;
-  resume_id: number;
+  resume_id: number | null;
   settings: {
     type: "technical" | "behavioral" | "mixed";
     difficulty: "beginner" | "intermediate" | "advanced";
