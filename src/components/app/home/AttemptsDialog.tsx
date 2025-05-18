@@ -36,6 +36,7 @@ import QuestionsProgress from "@/components/app/shared/QuestionsProgress";
 import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
+import { QuestionAnswer } from "@/types/interview";
 
 // Interface for interview attempt data
 interface AttemptData {
@@ -81,11 +82,12 @@ export default function AttemptsDialog({
   const attempts = React.useMemo(() => {
     if (interviewAttempts) {
       return interviewAttempts.map(attempt => ({
-        id: attempt.id.toString(),
+        id: attempt.id,
         date: moment(attempt.created_at).format('MMM DD, YYYY'),
         score: attempt.score,
         questions: attempt.question_answers.length,
         totalQuestions: attempt.questions.length,
+        questionAnswers: attempt.question_answers,
         status: attempt.question_answers.length >= attempt.questions.length ? 'Completed' : 'In Progress'
       }));
     }
@@ -97,14 +99,14 @@ export default function AttemptsDialog({
     console.log("View attempt details:", attemptId);
   };
 
-  const handleContinueAttempt = async (attemptId: string) => {
+  const handleContinueAttempt = async (questionAnswers: QuestionAnswer[]) => {
     if (!interviewId) return;
     
     try {
       const loadedInterview = await loadInterview.mutateAsync({ interviewId });
 
       // Use the new store method instead of directly constructing the state
-      loadInterviewState(loadedInterview);
+      loadInterviewState({...loadedInterview, questionAnswers: questionAnswers});
       
       onClose(); // Close the dialog first
       router.push("/app/interview");
@@ -223,6 +225,7 @@ export default function AttemptsDialog({
       renderCell: (params) => {
         const status = params.row.status;
         const attemptId = params.row.id;
+        const questionAnswers = params.row.questionAnswers;
         
         if (status === 'Completed') {
           return (
@@ -241,7 +244,6 @@ export default function AttemptsDialog({
                   color: "error"
                 }
               ]}
-              sx={{ fontWeight: 'bold' }}
             />
           );
         } else {
@@ -252,7 +254,7 @@ export default function AttemptsDialog({
               color="primary"
               size="medium"
               startIcon={<PlayArrowIcon />}
-              onClick={() => handleContinueAttempt(attemptId)}
+              onClick={() => handleContinueAttempt(questionAnswers)}
               actions={[
                 {
                   label: "Delete Attempt",
@@ -261,7 +263,6 @@ export default function AttemptsDialog({
                   color: "error"
                 }
               ]}
-              sx={{ fontWeight: 'bold' }}
             />
           );
         }

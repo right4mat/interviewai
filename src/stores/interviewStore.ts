@@ -20,6 +20,7 @@ interface LoadedInterview {
     difficulty: string;
   };
   resumeId?: number;
+  questionAnswers: QuestionAnswer[];
 }
 
 interface InterviewStore {
@@ -150,8 +151,8 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
           difficulty: loadedInterview.settings.difficulty as "beginner" | "intermediate" | "advanced"
         },
         resumeId: loadedInterview.resumeId,
-        currentQuestionIndex: 0,
-        questionAnswers: [],
+        currentQuestionIndex: loadedInterview.questionAnswers.length,
+        questionAnswers: loadedInterview.questionAnswers,
         stage: "interview",
         interviewStarted: false
       }

@@ -60,7 +60,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       const loadedInterview = await loadInterview.mutateAsync({ interviewId: interviewId });
 
       // Use the store's loadInterview method
-      loadInterviewState(loadedInterview);
+      loadInterviewState({...loadedInterview, questionAnswers: []});
       
       router.push("/app/interview");
     } catch (error) {
@@ -205,7 +205,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         const value = params.row?.avg ?? 0;
         return (
           <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center", color: "text.secondary" }}>
-            <ScoreProgress score={value} />
+            <ScoreProgress score={Number(value.toFixed(0))} />
           </Box>
         );
       }
@@ -250,7 +250,6 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         return (
           <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" sx={{ width: "100%" , height: "100%" }}>
             <ActionButton
-            sx={{fontWeight:"bold"}}
               label="Try Again"
               variant="contained"
               startIcon={<ReplayIcon />}
@@ -298,7 +297,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         pageSize={10}
         checkboxSelection={false}
         disableColumnResize={true}
-        density="standard"
+        density="comfortable"
         onRowClick={handleRowClick}
       />
     </>
