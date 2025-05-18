@@ -26,10 +26,21 @@ import { Gauge } from "@mui/x-charts/Gauge";
 import { useLoadInterview, useDeleteInterview } from "@/services/appServices";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useRouter } from "next/navigation";
+import AttemptsDialog from "./AttemptsDialog";
 
 interface InterviewListProps {
   interviews: InterviewListResponse[];
   isLoading: boolean;
+}
+
+// Mock data for the attempts - replace with actual API call when available
+interface AttemptData {
+  id: string;
+  date: string;
+  score: number;
+  questions: number;
+  status: string;
+  totalQuestions?: number;
 }
 
 export function InterviewList({ interviews, isLoading }: InterviewListProps) {
@@ -37,6 +48,11 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
   const loadInterview = useLoadInterview();
   const deleteInterview = useDeleteInterview();
   const { updateInterviewState, setStage } = useInterviewStore();
+  
+  // State for dialog
+  const [attemptsDialogOpen, setAttemptsDialogOpen] = React.useState(false);
+  const [selectedInterviewId, setSelectedInterviewId] = React.useState<number | null>(null);
+  const [attemptData, setAttemptData] = React.useState<AttemptData[]>([]);
 
   const handleTryAgain = async (interviewId: number) => {
     try {
@@ -68,8 +84,43 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
   };
 
   const handleViewAttempts = (interviewId: number) => {
-    // TODO: Implement view attempts logic
-    console.log("View attempts for interview:", interviewId);
+    setSelectedInterviewId(interviewId);
+    
+    // In a real app, you would fetch the attempts from an API here
+    // For now, we'll use mock data based on the interview ID
+    const mockAttempts: AttemptData[] = [
+      {
+        id: `${interviewId}-1`,
+        date: moment().subtract(2, 'days').format('MMM DD, YYYY'),
+        score: 78,
+        questions: 8,
+        totalQuestions: 10,
+        status: 'Completed'
+      },
+      {
+        id: `${interviewId}-2`,
+        date: moment().subtract(7, 'days').format('MMM DD, YYYY'),
+        score: 65,
+        questions: 7,
+        totalQuestions: 10,
+        status: 'Completed'
+      },
+      {
+        id: `${interviewId}-3`,
+        date: moment().subtract(14, 'days').format('MMM DD, YYYY'),
+        score: 45,
+        questions: 4,
+        totalQuestions: 10,
+        status: 'Incomplete'
+      }
+    ];
+    
+    setAttemptData(mockAttempts);
+    setAttemptsDialogOpen(true);
+  };
+
+  const handleRowClick = (params: any) => {
+    handleViewAttempts(params.row.id);
   };
 
   const handleDelete = async (interviewId: number) => {
@@ -266,6 +317,11 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
   return (
     <>
       {deleteInterview.ConfirmDialog}
+      <AttemptsDialog
+        open={attemptsDialogOpen}
+        onClose={() => setAttemptsDialogOpen(false)}
+        attempts={attemptData}
+      />
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <HistoryIcon />
         <Typography component="h2" variant="h6" sx={{ ml: 1 }}>
@@ -281,6 +337,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
         checkboxSelection={false}
         disableColumnResize={true}
         density="standard"
+        onRowClick={handleRowClick}
       />
     </>
   );
