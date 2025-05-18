@@ -17,6 +17,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ScoreProgress from "../shared/ScoreProgress";
 
 interface QuestionAnswer {
   questionSummary: string;
@@ -74,33 +75,7 @@ const ScoreCircle = ({ score }: { score?: number }) => (
     animate={{ scale: 1 }}
     transition={{ type: "spring", stiffness: 200, damping: 20 }}
   >
-    <Box sx={{ position: "relative", display: "inline-flex" }}>
-      <CircularProgress
-        variant="determinate"
-        value={score || 0}
-        size={50}
-        thickness={4}
-        sx={{
-          color: score && score > 70 ? "success.main" : score && score > 40 ? "warning.main" : "error.main",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        <Typography variant="caption" component="div" sx={{ fontWeight: "bold" }}>
-          {score}
-        </Typography>
-      </Box>
-    </Box>
+    <ScoreProgress score={score || 0} size={50} thickness={4} />
   </motion.div>
 );
 
