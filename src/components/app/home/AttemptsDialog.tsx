@@ -252,7 +252,7 @@ export default function AttemptsDialog({
               label="Continue"
               variant="contained"
               color="primary"
-              size="medium"
+              size="small"
               startIcon={<PlayArrowIcon />}
               onClick={() => handleContinueAttempt(questionAnswers)}
               actions={[

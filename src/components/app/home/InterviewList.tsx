@@ -143,6 +143,13 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
           </Typography>
         </Box>
       ),
+      renderCell: (params: GridRenderCellParams<InterviewListResponse>) => (
+        <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: "text.secondary" }}>
+          <Typography variant="body2" fontWeight="bold" align="center">
+            {params.row?.count}
+          </Typography>
+        </Box>
+      ),
     },
     {
       field: "avg",

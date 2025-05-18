@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   Button,
   ButtonGroup,
@@ -10,29 +10,24 @@ import {
   Popover,
   Box,
   ListItemIcon,
-  ListItemText,
-} from '@mui/material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+  ListItemText
+} from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 interface ActionItem {
   label: string;
   onClick: () => void;
   icon?: React.ReactNode;
-  color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
+  color?: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning";
 }
 
-interface ActionButtonProps extends Omit<ButtonProps, 'onClick'> {
+interface ActionButtonProps extends Omit<ButtonProps, "onClick"> {
   label: string;
   actions: ActionItem[];
   onClick?: () => void;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({
-  label,
-  actions,
-  onClick,
-  ...buttonProps
-}) => {
+const ActionButton: React.FC<ActionButtonProps> = ({ label, actions, onClick, ...buttonProps }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -41,10 +36,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   };
 
   const handleClose = (event: Event) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
     }
     setOpen(false);
@@ -57,20 +49,12 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
   return (
     <>
-      <ButtonGroup
-        fullWidth
-        variant={buttonProps.variant}
-        color={buttonProps.color || 'primary'}
-
-      
-        ref={anchorRef}
-        aria-label="split button"
-      >
+      <ButtonGroup fullWidth variant={buttonProps.variant} color={buttonProps.color || "primary"} ref={anchorRef} aria-label="split button">
         <Button
           {...buttonProps}
           onClick={onClick}
           sx={{
-            textTransform: 'none',
+            textTransform: "none",
             flex: 1,
             ...buttonProps.sx
           }}
@@ -78,14 +62,14 @@ const ActionButton: React.FC<ActionButtonProps> = ({
           {label}
         </Button>
         <Button
-       
-          aria-controls={open ? 'split-button-menu' : undefined}
-          aria-expanded={open ? 'true' : undefined}
+          size={buttonProps.size}
+          aria-controls={open ? "split-button-menu" : undefined}
+          aria-expanded={open ? "true" : undefined}
           aria-haspopup="menu"
           onClick={handleToggle}
           sx={{
             px: 0.5,
-            flex: .5,
+            flex: 0.5
           }}
         >
           <ArrowDropDownIcon />
@@ -96,8 +80,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         anchorEl={anchorRef.current}
         role={undefined}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
+          vertical: "bottom",
+          horizontal: "center"
         }}
         onClose={handleClose}
       >
@@ -105,18 +89,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({
           <ClickAwayListener onClickAway={handleClose}>
             <MenuList id="split-button-menu" autoFocusItem>
               {actions.map((action, index) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => handleMenuItemClick(action.onClick)}
-                >
-                  {action.icon && (
-                    <ListItemIcon sx={{ color: action.color }}>
-                      {action.icon}
-                    </ListItemIcon>
-                  )}
-                  <ListItemText  sx={{ color: action.color }}>
-                    {action.label}
-                  </ListItemText>
+                <MenuItem key={index} onClick={() => handleMenuItemClick(action.onClick)}>
+                  {action.icon && <ListItemIcon sx={{ color: action.color }}>{action.icon}</ListItemIcon>}
+                  <ListItemText sx={{ color: action.color }}>{action.label}</ListItemText>
                 </MenuItem>
               ))}
             </MenuList>
