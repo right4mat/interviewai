@@ -27,8 +27,11 @@ import HistoryIcon from '@mui/icons-material/History';
 import ActionButton from "@/components/shared/ActionButton";
 import moment from "moment";
 import { useRouter } from "next/navigation";
-import { useLoadInterview, useDeleteInterview } from "@/services/appServices";
+import { useLoadInterview, useDeleteInterview, useInterviewAttempts } from "@/services/appServices";
 import { useInterviewStore } from "@/stores/interviewStore";
+// Import shared progress components
+import ScoreProgress from "@/components/app/shared/ScoreProgress";
+import QuestionsProgress from "@/components/app/shared/QuestionsProgress";
 // Confirmation dialog imports
 import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
@@ -59,104 +62,6 @@ interface AttemptsDialogProps {
   interviewId: number | null;
 }
 
-// Reusable score progress component
-interface ScoreProgressProps {
-  score: number;
-  size?: number;
-  thickness?: number;
-}
-
-function ScoreProgress({ score, size = 50, thickness = 8 }: ScoreProgressProps) {
-  // Determine color based on score
-  const getScoreColor = (value: number) => {
-    if (value >= 70) return 'success.main';
-    if (value >= 50) return 'warning.main';
-    return 'error.main';
-  };
-  
-  return (
-    <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <CircularProgress
-        variant="determinate"
-        value={score}
-        size={size}
-        thickness={thickness}
-        sx={{ 
-          color: getScoreColor(score),
-          '& .MuiCircularProgress-circle': {
-            strokeLinecap: 'round',
-          }
-        }}
-      />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: 'absolute',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography
-          variant="caption"
-          component="div"
-          fontWeight="bold"
-          sx={{ fontSize: '0.9rem' }}
-        >
-          {`${score}`}
-        </Typography>
-      </Box>
-    </Box>
-  );
-}
-
-// Reusable questions progress component
-interface QuestionsProgressProps {
-  answered: number;
-  total?: number;
-  height?: number;
-  color?: string;
-}
-
-function QuestionsProgress({ answered, total = 10, height = 20, color = brand[500] }: QuestionsProgressProps) {
-  const progressPercent = Math.round((answered / total) * 100);
-  
-  return (
-    <Box sx={{ width: '100%', height: '100%', mr: 1, display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ width: '100%', mr: 1, position: 'relative' }}>
-        <LinearProgress 
-          variant="determinate" 
-          value={progressPercent}
-          sx={{
-            height: height,
-            borderRadius: height / 2,
-            backgroundColor: 'rgba(0, 0, 0, 0.1)',
-            '& .MuiLinearProgress-bar': {
-              borderRadius: height / 2,
-              backgroundColor: color,
-            },
-          }}
-        />
-        
-      </Box>
-      <Box sx={{ minWidth: 60 }}>
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            fontWeight: 'bold',
-            color: 'text.primary',
-          }}
-        >
-          {`${progressPercent}%`}
-        </Typography>
-      </Box>
-    </Box>
-  );
-}
-
 export default function AttemptsDialog({ 
   open, 
   onClose, 
@@ -165,56 +70,27 @@ export default function AttemptsDialog({
   const router = useRouter();
   const loadInterview = useLoadInterview();
   const deleteInterview = useDeleteInterview();
-  const { updateInterviewState } = useInterviewStore();
-  const [attempts, setAttempts] = React.useState<AttemptData[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const { updateInterviewState, loadInterview: loadInterviewState } = useInterviewStore();
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
   const [attemptToDelete, setAttemptToDelete] = React.useState<string | null>(null);
+  
+  // Use the useInterviewAttempts hook with proper null handling
+  const { data: interviewAttempts, isLoading } = useInterviewAttempts(interviewId ?? 0);
 
-  // Load attempts data when dialog opens and interviewId changes
-  React.useEffect(() => {
-    if (open && interviewId) {
-      loadAttempts(interviewId);
+  // Use useMemo to transform the data from the hook to match our component format
+  const attempts = React.useMemo(() => {
+    if (interviewAttempts) {
+      return interviewAttempts.map(attempt => ({
+        id: attempt.id.toString(),
+        date: moment(attempt.created_at).format('MMM DD, YYYY'),
+        score: attempt.score,
+        questions: attempt.question_answers.length,
+        totalQuestions: attempt.questions.length,
+        status: attempt.question_answers.length >= attempt.questions.length ? 'Completed' : 'In Progress'
+      }));
     }
-  }, [open, interviewId]);
-
-  const loadAttempts = (id: number) => {
-    setLoading(true);
-    // In a real app, you would fetch the attempts from an API here
-    // For now, we'll use mock data based on the interview ID
-    const mockAttempts: AttemptData[] = [
-      {
-        id: `${id}-1`,
-        date: moment().subtract(2, 'days').format('MMM DD, YYYY'),
-        score: 78,
-        questions: 8,
-        totalQuestions: 10,
-        status: 'Completed'
-      },
-      {
-        id: `${id}-2`,
-        date: moment().subtract(7, 'days').format('MMM DD, YYYY'),
-        score: 65,
-        questions: 7,
-        totalQuestions: 10,
-        status: 'Completed'
-      },
-      {
-        id: `${id}-3`,
-        date: moment().subtract(14, 'days').format('MMM DD, YYYY'),
-        score: 45,
-        questions: 4,
-        totalQuestions: 10,
-        status: 'In Progress'
-      }
-    ];
-    
-    // Simulate API delay
-    setTimeout(() => {
-      setAttempts(mockAttempts);
-      setLoading(false);
-    }, 500);
-  };
+    return [];
+  }, [interviewAttempts]);
 
   const handleViewAttempt = async (attemptId: string) => {
     // Here you would navigate to the attempt details page
@@ -225,34 +101,16 @@ export default function AttemptsDialog({
     if (!interviewId) return;
     
     try {
-      setLoading(true);
       const loadedInterview = await loadInterview.mutateAsync({ interviewId });
 
-      // Update the interview store with the loaded interview data
-      const newState = {
-        questions: loadedInterview.questions,
-        company: loadedInterview.company,
-        jobDescription: loadedInterview.jobDescription,
-        interviewer: loadedInterview.interviewer,
-        settings: {
-          type: loadedInterview.settings.type as "technical" | "behavioral" | "mixed",
-          difficulty: loadedInterview.settings.difficulty as "beginner" | "intermediate" | "advanced"
-        },
-        resumeId: loadedInterview?.resumeId,
-        currentQuestionIndex: 0,
-        questionAnswers: [],
-        stage: "interview" as "interview" | "setup",
-        interviewStarted: false
-      };
-
-      updateInterviewState(newState);
+      // Use the new store method instead of directly constructing the state
+      loadInterviewState(loadedInterview);
+      
       onClose(); // Close the dialog first
       router.push("/app/interview");
     } catch (error) {
       console.error("Failed to load interview:", error);
       // TODO: Add error handling UI feedback
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -270,17 +128,20 @@ export default function AttemptsDialog({
     if (!attemptToDelete) return;
     
     setConfirmDeleteOpen(false);
-    setLoading(true);
     
     // In a real app, you would call an API to delete the attempt
     console.log("Deleting attempt:", attemptToDelete);
     
-    // Simulate API call and update the UI
-    setTimeout(() => {
-      setAttempts(prev => prev.filter(attempt => attempt.id !== attemptToDelete));
-      setAttemptToDelete(null);
-      setLoading(false);
-    }, 500);
+    // Instead of using setTimeout, you would call an API to delete the attempt
+    // and then invalidate the useInterviewAttempts query
+    try {
+      // Mock deletion for now
+      setTimeout(() => {
+        setAttemptToDelete(null);
+      }, 500);
+    } catch (error) {
+      console.error("Failed to delete attempt:", error);
+    }
   };
 
   // Define columns for the data grid
@@ -439,7 +300,7 @@ export default function AttemptsDialog({
         </DialogTitle>
         <DialogContent dividers sx={{ height: 400 }}>
           <CustomizedDataGrid 
-            loading={loading}
+            loading={isLoading || loadInterview.isPending}
             rows={attempts}
             columns={columns}
             pageSize={5}

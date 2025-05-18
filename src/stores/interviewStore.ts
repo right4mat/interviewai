@@ -6,6 +6,22 @@ interface InterviewSettings {
   difficulty: "beginner" | "intermediate" | "advanced";
 }
 
+// Add interface for loaded interview data
+interface LoadedInterview {
+  questions: string[];
+  company: string;
+  jobDescription: string;
+  interviewer: {
+    name: string;
+    role: string;
+  };
+  settings: {
+    type: string;
+    difficulty: string;
+  };
+  resumeId?: number;
+}
+
 interface InterviewStore {
   // Setup state
   interviewState: {
@@ -35,6 +51,9 @@ interface InterviewStore {
   clearinterviewState: () => void;
   setStage: (stage: "setup" | "interview") => void;
   updateInterviewState: (state: Partial<InterviewStore["interviewState"]>) => void;
+  
+  // New method to load an interview
+  loadInterview: (loadedInterview: LoadedInterview) => void;
 
   // Interview actions
   toggleMute: () => void;
@@ -113,6 +132,30 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
     })),
   updateInterviewState: (newState) => set((state) => ({ interviewState: { ...state.interviewState, ...newState } })),
   setStage: (stage) => set((state) => ({ interviewState: { ...state.interviewState, stage } })),
+  
+  // New method to load an interview
+  loadInterview: (loadedInterview: LoadedInterview) => 
+    set((state) => ({
+      interviewState: {
+        ...state.interviewState,
+        questions: loadedInterview.questions,
+        company: loadedInterview.company,
+        jobDescription: loadedInterview.jobDescription,
+        interviewer: {
+          name: loadedInterview.interviewer.name,
+          role: loadedInterview.interviewer.role
+        },
+        settings: {
+          type: loadedInterview.settings.type as "technical" | "behavioral" | "mixed",
+          difficulty: loadedInterview.settings.difficulty as "beginner" | "intermediate" | "advanced"
+        },
+        resumeId: loadedInterview.resumeId,
+        currentQuestionIndex: 0,
+        questionAnswers: [],
+        stage: "interview",
+        interviewStarted: false
+      }
+    })),
 
   // Interview actions
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),

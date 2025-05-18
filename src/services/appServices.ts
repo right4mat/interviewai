@@ -106,6 +106,17 @@ interface InterviewListResponse {
   created_at: string;
 }
 
+interface InterviewAttemptsResponse {
+  id: number;
+  interview_id: number;
+  question_answers: QuestionAnswer[];
+  current_question_index: number;
+  score: number;
+  review: string;
+  created_at: string;
+  questions: string[];
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, File>({
     mutationFn: async (pdfFile: File) => {
@@ -281,6 +292,37 @@ export const useInterviewList = () => {
         count: stat.question_answers?.[0]?.count
       }));
     }
+  });
+};
+
+export const useInterviewAttempts = (interviewId: number) => {
+  const { user } = useAuth();
+  return useQuery<InterviewAttemptsResponse[], Error>({
+    queryKey: ["interviewAttempts", interviewId],
+    queryFn: async () => {
+      if (!user) throw new Error("User not found");
+
+      const { data, error } = await supabase
+        .from("question_answers")
+        .select("*, interviews(questions)")
+        .eq("interview_id", interviewId)
+
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      return data.map(attempt => ({
+        id: attempt.id,
+        interview_id: attempt.interview_id,
+        question_answers: attempt.question_answers || [],
+        current_question_index: attempt.current_question_index || 0,
+        score: attempt.score || 0,
+        review: attempt.review || "",
+        created_at: attempt.created_at,
+        questions: attempt.interviews?.questions || []
+      }));
+    },
+    enabled: !!interviewId && !!user
   });
 };
 

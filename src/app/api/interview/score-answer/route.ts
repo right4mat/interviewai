@@ -15,7 +15,7 @@ const scoreAnswerSchema = z.object({
   answer: z.string().min(1, "Answer is required"),
   type: z.string().optional().default("mixed"),
   difficulty: z.string().optional().default("intermediate"),
-  resumeId: z.number().optional()
+  resumeId: z.number().nullable().optional()
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {

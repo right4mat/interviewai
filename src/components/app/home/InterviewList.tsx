@@ -27,6 +27,7 @@ import { useLoadInterview, useDeleteInterview } from "@/services/appServices";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useRouter } from "next/navigation";
 import AttemptsDialog from "./AttemptsDialog";
+import ScoreProgress from "@/components/app/shared/ScoreProgress";
 
 interface InterviewListProps {
   interviews: InterviewListResponse[];
@@ -47,7 +48,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
   const router = useRouter();
   const loadInterview = useLoadInterview();
   const deleteInterview = useDeleteInterview();
-  const { updateInterviewState, setStage } = useInterviewStore();
+  const { updateInterviewState, setStage, loadInterview: loadInterviewState } = useInterviewStore();
   
   // State for dialog
   const [attemptsDialogOpen, setAttemptsDialogOpen] = React.useState(false);
@@ -58,24 +59,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
     try {
       const loadedInterview = await loadInterview.mutateAsync({ interviewId: interviewId });
 
-      // Update the interview store with the loaded interview data
-      const newState = {
-        questions: loadedInterview.questions,
-        company: loadedInterview.company,
-        jobDescription: loadedInterview.jobDescription,
-        interviewer: loadedInterview.interviewer,
-        settings: {
-          type: loadedInterview.settings.type as "technical" | "behavioral" | "mixed",
-          difficulty: loadedInterview.settings.difficulty as "beginner" | "intermediate" | "advanced"
-        },
-        resumeId: loadedInterview?.resumeId,
-        currentQuestionIndex: 0,
-        questionAnswers: [],
-        stage: "interview" as "interview" | "setup",
-        interviewStarted: false
-      };
-
-      updateInterviewState(newState);
+      // Use the store's loadInterview method
+      loadInterviewState(loadedInterview);
+      
       router.push("/app/interview");
     } catch (error) {
       console.error("Failed to load interview:", error);
@@ -218,17 +204,8 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const value = params.row?.avg ?? 0;
         return (
-          <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center",  color: "text.secondary" }}>
-            <Gauge
-              value={value}
-              sx={{
-                width: 55,
-                height: 55,
-                "& .MuiGauge-root": {
-                  color: brand[500]
-                }
-              }}
-            />
+          <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center", color: "text.secondary" }}>
+            <ScoreProgress score={value} />
           </Box>
         );
       }
