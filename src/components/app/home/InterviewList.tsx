@@ -85,38 +85,23 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
 
   const handleViewAttempts = (interviewId: number) => {
     setSelectedInterviewId(interviewId);
-    
-    // In a real app, you would fetch the attempts from an API here
-    // For now, we'll use mock data based on the interview ID
-    const mockAttempts: AttemptData[] = [
-      {
-        id: `${interviewId}-1`,
-        date: moment().subtract(2, 'days').format('MMM DD, YYYY'),
-        score: 78,
-        questions: 8,
-        totalQuestions: 10,
-        status: 'Completed'
-      },
-      {
-        id: `${interviewId}-2`,
-        date: moment().subtract(7, 'days').format('MMM DD, YYYY'),
-        score: 65,
-        questions: 7,
-        totalQuestions: 10,
-        status: 'Completed'
-      },
-      {
-        id: `${interviewId}-3`,
-        date: moment().subtract(14, 'days').format('MMM DD, YYYY'),
-        score: 45,
-        questions: 4,
-        totalQuestions: 10,
-        status: 'Incomplete'
-      }
-    ];
-    
-    setAttemptData(mockAttempts);
     setAttemptsDialogOpen(true);
+  };
+
+  const handleViewAttemptDetails = (attemptId: string) => {
+    console.log("View attempt details:", attemptId);
+    // Here you would navigate to the attempt details page or open a details dialog
+    // For now, we'll just log it
+  };
+
+  const handleContinueAttempt = (attemptId: string) => {
+    console.log("Continue attempt:", attemptId);
+    // Here you would load the attempt and navigate to the interview page
+    // For now, we'll just log it
+    
+    // Extract the interview ID from the attempt ID
+    const interviewId = parseInt(attemptId.split('-')[0]);
+    handleTryAgain(interviewId);
   };
 
   const handleRowClick = (params: any) => {
@@ -290,7 +275,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
             <ActionButton
             sx={{fontWeight:"bold"}}
               label="Try Again"
-              variant="outlined"
+              variant="contained"
               startIcon={<ReplayIcon />}
               actions={[
                 {
@@ -320,7 +305,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       <AttemptsDialog
         open={attemptsDialogOpen}
         onClose={() => setAttemptsDialogOpen(false)}
-        attempts={attemptData}
+        interviewId={selectedInterviewId}
       />
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <HistoryIcon />
