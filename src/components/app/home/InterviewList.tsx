@@ -149,26 +149,76 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const type = params.row?.settings?.type;
+        
+        // Define styles for each interview type
+        let chipStyle: any = {
+          background: '#f0f0f0',
+          color: '#444',
+          border: '1px solid #ddd',
+          fontWeight: 'bold'
+        };
+        
+        let iconStyle = { color: '#444' };
+        
+        switch(type) {
+          case "technical":
+            chipStyle = {
+              background: 'linear-gradient(135deg, #6b9fed 0%, #a1c4ff 50%, #6b9fed 100%)',
+              color: '#0a2e5c',
+              border: '1px solid #5a8ae3',
+              fontWeight: 'bold',
+              textShadow: '0px 1px 1px rgba(255, 255, 255, 0.5)'
+            };
+            iconStyle = { color: '#0a2e5c' };
+            break;
+          case "behavioral":
+            chipStyle = {
+              background: 'linear-gradient(135deg, #a073e6 0%, #c7b0f7 50%, #a073e6 100%)',
+              color: '#3a1e66',
+              border: '1px solid #8a5ad9',
+              fontWeight: 'bold',
+              textShadow: '0px 1px 1px rgba(255, 255, 255, 0.5)'
+            };
+            iconStyle = { color: '#3a1e66' };
+            break;
+          case "mixed":
+            chipStyle = {
+              background: 'linear-gradient(135deg, #5cc489 0%, #9fe3c0 50%, #5cc489 100%)',
+              color: '#1e4e35',
+              border: '1px solid #4aaa76',
+              fontWeight: 'bold',
+              textShadow: '0px 1px 1px rgba(255, 255, 255, 0.5)'
+            };
+            iconStyle = { color: '#1e4e35' };
+            break;
+          default:
+            // Default styling already defined above
+        }
+        
         let icon;
         switch(type) {
           case "technical":
-            icon = <CodeIcon />;
+            icon = <CodeIcon sx={iconStyle} />;
             break;
           case "behavioral":
-            icon = <PsychologyIcon />;
+            icon = <PsychologyIcon sx={iconStyle} />;
             break;
           case "mixed":
-            icon = <IntegrationInstructionsIcon />;
+            icon = <IntegrationInstructionsIcon sx={iconStyle} />;
             break;
           default:
-            icon = <CategoryIcon />;
+            icon = <CategoryIcon sx={iconStyle} />;
         }
         
         return (
           <Chip
             label={type || ""}
             icon={icon}
-            sx={{ textTransform: "capitalize" }}
+            sx={{ 
+              textTransform: "capitalize",
+              boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+              ...chipStyle
+            }}
             size="medium"
           />
         );
