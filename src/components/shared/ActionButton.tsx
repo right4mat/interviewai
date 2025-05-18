@@ -114,7 +114,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
                       {action.icon}
                     </ListItemIcon>
                   )}
-                  <ListItemText sx={{ color: action.color }}>
+                  <ListItemText  sx={{ color: action.color }}>
                     {action.label}
                   </ListItemText>
                 </MenuItem>

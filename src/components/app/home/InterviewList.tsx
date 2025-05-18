@@ -256,15 +256,15 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
               actions={[
                 {
                   label: "View Attempts",
-                  icon: <VisibilityIcon />,
+                  icon: <VisibilityIcon color="primary"/>,
                   onClick: () => handleViewAttempts(interviewId),
                   color: "primary"
                 },
                 {
                   label: "Delete",
-                  icon: <DeleteIcon />,
+                  icon: <DeleteIcon color="warning" />,
                   onClick: () => handleDelete(interviewId),
-                  color: "error"
+                  color: "warning"
                 }
               ]}
               onClick={() => handleTryAgain(interviewId)}
