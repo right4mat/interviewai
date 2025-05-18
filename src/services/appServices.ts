@@ -4,7 +4,8 @@ import { Interviewer, QuestionAnswer } from "@/types/interview";
 import { convertPdfToImageArray } from "@/utils/util";
 import { useConfirmMutation } from "@/hooks/useConfirmMutation";
 import supabase from "@/utils/supabase";
-import { client } from "@/utils/db";
+import { QueryClient } from "@tanstack/react-query";
+const client = new QueryClient();
 import { useAuth } from "@/utils/auth";
 
 interface ScoreAnswerRequest {
@@ -115,6 +116,11 @@ interface InterviewAttemptsResponse {
   review: string;
   created_at: string;
   questions: string[];
+}
+
+interface ResumeData {
+  id: number;
+  filename: string;
 }
 
 export const useExtractResume = () => {
@@ -242,7 +248,7 @@ export const useLoadInterview = () => {
         currentQuestionIndex: interview.question_answers?.[0]?.current_question_index || 0,
         interviewer: interview.interviewer || { name: "", role: "" },
         settings: interview.settings || { difficulty: "", type: "" },
-        jobDescription: interview.job_descriptions?.job_description || "",
+        jobDescription: interview.job_descriptions?.[0]?.job_description || "",
         resumeId: interview.resume_id,
         questionAnswers: (interview.question_answers?.[0]?.question_answers).map((qa: any) => ({
           question: qa.question || "",
@@ -311,7 +317,7 @@ export const useInterviewAttempts = (interviewId: number) => {
 
       if (error) throw error;
 
-      return data.map(attempt => ({
+      return data.map((attempt) => ({
         id: attempt.id,
         interview_id: attempt.interview_id,
         question_answers: attempt.question_answers || [],
@@ -342,6 +348,69 @@ export const useDeleteInterview = () => {
     confirmConfig: {
       title: "Delete Interview",
       content: "Are you sure you want to delete this interview? This action cannot be undone.",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      confirmColor: "error"
+    }
+  });
+};
+
+export const useGetResume = () => {
+  const { user } = useAuth();
+
+  return useQuery<ResumeData | null, Error>({
+    queryKey: ["userResume"],
+    queryFn: async () => {
+      if (!user) throw new Error("User not found");
+
+      const { data, error } = await supabase
+        .from("resumes")
+        .select("id, filename")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) {
+        // If no rows matched, return null instead of throwing an error
+        if (error.code === "PGRST116") {
+          return null;
+        }
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!user
+  });
+};
+
+export const useDeleteResume = () => {
+  const { user } = useAuth();
+
+  return useConfirmMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("User not found");
+
+      const { error } = await supabase.from("resumes").delete().eq("user_id", user.id);
+
+      if (error) throw error;
+
+      // Return true on successful deletion
+      return true;
+    },
+    onSuccess: () => {
+      // Invalidate the resume query to refetch the data
+      client.invalidateQueries({ queryKey: ["userResume"] });
+     
+    },
+    onError: (error) => {
+      console.error("Error deleting resume:", error);
+      alert("Failed to delete resume. Please try again.");
+    },
+    confirmConfig: {
+      title: "Delete Resume",
+      content: "Are you sure you want to delete this resume? This will affect your personalized interview questions and responses.",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
       confirmColor: "error"

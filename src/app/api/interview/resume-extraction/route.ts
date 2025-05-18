@@ -2,13 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import requireAuth from "../../_require-auth";
 import openai from "../../_openAI";
 import { z } from "zod";
-import { createResume } from "../../_app";
+import { upsertResume } from "../../_app";
+import crypto from "crypto";
+import supabase from "../../_supabase";
+import { handle } from "../../_db";
 
 export const maxDuration = 60; // This function can run for a maximum of 60 seconds
 
 // Define schema for request validation
 const ResumeRequestSchema = z.object({
-  resumeImageArray: z.array(z.string())
+  resumeImageArray: z.array(z.string()),
+  filename: z.string().optional()
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {
@@ -24,7 +28,30 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       );
     }
 
-    // Call OpenAI API to extract resume data
+    // Generate a hash from the resume images array
+    const resumeImagesContent = validatedBody.data.resumeImageArray.join('');
+    const resumeHash = crypto.createHash("sha256").update(resumeImagesContent).digest("hex");
+    
+    // Check if a resume with this exact hash exists for this user
+    const existingResume = await supabase
+      .from("resumes")
+      .select("id, resume")
+      .eq("hash", resumeHash)
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(handle);
+    
+    // If we already have this exact resume, return the existing ID
+    if (existingResume) {
+      return NextResponse.json({
+        status: "success",
+        data: {
+          resumeId: existingResume.id
+        }
+      });
+    }
+
+    // If resume doesn't exist with this hash, call OpenAI API to extract resume data
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.1,
@@ -68,10 +95,12 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       );
     }
 
-    // Save resume to database using the createResume function
-    const { id: resumeId } = await createResume({
+    // Upsert resume to database with filename and hash
+    const { id: resumeId } = await upsertResume({
       userId: user.id,
-      resumeContent: content
+      resumeContent: content,
+      filename: validatedBody.data.filename,
+      hash: resumeHash
     });
 
     // Return only the resume row ID

@@ -5,6 +5,8 @@ const crypto = require("crypto");
 interface ResumeData {
   userId: string;
   resumeContent: string;
+  filename?: string;
+  hash?: string;
 }
 
 interface JobDescriptionData {
@@ -43,55 +45,42 @@ interface QuestionAnswerData {
   currentQuestionIndex: number;
 }
 
-async function createResume(data: ResumeData) {
-  const { userId, resumeContent } = data;
+async function upsertResume(data: ResumeData) {
+  const { userId, resumeContent, filename, hash } = data;
   
-  // Generate hash for the resume content
-  const resumeHash = crypto.createHash("sha256").update(resumeContent).digest("hex");
+  const resumeHash = hash;
   
-  // Check if resume with this hash already exists for the user
-  const existingResume = await supabase
+  // Use Supabase upsert to insert or update based on user_id
+  const { data: resumeData, error } = await supabase
     .from("resumes")
-    .select("id")
-    .eq("hash", resumeHash)
-    .eq("user_id", userId)
-    .single()
-    .then(handle);
-    
-  if (existingResume) {
-    return { id: existingResume.id };
-  }
-  
-  // Insert new resume
-  const newResume = await supabase
-    .from("resumes")
-    .insert([
+    .upsert(
       {
         user_id: userId,
         resume: resumeContent,
-        hash: resumeHash
+        hash: resumeHash,
+        filename: filename,
+      },
+      {
+        onConflict: 'user_id'
       }
-    ])
-    .select("id")
-    .single()
-    .then(handle);
+    )
+    .select('id')
+    .single();
   
-  return { id: newResume.id };
+  if (error) {
+    throw error;
+  }
+  
+  return { id: resumeData.id };
 }
 
 async function getResume(id: number, userId: string) {
-  return await supabase
-    .from("resumes")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", userId)
-    .single()
-    .then(handle);
+  return await supabase.from("resumes").select("*").eq("id", id).eq("user_id", userId).single().then(handle);
 }
 
 async function getOrCreateJobDescription(data: JobDescriptionData) {
   const { userId, jobDescription } = data;
-  
+
   // Generate hash for job description
   const jobDescriptionHash = crypto.createHash("sha256").update(jobDescription).digest("hex");
 
@@ -137,11 +126,11 @@ async function findExistingInterview(data: {
   questions: string[];
 }) {
   const { userId, jobDescriptionId, resumeId, settings, interviewer, questions } = data;
-  
+
   // Check for an existing interview that matches the criteria
   let query = supabase
     .from("interviews")
-    .select("id",{ count: "exact", head: false })
+    .select("id", { count: "exact", head: false })
     .limit(1)
     .eq("user_id", userId)
     .eq("job_description_id", jobDescriptionId)
@@ -165,7 +154,7 @@ async function findExistingInterview(data: {
 
 async function createInterview(data: InterviewData) {
   const { userId, jobDescriptionId, resumeId, settings, interviewer, questions } = data;
-  
+
   // Store interview record
   const interview = await supabase
     .from("interviews")
@@ -194,7 +183,7 @@ async function createInterview(data: InterviewData) {
 
 async function saveQuestionAnswers(data: QuestionAnswerData) {
   const { userId, interviewId, questionAnswers, totalScore, currentQuestionIndex } = data;
-  
+
   // Store question answers
   return await supabase
     .from("question_answers")
@@ -210,11 +199,4 @@ async function saveQuestionAnswers(data: QuestionAnswerData) {
     .then(handle);
 }
 
-export {
-  createResume,
-  getResume,
-  getOrCreateJobDescription,
-  createInterview,
-  saveQuestionAnswers,
-  findExistingInterview
-};
+export { upsertResume, getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers, findExistingInterview };
