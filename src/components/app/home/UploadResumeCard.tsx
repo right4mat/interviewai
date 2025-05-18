@@ -84,28 +84,31 @@ export function UploadResumeCard() {
 
   const handleRemoveFile = () => {
     // Use the confirmation mutation to delete the resume
-    deleteResume().then(() => {
-      setExistingFilename(undefined);
-      setResumeId(undefined);
-    });
+    deleteResume(undefined);
   };
 
   const handleFileUpload = (file: File) => {
     setSelectedFile(file);
-
-    // Use the useExtractResume mutation
-    extractResume(file, {
-      onSuccess: (data) => {
-        setResumeId(data.resumeId);
-        setExistingFilename(file.name);
-        console.log("Resume uploaded successfully:", data);
+    
+    // Use the useExtractResume mutation with file and filename
+    extractResume(
+      {
+        file,
+        filename: file.name
       },
-      onError: (error) => {
-        console.error("Error uploading resume:", error);
-        setSelectedFile(undefined);
-        alert("Failed to upload resume. Please try again.");
+      {
+        onSuccess: (data) => {
+          setResumeId(data.resumeId);
+          setExistingFilename(file.name);
+          console.log("Resume uploaded successfully:", data);
+        },
+        onError: (error) => {
+          console.error("Error uploading resume:", error);
+          setSelectedFile(undefined);
+          alert("Failed to upload resume. Please try again.");
+        }
       }
-    });
+    );
   };
 
   if (selectedFile || existingFilename) {

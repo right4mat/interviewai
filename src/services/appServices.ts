@@ -48,6 +48,11 @@ type GetQuestionsResponse = { questions: string[]; company: string };
 
 type ExtractResumeResponse = { resumeId: number };
 
+interface ExtractResumeRequest {
+  file: File;
+  filename: string;
+}
+
 interface ReviewInterviewRequest {
   company: string;
   jobDescription: string;
@@ -124,14 +129,15 @@ interface ResumeData {
 }
 
 export const useExtractResume = () => {
-  return useMutation<ExtractResumeResponse, Error, File>({
-    mutationFn: async (pdfFile: File) => {
+  return useMutation<ExtractResumeResponse, Error, ExtractResumeRequest>({
+    mutationFn: async ({ file, filename }: ExtractResumeRequest) => {
       // Convert PDF to array of images
-      const images = await convertPdfToImageArray(pdfFile);
+      const images = await convertPdfToImageArray(file);
 
       // Send images to resume extraction API
       const response = await apiRequest("interview/resume-extraction", "POST", {
-        resumeImageArray: images
+        resumeImageArray: images,
+        filename: filename
       });
 
       return response;
@@ -387,22 +393,21 @@ export const useGetResume = () => {
 
 export const useDeleteResume = () => {
   const { user } = useAuth();
-
+  
   return useConfirmMutation({
-    mutationFn: async () => {
+    mutationFn: async (_variables?: undefined) => {
       if (!user) throw new Error("User not found");
-
+      
       const { error } = await supabase.from("resumes").delete().eq("user_id", user.id);
-
+      
       if (error) throw error;
-
+      
       // Return true on successful deletion
       return true;
     },
     onSuccess: () => {
       // Invalidate the resume query to refetch the data
       client.invalidateQueries({ queryKey: ["userResume"] });
-     
     },
     onError: (error) => {
       console.error("Error deleting resume:", error);
