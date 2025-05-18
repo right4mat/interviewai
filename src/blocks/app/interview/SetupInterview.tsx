@@ -28,8 +28,6 @@ const SetupInterview: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
- 
-
   const handleSubmit = () => {
     if (!interviewState.jobDescription) {
       alert("Job description is required");
@@ -61,16 +59,17 @@ const SetupInterview: React.FC = () => {
         sx={{
           backgroundColor: active || completed ? "primary.main" : "background.paper",
           color: active || completed ? "primary.contrastText" : "text.secondary",
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           display: "flex",
           borderRadius: "50%",
           justifyContent: "center",
           alignItems: "center",
-          border: "1px solid",
+          border: "2px solid",
           borderColor: active || completed ? "primary.main" : "divider",
           padding: 1,
-          boxShadow: active || completed ? 1 : 0
+          boxShadow: active || completed ? 3 : 1,
+          transition: "all 0.3s ease-in-out"
         }}
       >
         {completed ? <CheckIcon /> : icons[String(icon)]}
@@ -83,13 +82,17 @@ const SetupInterview: React.FC = () => {
       icon: <WorkIcon />,
       content: (
         <Paper
-          elevation={0}
+          elevation={3}
           sx={{
             p: 3,
             borderRadius: 2,
             border: "1px solid",
             borderColor: "divider",
-            bgcolor: "background.paper"
+            bgcolor: "background.paper",
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              transform: "scale(1.02)"
+            }
           }}
         >
           <JobDescriptionInput value={interviewState.jobDescription} onChange={setJobDescription} />
@@ -101,13 +104,17 @@ const SetupInterview: React.FC = () => {
       icon: <DescriptionIcon />,
       content: (
         <Paper
-          elevation={0}
+          elevation={3}
           sx={{
             p: 3,
             borderRadius: 2,
             border: "1px solid",
             borderColor: "divider",
-            bgcolor: "background.paper"
+            bgcolor: "background.paper",
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              transform: "scale(1.02)"
+            }
           }}
         >
           <FileUpload
@@ -124,13 +131,17 @@ const SetupInterview: React.FC = () => {
       icon: <PeopleIcon />,
       content: (
         <Paper
-          elevation={0}
+          elevation={3}
           sx={{
             p: 3,
             borderRadius: 2,
             border: "1px solid",
             borderColor: "divider",
-            bgcolor: "background.paper"
+            bgcolor: "background.paper",
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              transform: "scale(1.02)"
+            }
           }}
         >
           <Box
@@ -185,12 +196,21 @@ const SetupInterview: React.FC = () => {
             activeStep={activeStep}
             alternativeLabel
             sx={{
-              mb: 2
+              mb: 2,
+              "& .MuiStepLabel-label": {
+                typography: "body1",
+                fontWeight: "bold",
+                color: "text.primary"
+              }
             }}
           >
             {steps.map((step, index) => (
-              <Step key={step.label} completed={index < activeStep}>
-                <StepLabel StepIconComponent={CustomStepIcon}>{step.label}</StepLabel>
+              <Step key={index} completed={index < activeStep}>
+                <StepLabel StepIconComponent={CustomStepIcon}>
+                  <Typography variant="body2" color={index === activeStep ? "primary.main" : "text.secondary"}>
+                    Step {index + 1}
+                  </Typography>
+                </StepLabel>
               </Step>
             ))}
           </Stepper>
@@ -199,8 +219,6 @@ const SetupInterview: React.FC = () => {
         <Grid size={{ xs: 12 }}>
           <Fade in key={activeStep} timeout={500}>
             <Box>
-      
-
               {currentStep.content}
 
               <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
