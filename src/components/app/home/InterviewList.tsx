@@ -15,6 +15,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ReplayIcon from "@mui/icons-material/Replay";
 import HistoryIcon from "@mui/icons-material/History";
 import BusinessIcon from "@mui/icons-material/Business";
+import CodeIcon from '@mui/icons-material/Code';
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CategoryIcon from "@mui/icons-material/Category";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import StarIcon from "@mui/icons-material/Star"; // New icon for Average Score
@@ -143,7 +149,29 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const type = params.row?.settings?.type;
-        return <Chip label={type || ""} sx={{ textTransform: "capitalize" }} size="medium" />;
+        let icon;
+        switch(type) {
+          case "technical":
+            icon = <CodeIcon />;
+            break;
+          case "behavioral":
+            icon = <PsychologyIcon />;
+            break;
+          case "mixed":
+            icon = <IntegrationInstructionsIcon />;
+            break;
+          default:
+            icon = <CategoryIcon />;
+        }
+        
+        return (
+          <Chip
+            label={type || ""}
+            icon={icon}
+            sx={{ textTransform: "capitalize" }}
+            size="medium"
+          />
+        );
       }
     },
     {
@@ -164,8 +192,63 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => {
         const difficulty = params.row?.settings?.difficulty;
-        const color = difficulty === "advanced" ? "error" : difficulty === "intermediate" ? "default" : "success";
-        return <Chip label={difficulty || ""} color={color} sx={{ textTransform: "capitalize" }} size="medium" />;
+        
+        // Default (beginner) - Bronze
+        let chipStyle = {
+          background: 'linear-gradient(135deg, #CD7F32 0%, #E6B980 50%, #CD7F32 100%)',
+          color: '#553311',
+          border: '1px solid #8B5A2B',
+          fontWeight: 'bold',
+          textShadow: '0px 1px 1px rgba(255, 255, 255, 0.5)'
+        };
+        
+        if (difficulty === "intermediate") {
+          // Silver
+          chipStyle = {
+            background: 'linear-gradient(135deg, #C0C0C0 0%, #E8E8E8 50%, #C0C0C0 100%)',
+            color: '#444444',
+            border: '1px solid #7D7D7D',
+            fontWeight: 'bold',
+            textShadow: '0px 1px 1px rgba(255, 255, 255, 0.5)'
+          };
+        } else if (difficulty === "advanced") {
+          // Gold
+          chipStyle = {
+            background: 'linear-gradient(135deg, #FFD700 0%, #FFF089 50%, #FFD700 100%)',
+            color: '#5D4B00',
+            border: '1px solid #B29600',
+            fontWeight: 'bold',
+            textShadow: '0px 1px 1px rgba(255, 255, 255, 0.5)'
+          };
+        }
+        
+        let icon;
+        switch(difficulty) {
+          case "beginner":
+            icon = <SportsEsportsIcon sx={{ color: '#553311' }} />;
+            break;
+          case "intermediate":
+            icon = <FitnessCenterIcon sx={{ color: '#444444' }} />;
+            break;
+          case "advanced":
+            icon = <EmojiEventsIcon sx={{ color: '#5D4B00' }} />;
+            break;
+          default:
+            icon = <BarChartIcon />;
+        }
+        
+        return (
+          <Chip
+            label={difficulty || ""}
+            icon={icon}
+            sx={{ 
+              textTransform: "capitalize",
+              boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+              ...chipStyle
+            }}
+            size="medium"
+          />
+        );
       }
     },
     {
