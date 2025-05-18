@@ -7,6 +7,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useInterviewList } from "@/services/appServices";
 import { StatsCard } from "@/components/app/home/StatsCard";
 import { StartPracticeCard } from "@/components/app/home/StartPracticeCard";
+import { AverageScoreCard } from "@/components/app/home/AverageScoreCard";
 import { InterviewList } from "@/components/app/home/InterviewList";
 import { TrendType } from "@/components/app/home/types";
 import { UploadResumeCard } from "@/components/app/home/UploadResumeCard";
@@ -35,18 +36,9 @@ export default function Home(): React.ReactElement {
   // Calculate statistics
   const totalInterviews = interviews.length;
   const averageScore = Math.round(interviews.reduce((acc, curr) => acc + (curr.avg || 0), 0) / totalInterviews);
-
-  // Prepare stats data
-  const stats = [
-    {
-      title: "Average Score",
-      value: `${averageScore}%`,
-      interval: "All time",
-      trend: (averageScore >= 70 ? "up" : averageScore >= 50 ? "neutral" : "down") as TrendType,
-      data: [], // We don't need to pass detailed data anymore since we're using a slider
-      color: theme.palette.primary.main
-    }
-  ];
+  
+  // Determine trend based on average score
+  const scoreTrend: TrendType = averageScore >= 70 ? "up" : averageScore >= 50 ? "neutral" : "down";
 
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
@@ -55,11 +47,13 @@ export default function Home(): React.ReactElement {
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <UploadResumeCard />
         </Grid>
-        {stats.map((stat, index) => (
-          <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
-            <StatsCard {...stat} />
-          </Grid>
-        ))}
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <AverageScoreCard 
+            score={averageScore || 0} 
+            interval="All time" 
+            trend={scoreTrend} 
+          />
+        </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StartPracticeCard isSmallScreen={isSmallScreen} />
         </Grid>

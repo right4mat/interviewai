@@ -17,6 +17,8 @@ import {
   Star as StarIcon,
   Timeline as TimelineIcon,
   CalendarToday as CalendarTodayIcon,
+  Bolt as ElectricBoltIcon,
+  FormatListNumbered as FormatListNumberedIcon,
 } from "@mui/icons-material";
 import moment from "moment";
 import CustomizedDataGrid from "@/components/shared/CustomizedDataGrid";
@@ -78,9 +80,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       filterable: false,
       disableColumnMenu: true,
       renderHeader: () => (
-        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
-          <BusinessIcon sx={{ mr: 0.5 }} />
-          <Typography variant="body2" sx={{ color: "text.secondary" }} fontWeight="bold">
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <BusinessIcon sx={{ mr: 0.5 }} color="primary" />
+          <Typography variant="body2" color="text.secondary" fontWeight="bold">
             Company
           </Typography>
         </Box>
@@ -96,9 +98,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       filterable: false,
       disableColumnMenu: true,
       renderHeader: () => (
-        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
-          <CategoryIcon sx={{ mr: 0.5 }} />
-          <Typography variant="body2" sx={{ color: "text.secondary" }} fontWeight="bold">
+        <Box sx={{ display: "flex", alignItems: "center"}}>
+          <CategoryIcon sx={{ mr: 0.5 }} color="primary" />
+          <Typography variant="body2" color="text.secondary" fontWeight="bold">
             Type
           </Typography>
         </Box>
@@ -115,9 +117,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       filterable: false,
       disableColumnMenu: true,
       renderHeader: () => (
-        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
-          <BarChartIcon sx={{ mr: 0.5 }} />
-          <Typography variant="body2" fontWeight="bold">
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <BarChartIcon sx={{ mr: 0.5 }} color="primary" />
+          <Typography variant="body2" color="text.secondary" fontWeight="bold">
             Difficulty
           </Typography>
         </Box>
@@ -136,9 +138,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       disableColumnMenu: true,
       align: "center",
       renderHeader: () => (
-        <Box sx={{ display: "flex", alignItems: "flex-start", color: "text.secondary", minWidth: "100%", mr: 4 }}>
-          <TimelineIcon sx={{ mr: 0.5 }} />
-          <Typography variant="body2" fontWeight="bold" align="left">
+        <Box sx={{ display: "flex", alignItems: "flex-start",  minWidth: "100%", mr: 4 }}>
+          <FormatListNumberedIcon sx={{ mr: 0.5 }} color="primary" />
+          <Typography variant="body2" color="text.secondary" fontWeight="bold" align="left">
             Attempts
           </Typography>
         </Box>
@@ -159,9 +161,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       filterable: false,
       disableColumnMenu: true,
       renderHeader: () => (
-        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
-          <StarIcon sx={{ mr: 0.5 }} />
-          <Typography variant="body2" fontWeight="bold">
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <ElectricBoltIcon sx={{ mr: 0.5 }} color="primary" />
+          <Typography variant="body2" color="text.secondary" fontWeight="bold">
             Average Score
           </Typography>
         </Box>
@@ -181,9 +183,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       filterable: false,
       disableColumnMenu: true,
       renderHeader: () => (
-        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
-          <CalendarTodayIcon sx={{ mr: 0.5 }} />
-          <Typography variant="body2" fontWeight="bold">
+        <Box sx={{ display: "flex", alignItems: "center"}}>
+          <CalendarTodayIcon sx={{ mr: 0.5 }} color="primary" />
+          <Typography variant="body2" color="text.secondary" fontWeight="bold">
             Created At
           </Typography>
         </Box>
