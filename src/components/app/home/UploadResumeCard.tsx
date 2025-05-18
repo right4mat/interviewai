@@ -32,7 +32,11 @@ export function UploadResumeCard() {
   const [resumeId, setResumeId] = useState<number | undefined>(undefined);
 
   // Fetch existing resume if available
-  const { data: resumeData, isLoading: isLoadingResume, refetch: refetchResume } = useGetResume();
+  const { 
+    data: resumeData, 
+    isLoading: isLoadingResume, 
+    refetch: refetchResume
+  } = useGetResume();
 
   // Use the mutation hook for resume extraction
   const { mutate: extractResume, isPending: isExtracting } = useExtractResume();
@@ -44,6 +48,10 @@ export function UploadResumeCard() {
     if (resumeData) {
       setExistingFilename(resumeData.filename);
       setResumeId(resumeData.id);
+    } else {
+      // Clear the state if resumeData is null
+      setExistingFilename(undefined);
+      setResumeId(undefined);
     }
   }, [resumeData]);
 
@@ -84,12 +92,31 @@ export function UploadResumeCard() {
 
   const handleRemoveFile = () => {
     // Use the confirmation mutation to delete the resume
-    deleteResume(undefined);
+    if (resumeId) {
+      deleteResume(resumeId, {
+        onSuccess: () => {
+          console.log("Resume deleted");
+          
+          // Clear all local state immediately
+          setSelectedFile(undefined);
+          setExistingFilename(undefined);
+          setResumeId(undefined);
+          
+          // Force a refetch after a small delay to ensure DB changes are reflected
+          setTimeout(() => {
+            refetchResume();
+          }, 500);
+        }
+      });
+    } else if (selectedFile) {
+      // If we have a selected file but not yet uploaded, just clear it
+      setSelectedFile(undefined);
+    }
   };
 
   const handleFileUpload = (file: File) => {
     setSelectedFile(file);
-    
+
     // Use the useExtractResume mutation with file and filename
     extractResume(
       {

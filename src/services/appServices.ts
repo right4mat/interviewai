@@ -128,6 +128,10 @@ interface ResumeData {
   filename: string;
 }
 
+interface LoadAttemptRequest {
+  attemptId: number;
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, ExtractResumeRequest>({
     mutationFn: async ({ file, filename }: ExtractResumeRequest) => {
@@ -198,10 +202,15 @@ export const useReviewInterview = (params: ReviewInterviewRequest) => {
 };
 
 export const useSaveInterview = () => {
+  const { refetch: refetchInterviewList } = useInterviewList();
   return useConfirmMutation({
     mutationFn: async (variables: SaveInterviewRequest) => {
       const response = await apiRequest("interview/save", "POST", variables);
       return response;
+    },
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["interviewList"] });
+      refetchInterviewList();
     },
     confirmConfig: {
       title: "Stop Interview",
@@ -229,12 +238,6 @@ export const useLoadInterview = () => {
           resume_id,
           job_descriptions (
             job_description
-          ),
-          question_answers (
-            question_answers,
-            score,
-            review,
-            current_question_index
           )
         `
         )
@@ -251,20 +254,45 @@ export const useLoadInterview = () => {
       return {
         company: interview.company || "",
         questions: interview.questions || [],
-        currentQuestionIndex: interview.question_answers?.[0]?.current_question_index || 0,
+        currentQuestionIndex: 0,
         interviewer: interview.interviewer || { name: "", role: "" },
         settings: interview.settings || { difficulty: "", type: "" },
-        jobDescription: interview.job_descriptions?.[0]?.job_description || "",
+        // @ts-ignore
+        jobDescription: interview.job_descriptions?.job_description || "",
         resumeId: interview.resume_id,
-        questionAnswers: (interview.question_answers?.[0]?.question_answers).map((qa: any) => ({
-          question: qa.question || "",
-          answer: qa.answer || "",
-          score: qa.score,
-          reasoning: qa.reasoning,
-          cleanedAnswer: qa.cleaned_answer,
-          questionSummary: qa.question_summary,
-          modelAnswer: qa.model_answer
-        }))
+        questionAnswers: []
+      };
+    }
+  });
+};
+
+export const useLoadAttempt = () => {
+  const { user } = useAuth();
+  return useMutation<SaveInterviewRequest, Error, LoadAttemptRequest>({
+    mutationFn: async (variables: LoadAttemptRequest) => {
+      if (!user) throw new Error("User not found");
+
+      const { data: attempt, error: attemptError } = await supabase
+        .from("question_answers")
+        .select("*, interviews(id, company, questions, settings, interviewer, resume_id, job_descriptions(job_description))")
+        .eq("id", variables.attemptId)
+        .single();
+
+      if (attemptError) throw attemptError;
+      if (!attempt) {
+        throw new Error("Attempt not found");
+      }
+
+      // Transform the data to match SaveInterviewRequest shape
+      return {
+        company: attempt.interviews?.company || "",
+        questions: attempt.interviews?.questions || [],
+        currentQuestionIndex: attempt.current_question_index || 0,
+        interviewer: attempt.interviews?.interviewer || { name: "", role: "" },
+        settings: attempt.interviews?.settings || { difficulty: "", type: "" },
+        jobDescription: attempt.interviews?.job_descriptions?.job_description || "",
+        resumeId: attempt.interviews?.resume_id,
+        questionAnswers: attempt.question_answers || []
       };
     }
   });
@@ -340,6 +368,7 @@ export const useInterviewAttempts = (interviewId: number) => {
 
 export const useDeleteInterview = () => {
   const { user } = useAuth();
+  const { refetch: refetchInterviewList } = useInterviewList();
   return useConfirmMutation({
     mutationFn: async (variables: DeleteInterviewRequest) => {
       if (!user) throw new Error("User not found");
@@ -350,6 +379,7 @@ export const useDeleteInterview = () => {
     },
     onSuccess: () => {
       client.invalidateQueries({ queryKey: ["interviewList"] });
+      refetchInterviewList();
     },
     confirmConfig: {
       title: "Delete Interview",
@@ -393,21 +423,23 @@ export const useGetResume = () => {
 
 export const useDeleteResume = () => {
   const { user } = useAuth();
-  
+  const { refetch: refetchResume } = useGetResume();
+
   return useConfirmMutation({
-    mutationFn: async (_variables?: undefined) => {
+    mutationFn: async (resumeId: number) => {
       if (!user) throw new Error("User not found");
-      
-      const { error } = await supabase.from("resumes").delete().eq("user_id", user.id);
-      
+
+      const { error } = await supabase.from("resumes").delete().eq("id", resumeId).eq("user_id", user.id);
+
       if (error) throw error;
-      
+
       // Return true on successful deletion
       return true;
     },
     onSuccess: () => {
       // Invalidate the resume query to refetch the data
       client.invalidateQueries({ queryKey: ["userResume"] });
+      refetchResume();
     },
     onError: (error) => {
       console.error("Error deleting resume:", error);

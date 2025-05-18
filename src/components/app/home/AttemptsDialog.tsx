@@ -27,7 +27,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import ActionButton from "@/components/shared/ActionButton";
 import moment from "moment";
 import { useRouter } from "next/navigation";
-import { useLoadInterview, useDeleteInterview, useInterviewAttempts } from "@/services/appServices";
+import { useLoadInterview, useDeleteInterview, useInterviewAttempts, useLoadAttempt } from "@/services/appServices";
 import { useInterviewStore } from "@/stores/interviewStore";
 // Import shared progress components
 import ScoreProgress from "@/components/app/shared/ScoreProgress";
@@ -70,6 +70,7 @@ export default function AttemptsDialog({
 }: AttemptsDialogProps) {
   const router = useRouter();
   const loadInterview = useLoadInterview();
+  const loadAttempt = useLoadAttempt();
   const deleteInterview = useDeleteInterview();
   const { updateInterviewState, loadInterview: loadInterviewState } = useInterviewStore();
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
@@ -99,19 +100,19 @@ export default function AttemptsDialog({
     console.log("View attempt details:", attemptId);
   };
 
-  const handleContinueAttempt = async (questionAnswers: QuestionAnswer[]) => {
+  const handleContinueAttempt = async (questionAnswers: QuestionAnswer[], attemptId: string) => {
     if (!interviewId) return;
     
     try {
-      const loadedInterview = await loadInterview.mutateAsync({ interviewId });
-
-      // Use the new store method instead of directly constructing the state
-      loadInterviewState({...loadedInterview, questionAnswers: questionAnswers});
+      const loadedAttempt = await loadAttempt.mutateAsync({ attemptId: parseInt(attemptId) });
+      
+      // Use the new store method to load the interview state
+      loadInterviewState(loadedAttempt);
       
       onClose(); // Close the dialog first
       router.push("/app/interview");
     } catch (error) {
-      console.error("Failed to load interview:", error);
+      console.error("Failed to load attempt:", error);
       // TODO: Add error handling UI feedback
     }
   };
@@ -254,7 +255,7 @@ export default function AttemptsDialog({
               color="primary"
               size="small"
               startIcon={<PlayArrowIcon />}
-              onClick={() => handleContinueAttempt(questionAnswers)}
+              onClick={() => handleContinueAttempt(questionAnswers, attemptId)}
               actions={[
                 {
                   label: "Delete Attempt",

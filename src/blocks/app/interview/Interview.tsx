@@ -19,8 +19,11 @@ import { useInterview } from "@/hooks/useInterview";
 import InterviewProgress from "@/components/app/interview/InterviewProgress";
 import { brand } from "@/theme/themePrimitives";
 import ReviewDialog from "@/components/app/interview/ReviewDialog";
+import { useRouter } from "next/router";
+import { PAGE_PATH } from "@/path";
 
 export default function Interview(): React.ReactElement {
+  const router = useRouter();
   const webcamRef = useRef<Webcam>(null);
   const [showEndCallDialog, setShowEndCallDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
@@ -36,8 +39,11 @@ export default function Interview(): React.ReactElement {
     startInterview,
     stopInterview,
     setStage,
+    clearinterviewState,
     updateInterviewState
   } = useInterviewStore();
+
+  console.log(interviewState);
 
   // Fetch interview questions using custom hook. If questions are already loaded from save state, they will be used.
   const { data: details, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
@@ -92,7 +98,7 @@ export default function Interview(): React.ReactElement {
         jobDescription: interviewState.jobDescription,
         resumeId: interviewState.resumeId,
         questionAnswers
-      })
+      });
 
       setShowReviewDialog(true);
     }
@@ -107,7 +113,8 @@ export default function Interview(): React.ReactElement {
   const handleSaveSuccess = () => {
     stopInterview();
     stopAudio();
-    setStage("setup");
+    clearinterviewState();
+    router.push(PAGE_PATH.appRoot);
   };
 
   const handleStopInterview = () => {
@@ -130,15 +137,14 @@ export default function Interview(): React.ReactElement {
 
   const handleEndCall = () => {
     setShowEndCallDialog(true);
-  };
-
-  const handleCancelEndCall = () => {
-    setShowEndCallDialog(false);
+    clearinterviewState();
+    router.push(PAGE_PATH.appRoot);
   };
 
   const handleCloseReview = () => {
     setShowReviewDialog(false);
-    setStage("setup");
+    clearinterviewState();
+    router.push(PAGE_PATH.appRoot);
   };
 
   // Render the interview interface

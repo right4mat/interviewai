@@ -19,30 +19,16 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import PeopleIcon from "@mui/icons-material/People";
 import CheckIcon from "@mui/icons-material/Check";
 import { useInterviewStore } from "@/stores/interviewStore";
-import { useExtractResume } from "@/services/appServices";
-import CircularProgress from "@mui/material/CircularProgress";
 import Fade from "@mui/material/Fade";
 
 const SetupInterview: React.FC = () => {
-  const { interviewState, setJobDescription, setPdfFile, setResume, setInterviewer, setSettings, setStage } = useInterviewStore();
-  const extractResume = useExtractResume();
+  const { interviewState, setJobDescription, setResume, setInterviewer, setSettings, setStage } = useInterviewStore();
 
   const [showInterviewers, setShowInterviewers] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
-  const handlePdfFileChange = async (file: File | undefined) => {
-    setPdfFile(file);
-    if (file) {
-      try {
-        const result = await extractResume.mutateAsync(file);
-        if (result?.resumeId) {
-          setResume(result.resumeId);
-        }
-      } catch (error) {
-        console.error("Failed to extract text from pdf:", error);
-      }
-    }
-  };
+ 
 
   const handleSubmit = () => {
     if (!interviewState.jobDescription) {
@@ -94,8 +80,6 @@ const SetupInterview: React.FC = () => {
 
   const steps = [
     {
-      label: "Job Description",
-      description: "Enter the job description for this interview",
       icon: <WorkIcon />,
       content: (
         <Paper
@@ -114,8 +98,6 @@ const SetupInterview: React.FC = () => {
       isValid: interviewState.jobDescription.trim().length > 0
     },
     {
-      label: "Resume",
-      description: "Upload the candidate's resume",
       icon: <DescriptionIcon />,
       content: (
         <Paper
@@ -128,14 +110,17 @@ const SetupInterview: React.FC = () => {
             bgcolor: "background.paper"
           }}
         >
-          <FileUpload isPending={extractResume.isPending} onFileSelect={handlePdfFileChange} selectedFile={interviewState.pdfFile} />
+          <FileUpload
+            resumeId={interviewState.resumeId}
+            setResumeId={setResume}
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+          />
         </Paper>
       ),
       isValid: true // Resume is optional
     },
     {
-      label: "Interviewers",
-      description: "Add custom interviewers (optional)",
       icon: <PeopleIcon />,
       content: (
         <Paper
@@ -214,22 +199,12 @@ const SetupInterview: React.FC = () => {
         <Grid size={{ xs: 12 }}>
           <Fade in key={activeStep} timeout={500}>
             <Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                {currentStep.label}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                {currentStep.description}
-              </Typography>
+      
 
               {currentStep.content}
 
               <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<ArrowBackIcon />}
-                  onClick={handleBack}
-                  disabled={activeStep === 0}
-                >
+                <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack} disabled={activeStep === 0}>
                   Back
                 </Button>
 

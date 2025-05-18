@@ -46,7 +46,7 @@ interface InterviewStore {
 
   setJobDescription: (description: string) => void;
   setPdfFile: (file: File | undefined) => void;
-  setResume: (id: number) => void;
+  setResume: (id: number | undefined) => void;
   setInterviewer: (interviewer: Interviewer) => void;
   setSettings: (settings: InterviewSettings) => void;
   clearinterviewState: () => void;
