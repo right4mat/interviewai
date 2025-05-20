@@ -19,9 +19,9 @@ export function Clientele({ clienteleList }: ClienteleConfig) {
       <Typography component="p" variant="subtitle2" align="center" sx={{ color: "text.secondary" }}>
         {t('clientele.title')}
       </Typography>
-      <Typography component="p" variant="subtitle1" align="center" sx={{ color: "text.secondary", mb: 2 }}>
+      {/* <Typography component="p" variant="subtitle1" align="center" sx={{ color: "text.secondary", mb: 2 }}>
         {t('clientele.subtitle')}
-      </Typography>
+      </Typography> */}
       <Grid container sx={{ justifyContent: "center", mt: 0.5, opacity: 0.6 }} spacing={4}>
         {clienteleList.map((Logo, index) => (
           <Grid key={index}>{Logo}</Grid>

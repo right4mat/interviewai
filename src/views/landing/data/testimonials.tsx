@@ -1,8 +1,8 @@
 "use client";
 import { Avatar } from "@mui/material";
 import React, { ReactNode } from "react";
-import GrainCorp from "@/images/clientele/GrainCorp";
-import Wesfarmers from "@/images/clientele/Wesfarmers";
+import GrainCorp from "@/images/clientele/ProductHunt";
+import Wesfarmers from "@/images/clientele/ToolifyAI";
 import EldersLimited from "@/images/clientele/Elders";
 
 export interface Testimonial {

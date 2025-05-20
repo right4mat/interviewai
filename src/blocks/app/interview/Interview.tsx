@@ -19,7 +19,7 @@ import { useInterview } from "@/hooks/useInterview";
 import InterviewProgress from "@/components/app/interview/InterviewProgress";
 import { brand } from "@/theme/themePrimitives";
 import ReviewDialog from "@/components/app/interview/ReviewDialog";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { PAGE_PATH } from "@/path";
 
 export default function Interview(): React.ReactElement {

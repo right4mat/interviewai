@@ -9,15 +9,14 @@ import { ReactElement } from "react";
 import Mon from "@/images/clientele/Mon";
 import Col from "@/images/clientele/Col";
 import { ClienteleConfig } from "@/components/landing/Clientele";
-import GrainCorp from "@/images/clientele/GrainCorp";
+import ProductHunt from "@/images/clientele/ProductHunt";
 import Elders from "@/images/clientele/Elders";
-import Wesfarmers from "@/images/clientele/Wesfarmers";
+import ToolifyAI from "@/images/clientele/ToolifyAI";
 import BusinessIcon from '@mui/icons-material/Business';
 
 export const clientele: ClienteleConfig = {
   clienteleList: [
-    <GrainCorp  imageSize={{width: 200, height: 200}}  />,
-    <Elders   imageSize={{width: 200, height: 200}} />,
-    <Wesfarmers   imageSize={{width: 200, height: 200}} />
+    <ProductHunt  imageSize={{width: 350, height: 200}}  />,
+    <ToolifyAI   imageSize={{width: 350, height: 200}} />
   ]
 };

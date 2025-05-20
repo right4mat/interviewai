@@ -122,9 +122,10 @@ const QuestionHistory = ({ qa, index }: { qa: QuestionAnswer, index: number }) =
           {qa.answer}
         </Typography>
 
-        <AnimatePresence>
+        <AnimatePresence >
           {qa.reasoning && (
             <motion.div
+              key={"reasoning"}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -140,6 +141,7 @@ const QuestionHistory = ({ qa, index }: { qa: QuestionAnswer, index: number }) =
 
           {qa.modelAnswer && (
             <motion.div
+              key={"model-answer"}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
