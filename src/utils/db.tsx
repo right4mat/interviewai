@@ -8,7 +8,7 @@ import { ReactNode } from "react";
 
 export const supabaseClient = supabase
 // React Query client
-const client = new QueryClient({
+export const client = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes

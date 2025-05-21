@@ -5,9 +5,8 @@ import { convertPdfToImageArray } from "@/utils/util";
 import { useConfirmMutation } from "@/hooks/useConfirmMutation";
 import supabase from "@/utils/supabase";
 import { QueryClient } from "@tanstack/react-query";
-const client = new QueryClient();
 import { useAuth } from "@/utils/auth";
-
+import { client } from "@/utils/db";
 interface ScoreAnswerRequest {
   question: string;
   answer: string;
@@ -340,7 +339,7 @@ export const useInterviewList = () => {
   });
 };
 
-export const useInterviewAttempts = (interviewId: number) => {
+export const useInterviewAttempts = (interviewId?: number | null) => {
   const { user } = useAuth();
   return useQuery<InterviewAttemptsResponse[], Error>({
     queryKey: ["interviewAttempts", interviewId],
@@ -373,18 +372,17 @@ export const useInterviewAttempts = (interviewId: number) => {
 
 export const useDeleteInterview = () => {
   const { user } = useAuth();
-  const { refetch: refetchInterviewList } = useInterviewList();
   return useConfirmMutation({
     mutationFn: async (variables: DeleteInterviewRequest) => {
       if (!user) throw new Error("User not found");
       const { error } = await supabase.from("interviews").delete().eq("id", variables.interviewId).eq("user_id", user.id);
 
       if (error) throw error;
+      await client.invalidateQueries({ queryKey: ["interviewList"] });
       return true;
     },
-    onSuccess: () => {
-      client.invalidateQueries({ queryKey: ["interviewList"] });
-      refetchInterviewList();
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ["interviewList"]});
     },
     confirmConfig: {
       title: "Delete Interview",
@@ -409,11 +407,12 @@ export const useDeleteAttempt = () => {
         .eq("id", variables.attemptId);
 
       if (error) throw error;
+      console.log("Attempt deleted");
       return variables.attemptId;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Invalidate all interview attempts queries
-      client.invalidateQueries({ queryKey: ["interviewAttempts"] });
+      await client.invalidateQueries({ queryKey: ["interviewAttempts"], exact: false });
     },
     confirmConfig: {
       title: "Delete Attempt",
@@ -457,7 +456,6 @@ export const useGetResume = () => {
 
 export const useDeleteResume = () => {
   const { user } = useAuth();
-  const { refetch: refetchResume } = useGetResume();
 
   return useConfirmMutation({
     mutationFn: async (resumeId: number) => {
@@ -470,10 +468,9 @@ export const useDeleteResume = () => {
       // Return true on successful deletion
       return true;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Invalidate the resume query to refetch the data
-      client.invalidateQueries({ queryKey: ["userResume"] });
-      refetchResume();
+      await client.invalidateQueries({ queryKey: ["userResume"], exact: false });
     },
     onError: (error) => {
       console.error("Error deleting resume:", error);
