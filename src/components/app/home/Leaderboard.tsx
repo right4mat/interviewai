@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import { Box, Typography, Grid, Card, CardContent, Stack } from "@mui/material";
+import { Box, Typography, Card, CardContent, Stack, CircularProgress } from "@mui/material";
 import { EmojiEvents as TrophyIcon } from "@mui/icons-material";
 import ScoreProgress from "@/components/app/shared/ScoreProgress";
 import { DifficultyChip, DifficultyLevel } from "@/components/app/shared/StyledChips";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLeaders } from "@/services/appServices";
 
 interface LeaderboardEntry {
   id: number;
@@ -17,29 +18,30 @@ interface LeaderboardEntry {
 
 export default function Leaderboard() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | 'all'>('all');
-
-  // Dummy data for leaderboard entries
-  const dummyData: LeaderboardEntry[] = [
-    { id: 1, rank: 0, name: "Alice", averageScore: 85, totalInterviews: 10, difficulty: 'beginner' },
-    { id: 2, rank: 0, name: "Bob", averageScore: 90, totalInterviews: 15, difficulty: 'intermediate' },
-    { id: 3, rank: 0, name: "Charlie", averageScore: 95, totalInterviews: 20, difficulty: 'advanced' },
-    { id: 4, rank: 0, name: "David", averageScore: 80, totalInterviews: 8, difficulty: 'beginner' },
-    { id: 5, rank: 0, name: "Eve", averageScore: 88, totalInterviews: 12, difficulty: 'intermediate' },
-    { id: 6, rank: 0, name: "Frank", averageScore: 92, totalInterviews: 18, difficulty: 'advanced' },
-    { id: 7, rank: 0, name: "Grace", averageScore: 87, totalInterviews: 14, difficulty: 'beginner' },
-    { id: 8, rank: 0, name: "Hannah", averageScore: 89, totalInterviews: 16, difficulty: 'intermediate' }
-  ];
-
-  // Filter by difficulty, sort by average score, and assign ranks
-  const leaderboardData = dummyData
-    .filter(entry => selectedDifficulty === 'all' || entry.difficulty === selectedDifficulty)
-    .sort((a, b) => b.averageScore - a.averageScore)
-    .map((entry, index) => ({
-      ...entry,
-      rank: index + 1
-    }));
+  const { data: leaderboardData, isLoading, error } = useLeaders();
 
   const difficulties: DifficultyLevel[] = ['beginner', 'intermediate', 'advanced'];
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ textAlign: 'center', color: 'error.main' }}>
+        <Typography>Failed to load leaderboard</Typography>
+      </Box>
+    );
+  }
+
+  // Filter by difficulty and sort by rank (already sorted from the server)
+  const filteredData = leaderboardData
+    ? leaderboardData.filter(entry => selectedDifficulty === 'all' || entry.difficulty === selectedDifficulty)
+    : [];
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -65,17 +67,26 @@ export default function Leaderboard() {
         ))}
       </Stack>
 
-      <Grid container spacing={2}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: '1fr 1fr',
+          md: '1fr 1fr 1fr 1fr'
+        },
+        gap: 2
+      }}>
         <AnimatePresence mode="popLayout">
-          {leaderboardData.map((entry) => (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={entry.id} component={motion.div}
+          {filteredData.map((entry) => (
+            <motion.div
+              key={entry.id}
               layout
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.3 }}
             >
-              <Card variant="outlined">
+              <Card variant="outlined" sx={{ height: '100%' }}>
                 <CardContent>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                     <TrophyIcon sx={{ mr: 1 }} color="primary" />
@@ -87,7 +98,7 @@ export default function Leaderboard() {
                     <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
                       Average Score:
                     </Typography>
-                    <ScoreProgress score={Math.round(entry.averageScore)} size={40} thickness={4} />
+                    <ScoreProgress score={entry.averageScore} size={40} thickness={4} />
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <Typography variant="body2" color="text.secondary">
@@ -97,10 +108,10 @@ export default function Leaderboard() {
                   </Box>
                 </CardContent>
               </Card>
-            </Grid>
+            </motion.div>
           ))}
         </AnimatePresence>
-      </Grid>
+      </Box>
     </Box>
   );
 }

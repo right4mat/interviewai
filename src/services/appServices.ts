@@ -144,6 +144,15 @@ interface JobDescriptionSummaryResponse {
   id: number;
 }
 
+interface LeaderboardEntry {
+  id: number;
+  rank: number;
+  name: string;
+  averageScore: number;
+  totalInterviews: number;
+  difficulty: string;
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, ExtractResumeRequest>({
     mutationFn: async ({ file, filename }: ExtractResumeRequest) => {
@@ -517,5 +526,18 @@ export const useAverageScore = () => {
       return data?.avg || null;
     },
     enabled: !!user
+  });
+};
+
+export const useLeaders = () => {
+  return useQuery<LeaderboardEntry[], Error>({
+    queryKey: ["leaderboard"],
+    queryFn: async () => {
+      const response = await fetch('/api/interview/leader-board/leaders');
+      if (!response.ok) {
+        throw new Error('Failed to fetch leaderboard data');
+      }
+      return response.json();
+    }
   });
 };

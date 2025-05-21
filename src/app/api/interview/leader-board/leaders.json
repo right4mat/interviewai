@@ -3,31 +3,31 @@
     "id": 3,
     "rank": 1,
     "name": "Charlie",
-    "averageScore": 95.2,
-    "totalInterviews": 21,
-    "difficulty": "advanced"
-  },
-  {
-    "id": 6,
-    "rank": 2,
-    "name": "Micheal",
-    "averageScore": 91,
-    "totalInterviews": 20,
+    "averageScore": 94,
+    "totalInterviews": 24,
     "difficulty": "advanced"
   },
   {
     "id": 2,
-    "rank": 3,
+    "rank": 2,
     "name": "Luke",
-    "averageScore": 90.8,
-    "totalInterviews": 16,
+    "averageScore": 89,
+    "totalInterviews": 17,
     "difficulty": "intermediate"
+  },
+  {
+    "id": 6,
+    "rank": 3,
+    "name": "Micheal",
+    "averageScore": 88,
+    "totalInterviews": 21,
+    "difficulty": "advanced"
   },
   {
     "id": 8,
     "rank": 4,
     "name": "Mitch",
-    "averageScore": 89.4,
+    "averageScore": 87,
     "totalInterviews": 16,
     "difficulty": "intermediate"
   },
@@ -35,31 +35,31 @@
     "id": 5,
     "rank": 5,
     "name": "Ella",
-    "averageScore": 86,
-    "totalInterviews": 13,
+    "averageScore": 84,
+    "totalInterviews": 14,
     "difficulty": "intermediate"
   },
   {
     "id": 7,
     "rank": 6,
     "name": "Alex",
-    "averageScore": 84.5,
-    "totalInterviews": 16,
-    "difficulty": "beginner"
-  },
-  {
-    "id": 1,
-    "rank": 7,
-    "name": "Alice",
-    "averageScore": 84.4,
-    "totalInterviews": 11,
+    "averageScore": 82,
+    "totalInterviews": 19,
     "difficulty": "beginner"
   },
   {
     "id": 4,
-    "rank": 8,
+    "rank": 7,
     "name": "David",
-    "averageScore": 79.5,
+    "averageScore": 77,
+    "totalInterviews": 11,
+    "difficulty": "beginner"
+  },
+  {
+    "id": 9,
+    "rank": 8,
+    "name": "Sophia",
+    "averageScore": 73,
     "totalInterviews": 9,
     "difficulty": "beginner"
   }
