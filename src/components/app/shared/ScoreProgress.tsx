@@ -7,12 +7,13 @@ interface ScoreProgressProps {
   score: number;
   size?: number;
   thickness?: number;
+  showLabel?: boolean;
 }
 
 /**
  * A circular progress component that displays a score value
  */
-export default function ScoreProgress({ score, size = 50, thickness = 8 }: ScoreProgressProps) {
+export default function ScoreProgress({ score, size = 50, thickness = 8, showLabel = false }: ScoreProgressProps) {
   // Determine color based on score
   const getScoreColor = (value: number) => {
     if (value >= 70) return 'success.main';
@@ -55,6 +56,14 @@ export default function ScoreProgress({ score, size = 50, thickness = 8 }: Score
           {`${score}`}
         </Typography>
       </Box>
+      {showLabel && (
+        <Typography 
+          variant="body2" 
+          sx={{ ml: 1, fontWeight: 'medium' }}
+        >
+          Score: {score}/100
+        </Typography>
+      )}
     </Box>
   );
 } 

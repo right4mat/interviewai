@@ -24,6 +24,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ActionButton from "@/components/shared/ActionButton";
 import moment from "moment";
 import { useRouter } from "next/navigation";
@@ -37,15 +38,32 @@ import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import { QuestionAnswer } from "@/types/interview";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Divider from "@mui/material/Divider";
+import Fade from "@mui/material/Fade";
+import Slide from "@mui/material/Slide";
+import { TransitionProps } from '@mui/material/transitions';
+
+// Transition for fullscreen dialog
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 // Interface for interview attempt data
 interface AttemptData {
-  id: string;
+  id: string | number;
   date: string;
   score: number;
   questions: number;
   status: string;
   totalQuestions?: number; // Optional, will default to 10 if not provided
+  questionAnswers: QuestionAnswer[];
 }
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -75,6 +93,8 @@ export default function AttemptsDialog({
   const { updateInterviewState, loadInterview: loadInterviewState } = useInterviewStore();
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
   const [attemptToDelete, setAttemptToDelete] = React.useState<string | null>(null);
+  const [viewingAttempt, setViewingAttempt] = React.useState<AttemptData | null>(null);
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
   
   // Use the useInterviewAttempts hook with proper null handling
   const { data: interviewAttempts, isLoading } = useInterviewAttempts(interviewId ?? 0);
@@ -96,8 +116,19 @@ export default function AttemptsDialog({
   }, [interviewAttempts]);
 
   const handleViewAttempt = async (attemptId: string) => {
-    // Here you would navigate to the attempt details page
-    console.log("View attempt details:", attemptId);
+    const attempt = attempts.find(a => a.id.toString() === attemptId.toString());
+    if (attempt) {
+      setViewingAttempt(attempt);
+      setIsFullscreen(true);
+    }
+  };
+
+  const handleBackToList = () => {
+    setIsFullscreen(false);
+    // Wait for transition to complete before resetting attempt data
+    setTimeout(() => {
+      setViewingAttempt(null);
+    }, 300);
   };
 
   const handleContinueAttempt = async (questionAnswers: QuestionAnswer[], attemptId: string) => {
@@ -239,6 +270,12 @@ export default function AttemptsDialog({
               onClick={() => handleViewAttempt(attemptId)}
               actions={[
                 {
+                  label: "View Attempt Details",
+                  icon: <VisibilityIcon />,
+                  onClick: () => handleViewAttempt(attemptId),
+                  color: "primary"
+                },
+                {
                   label: "Delete Attempt",
                   icon: <DeleteIcon />,
                   onClick: () => openDeleteConfirm(attemptId),
@@ -258,6 +295,12 @@ export default function AttemptsDialog({
               onClick={() => handleContinueAttempt(questionAnswers, attemptId)}
               actions={[
                 {
+                  label: "View Attempt Details",
+                  icon: <VisibilityIcon />,
+                  onClick: () => handleViewAttempt(attemptId),
+                  color: "primary"
+                },
+                {
                   label: "Delete Attempt",
                   icon: <DeleteIcon />,
                   onClick: () => openDeleteConfirm(attemptId),
@@ -271,25 +314,118 @@ export default function AttemptsDialog({
     }
   ];
 
+  // Render the details view for a specific attempt
+  const renderAttemptDetails = () => {
+    if (!viewingAttempt) return null;
+    
+    return (
+      <Fade in={!!viewingAttempt}>
+        <Box sx={{ height: '100%', overflow: 'auto' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h5" component="h2">
+              Attempt from {viewingAttempt.date}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Chip 
+                icon={viewingAttempt.status === 'Completed' ? <CheckCircleIcon /> : <HourglassEmptyIcon />}
+                label={viewingAttempt.status} 
+                color={viewingAttempt.status === 'Completed' ? 'success' : 'info'}
+                sx={{ fontWeight: 'medium' }}
+              />
+              <ScoreProgress score={viewingAttempt.score} showLabel />
+            </Box>
+          </Box>
+          
+          <Divider sx={{ mb: 3 }} />
+          
+          <Typography variant="h6" component="h3" sx={{ mb: 2 }}>
+            Question Responses ({viewingAttempt.questions}/{viewingAttempt.totalQuestions || 10})
+          </Typography>
+          
+          {viewingAttempt.questionAnswers.map((qa, index) => (
+            <Card key={index} sx={{ mb: 3, boxShadow: 2 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                    Question {index + 1}
+                  </Typography>
+                  <Chip 
+                    label={`Score: ${qa.score}/10`}
+                    color={qa.score >= 8 ? 'success' : qa.score >= 5 ? 'warning' : 'error'}
+                    size="small"
+                  />
+                </Box>
+                
+                <Typography variant="body1" sx={{ mb: 2, fontWeight: 'medium' }}>
+                  {qa.question}
+                </Typography>
+                
+                <Divider sx={{ my: 2 }} />
+                
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  Your Answer:
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
+                  {qa.answer}
+                </Typography>
+                
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  Feedback:
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
+                  {qa.reasoning}
+                </Typography>
+                
+                <Divider sx={{ my: 2 }} />
+                
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  Model Answer:
+                </Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {qa.modelAnswer}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      </Fade>
+    );
+  };
+
   return (
     <>
       <BootstrapDialog
-        onClose={onClose}
+        onClose={!isFullscreen ? onClose : undefined}
         aria-labelledby="customized-dialog-title"
         open={open}
-        maxWidth="md"
+        maxWidth={isFullscreen ? "xl" : "md"}
         fullWidth
+        fullScreen={isFullscreen}
+        TransitionComponent={isFullscreen ? Transition : undefined}
       >
         <DialogTitle id="customized-dialog-title">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <HistoryIcon color="primary" />
-            <Typography variant="h6" component="span">
-              Interview Attempts History
-            </Typography>
+            {isFullscreen && (
+              <IconButton onClick={handleBackToList} sx={{ mr: 1 }}>
+                <ArrowBackIcon />
+              </IconButton>
+            )}
+            {!isFullscreen ? (
+              <>
+                <HistoryIcon color="primary" />
+                <Typography variant="h6" component="span">
+                  Interview Attempts History
+                </Typography>
+              </>
+            ) : (
+              <Typography variant="h6" component="span">
+                Attempt Details
+              </Typography>
+            )}
           </Box>
           <IconButton
             aria-label="close"
-            onClick={onClose}
+            onClick={isFullscreen ? handleBackToList : onClose}
             sx={{
               position: 'absolute',
               right: 8,
@@ -300,17 +436,25 @@ export default function AttemptsDialog({
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers sx={{ height: 400 }}>
-          <CustomizedDataGrid 
-            loading={isLoading || loadInterview.isPending}
-            rows={attempts}
-            columns={columns}
-            pageSize={5}
-            checkboxSelection={false}
-            disableColumnResize={false}
-            density="comfortable"
-            getRowId={(row) => row.id}
-          />
+        <DialogContent 
+          dividers 
+          sx={{ 
+            height: isFullscreen ? 'calc(100vh - 100px)' : 400,
+            p: isFullscreen ? 3 : 2
+          }}
+        >
+          {!isFullscreen ? (
+            <CustomizedDataGrid 
+              loading={isLoading || loadInterview.isPending}
+              rows={attempts}
+              columns={columns}
+              pageSize={5}
+              checkboxSelection={false}
+              disableColumnResize={false}
+              density="comfortable"
+              getRowId={(row) => row.id}
+            />
+          ) : renderAttemptDetails()}
         </DialogContent>
       </BootstrapDialog>
 
