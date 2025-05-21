@@ -38,14 +38,14 @@ function getNewCandidate(currentLeaders: Leader[]): Leader {
   } while (currentLeaders.some(leader => leader.name === candidate.name));
 
   // Generate realistic starting stats
-  const averageScore = 70 + Math.random() * 10; // New candidates start with 70-80 score
+  const averageScore = Math.floor(70 + Math.random() * 10); // New candidates start with 70-80 score
   const totalInterviews = 5 + Math.floor(Math.random() * 5); // Start with 5-9 interviews
 
   return {
-    id: Math.max(...currentLeaders.map(l => l.id)) + 1, // Generate new unique ID
-    rank: 0, // Will be calculated later
+    id: Math.max(...currentLeaders.map(l => l.id)) + 1,
+    rank: 0,
     name: candidate.name,
-    averageScore: Number(averageScore.toFixed(1)),
+    averageScore,
     totalInterviews,
     difficulty: candidate.difficulty
   };
@@ -79,13 +79,13 @@ async function updateLeaderboard() {
       volatility = 4;
     }
 
-    const change = (Math.random() - 0.5) * volatility;
-    const newScore = Math.max(60, Math.min(100, leader.averageScore + change));
+    const change = Math.floor((Math.random() - 0.5) * volatility);
+    const newScore = Math.max(60, Math.min(100, Math.floor(leader.averageScore + change)));
     
     return {
       ...leader,
-      averageScore: Number(newScore.toFixed(1)),
-      totalInterviews: leader.totalInterviews + Math.floor(Math.random() * 2) // Occasionally increment interviews
+      averageScore: newScore,
+      totalInterviews: leader.totalInterviews + Math.floor(Math.random() * 2)
     };
   });
 
