@@ -10,14 +10,14 @@ import { client } from "@/utils/db";
 interface ScoreAnswerRequest {
   question: string;
   answer: string;
-  jobDescription: string;
+  jobDescriptionId: number;
   type: string;
   difficulty: string;
   resumeId?: number;
 }
 
 interface GetQuestionsRequest {
-  jobDescription: string;
+  jobDescriptionId: number;
   resumeId?: number;
   interviewers: Interviewer;
   difficulty: string;
@@ -28,7 +28,7 @@ interface GetQuestionsRequest {
 
 export interface GetInterviewReplyRequest {
   company: string;
-  jobDescription: string;
+  jobDescriptionId: number;
   resumeId?: number;
   interviewers: Interviewer;
   difficulty: string;
@@ -54,7 +54,7 @@ interface ExtractResumeRequest {
 
 interface ReviewInterviewRequest {
   company: string;
-  jobDescription: string;
+  jobDescriptionId: number;
   resumeId?: number;
   interviewers: Interviewer;
   difficulty: string;
@@ -81,7 +81,7 @@ interface SaveInterviewRequest {
     difficulty: string;
     type: string;
   };
-  jobDescription: string;
+  jobDescriptionId: number;
   resumeId?: number;
   questionAnswers: QuestionAnswer[];
 }
@@ -136,6 +136,14 @@ interface DeleteAttemptRequest {
   attemptId: number;
 }
 
+interface JobDescriptionSummaryRequest {
+  jobDescription: string;
+}
+
+interface JobDescriptionSummaryResponse {
+  id: number;
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, ExtractResumeRequest>({
     mutationFn: async ({ file, filename }: ExtractResumeRequest) => {
@@ -168,7 +176,7 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
       "interviewQuestions",
       params.difficulty,
       params.type,
-      params.jobDescription,
+      params.jobDescriptionId,
       params.resumeId,
       params.interviewers.name,
       params.interviewers.role
@@ -181,7 +189,7 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
       const response = await apiRequest("interview/get-questions", "POST", params);
       return response;
     },
-    enabled: !!params.jobDescription && !!params.interviewers && !!params.difficulty
+    enabled: !!params.jobDescriptionId && !!params.interviewers && !!params.difficulty
   });
 };
 
@@ -201,7 +209,7 @@ export const useReviewInterview = (params: ReviewInterviewRequest) => {
       const response = await apiRequest("interview/review-interview", "POST", params);
       return response;
     },
-    enabled: !!params.jobDescription && !!params.interviewers && !!params.questionAnswers.length
+    enabled: !!params.jobDescriptionId && !!params.interviewers && !!params.questionAnswers.length
   });
 };
 
@@ -240,9 +248,8 @@ export const useLoadInterview = () => {
           settings,
           interviewer,
           resume_id,
-          job_descriptions (
-            job_description
-          )
+          job_description_id
+          
         `
         )
         .eq("id", variables.interviewId)
@@ -261,8 +268,7 @@ export const useLoadInterview = () => {
         currentQuestionIndex: 0,
         interviewer: interview.interviewer || { name: "", role: "" },
         settings: interview.settings || { difficulty: "", type: "" },
-        // @ts-ignore
-        jobDescription: interview.job_descriptions?.job_description || "",
+        jobDescriptionId: interview.job_description_id,
         resumeId: interview.resume_id,
         questionAnswers: []
       };
@@ -278,7 +284,7 @@ export const useLoadAttempt = () => {
 
       const { data: attempt, error: attemptError } = await supabase
         .from("question_answers")
-        .select("*, interviews(id, company, questions, settings, interviewer, resume_id, job_descriptions(job_description))")
+        .select("*, interviews(id, company, questions, settings, interviewer, resume_id, job_descriptions_id)")
         .eq("id", variables.attemptId)
         .single();
 
@@ -294,7 +300,7 @@ export const useLoadAttempt = () => {
         currentQuestionIndex: attempt.current_question_index || 0,
         interviewer: attempt.interviews?.interviewer || { name: "", role: "" },
         settings: attempt.interviews?.settings || { difficulty: "", type: "" },
-        jobDescription: attempt.interviews?.job_descriptions?.job_description || "",
+        jobDescriptionId: attempt.interviews?.job_description_id,
         resumeId: attempt.interviews?.resume_id,
         questionAnswers: attempt.question_answers || []
       };
@@ -382,7 +388,7 @@ export const useDeleteInterview = () => {
       return true;
     },
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: ["interviewList"]});
+      await client.invalidateQueries({ queryKey: ["interviewList"] });
     },
     confirmConfig: {
       title: "Delete Interview",
@@ -399,12 +405,9 @@ export const useDeleteAttempt = () => {
   return useConfirmMutation({
     mutationFn: async (variables: DeleteAttemptRequest) => {
       if (!user) throw new Error("User not found");
-      
+
       // Delete the attempt
-      const { error } = await supabase
-        .from("question_answers")
-        .delete()
-        .eq("id", variables.attemptId);
+      const { error } = await supabase.from("question_answers").delete().eq("id", variables.attemptId);
 
       if (error) throw error;
       console.log("Attempt deleted");
@@ -483,5 +486,36 @@ export const useDeleteResume = () => {
       cancelLabel: "Cancel",
       confirmColor: "error"
     }
+  });
+};
+
+export const useJobDescriptionSummary = () => {
+  return useMutation<JobDescriptionSummaryResponse, Error, JobDescriptionSummaryRequest>({
+    mutationFn: async (variables: JobDescriptionSummaryRequest) => {
+      const response = await apiRequest("interview/job-description-summary", "POST", variables);
+      return response;
+    }
+  });
+};
+
+export const useAverageScore = () => {
+  const { user } = useAuth();
+  return useQuery<number | null, Error>({
+    queryKey: ["averageScore", user],
+    queryFn: async () => {
+      if (!user) throw new Error("User ID is required");
+
+      const { data, error } = await supabase
+        .from("question_answers")
+        .select("score")
+        .eq("user_id", user?.id)
+        .select("score.avg()")
+        .single();
+
+      if (error) throw error;
+      
+      return data?.avg || null;
+    },
+    enabled: !!user
   });
 };

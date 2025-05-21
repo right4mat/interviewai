@@ -1,5 +1,6 @@
 import supabase from "./_supabase";
 import { handle } from "./_db";
+import openai from "./_openAI";
 const crypto = require("crypto");
 
 interface ResumeData {
@@ -12,6 +13,7 @@ interface ResumeData {
 interface JobDescriptionData {
   userId: string;
   jobDescription: string;
+  summarizedJobDescription?: string;
 }
 
 interface InterviewData {
@@ -81,32 +83,57 @@ async function getResume(id: number, userId: string) {
 async function getOrCreateJobDescription(data: JobDescriptionData) {
   const { userId, jobDescription } = data;
 
-  // Generate hash for job description
+  // Generate hash for job description from the unsummarized version
   const jobDescriptionHash = crypto.createHash("sha256").update(jobDescription).digest("hex");
 
   // Get or create job description record
   let jobDescData = await supabase
     .from("job_descriptions")
-    .select("id")
+    .select("*")
     .eq("hash", jobDescriptionHash)
     .eq("user_id", userId)
     .maybeSingle()
     .then(handle);
 
-  if (!jobDescData) {
-    jobDescData = await supabase
-      .from("job_descriptions")
-      .insert([
-        {
-          user_id: userId,
-          job_description: jobDescription,
-          hash: jobDescriptionHash
-        }
-      ])
-      .select("id")
-      .single()
-      .then(handle);
+  if (jobDescData) {
+    return jobDescData;
   }
+
+  // If no existing summary, generate one using OpenAI
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    temperature: 0.3,
+    max_tokens: 300,
+    messages: [
+      {
+        role: "system",
+        content: "You are a specialized assistant that summarizes job descriptions concisely."
+      },
+      {
+        role: "user",
+        content: `Please summarize this job description in 200 words or less, focusing on the key requirements, responsibilities, and qualifications the employer is looking for. Emphasize the most important skills and experiences needed for this role:\n\n${jobDescription}`
+      }
+    ]
+  });
+
+  const summary = response?.choices[0]?.message?.content?.trim();
+  if (!summary) {
+    throw new Error("Failed to summarize the job description");
+  }
+
+  // Create new job description record with the summary
+  jobDescData = await supabase
+    .from("job_descriptions")
+    .insert([
+      {
+        user_id: userId,
+        job_description: summary,
+        hash: jobDescriptionHash
+      }
+    ])
+    .select("*")
+    .single()
+    .then(handle);
 
   return jobDescData;
 }
@@ -199,4 +226,14 @@ async function saveQuestionAnswers(data: QuestionAnswerData) {
     .then(handle);
 }
 
-export { upsertResume, getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers, findExistingInterview };
+async function getJobDescription(userId: string, jobDescriptionId: number) {
+  return await supabase
+    .from("job_descriptions")
+    .select("*")
+    .eq("id", jobDescriptionId)
+    .eq("user_id", userId)
+    .single()
+    .then(handle);
+}
+
+export { upsertResume, getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers, findExistingInterview, getJobDescription };

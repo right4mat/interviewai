@@ -35,14 +35,17 @@ export default function Interview(): React.ReactElement {
     stopInterview,
     setStage,
     clearinterviewState,
-    updateInterviewState
   } = useInterviewStore();
 
   console.log(interviewState);
 
+  if (!interviewState.jobDescriptionId) {
+    throw new Error("Job description ID is required");
+  }
+
   // Fetch interview questions using custom hook. If questions are already loaded from save state, they will be used.
   const { data: details, isLoading: isLoadingQuestions } = useGetInterviewQuestions({
-    jobDescription: interviewState.jobDescription,
+    jobDescriptionId: interviewState.jobDescriptionId,
     interviewers: interviewState.interviewer,
     resumeId: interviewState?.resumeId,
     difficulty: interviewState.settings.difficulty,
@@ -69,7 +72,7 @@ export default function Interview(): React.ReactElement {
   } = useInterview({
     company: details?.company || "",
     questions: details?.questions || [],
-    jobDescription: interviewState.jobDescription,
+    jobDescriptionId: interviewState.jobDescriptionId,
     interviewer: interviewState.interviewer,
     resumeId: interviewState?.resumeId,
     difficulty: interviewState.settings.difficulty,
@@ -82,6 +85,9 @@ export default function Interview(): React.ReactElement {
 
   // Effect to show review dialog when interview finishes this is messy but it works can fix later
   React.useEffect(() => {
+    if (!interviewState.jobDescriptionId) {
+      return 
+    }
     if (currentQuestionIndex >= (details?.questions?.length || 999) && !!interviewState.interviewStarted && !isAISpeaking) {
       // finished so lets save the interview
       saveInterview({
@@ -90,7 +96,7 @@ export default function Interview(): React.ReactElement {
         currentQuestionIndex,
         interviewer: interviewState.interviewer,
         settings: interviewState.settings,
-        jobDescription: interviewState.jobDescription,
+        jobDescriptionId: interviewState.jobDescriptionId,
         resumeId: interviewState.resumeId,
         questionAnswers
       });
@@ -113,6 +119,9 @@ export default function Interview(): React.ReactElement {
   };
 
   const handleStopInterview = () => {
+    if (!interviewState.jobDescriptionId) {
+      return;
+    }
     saveInterview(
       {
         company: details?.company || "",
@@ -120,7 +129,7 @@ export default function Interview(): React.ReactElement {
         currentQuestionIndex,
         interviewer: interviewState.interviewer,
         settings: interviewState.settings,
-        jobDescription: interviewState.jobDescription,
+        jobDescriptionId: interviewState.jobDescriptionId,
         resumeId: interviewState.resumeId,
         questionAnswers
       },
@@ -137,6 +146,9 @@ export default function Interview(): React.ReactElement {
   };
 
   const handleCloseReview = () => {
+    if (!interviewState.jobDescriptionId) {
+      return;
+    }
     setIsSavingInterview(true);
     saveInterview(
       {
@@ -145,7 +157,7 @@ export default function Interview(): React.ReactElement {
         currentQuestionIndex,
         interviewer: interviewState.interviewer,
         settings: interviewState.settings,
-        jobDescription: interviewState.jobDescription,
+        jobDescriptionId: interviewState.jobDescriptionId,
         resumeId: interviewState.resumeId,
         questionAnswers
       },
@@ -182,7 +194,7 @@ export default function Interview(): React.ReactElement {
           open={showReviewDialog}
           onClose={handleCloseReview}
           questionAnswers={questionAnswers}
-          jobDescription={interviewState.jobDescription}
+          jobDescriptionId={interviewState.jobDescriptionId}
           interviewers={interviewState.interviewer}
           resumeId={interviewState?.resumeId}
           type={interviewState.settings.type}

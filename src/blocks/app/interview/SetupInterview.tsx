@@ -20,13 +20,16 @@ import PeopleIcon from "@mui/icons-material/People";
 import CheckIcon from "@mui/icons-material/Check";
 import { useInterviewStore } from "@/stores/interviewStore";
 import Fade from "@mui/material/Fade";
+import { useJobDescriptionSummary } from "@/services/appServices";
 
 const SetupInterview: React.FC = () => {
-  const { interviewState, setJobDescription, setResume, setInterviewer, setSettings, setStage } = useInterviewStore();
+  const { interviewState, setJobDescription, setResume, setInterviewer, setSettings, setStage, updateInterviewState } = useInterviewStore();
 
   const [showInterviewers, setShowInterviewers] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+
+  const jobDescriptionSummaryMutation = useJobDescriptionSummary();
 
   const handleSubmit = () => {
     if (!interviewState.jobDescription) {
@@ -36,7 +39,20 @@ const SetupInterview: React.FC = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // If we're on the job description step, get the summary before proceeding
+    if (activeStep === 0) {
+      try {
+        const response = await jobDescriptionSummaryMutation.mutateAsync({
+          jobDescription: interviewState.jobDescription
+        });
+        updateInterviewState({ jobDescriptionId: response.id });
+      } catch (error) {
+        console.error("Failed to get job description summary:", error);
+        alert("Failed to process job description. Please try again.");
+        return;
+      }
+    }
     setActiveStep((prevActiveStep: number) => prevActiveStep + 1);
   };
 
@@ -95,7 +111,11 @@ const SetupInterview: React.FC = () => {
             }
           }}
         >
-          <JobDescriptionInput value={interviewState.jobDescription} onChange={setJobDescription} />
+          <JobDescriptionInput 
+            value={interviewState.jobDescription} 
+            onChange={setJobDescription}
+            loading={jobDescriptionSummaryMutation.isPending}
+          />
         </Paper>
       ),
       isValid: interviewState.jobDescription.trim().length > 0

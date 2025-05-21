@@ -31,7 +31,7 @@ interface ReviewDialogProps {
   open: boolean;
   onClose: () => void;
   questionAnswers: QuestionAnswer[];
-  jobDescription: string;
+  jobDescriptionId: number;
   interviewers: Interviewer;
   resumeId?: number;
   type: string;
@@ -44,7 +44,7 @@ export default function ReviewDialog({
   open,
   onClose,
   questionAnswers,
-  jobDescription,
+  jobDescriptionId,
   interviewers,
   resumeId,
   type,
@@ -54,7 +54,7 @@ export default function ReviewDialog({
 }: ReviewDialogProps) {
   const { data, isLoading, error } = useReviewInterview({
     company: company,
-    jobDescription: jobDescription,
+    jobDescriptionId: jobDescriptionId,
     interviewers: interviewers,
     resumeId: resumeId,
     questionAnswers: questionAnswers,

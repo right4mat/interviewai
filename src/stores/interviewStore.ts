@@ -10,7 +10,7 @@ interface InterviewSettings {
 interface LoadedInterview {
   questions: string[];
   company: string;
-  jobDescription: string;
+  jobDescriptionId: number;
   interviewer: {
     name: string;
     role: string;
@@ -29,6 +29,7 @@ interface InterviewStore {
     questions?: string[]; // questions for the interview if new interview this will be undefined and will be loaded once in the interview
     company: string;
     jobDescription: string;
+    jobDescriptionId?: number;
     pdfFile?: File;
     interviewer: Interviewer;
     settings: InterviewSettings;
@@ -96,7 +97,7 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
   isVideoOn: true,
   isChatOpen: true,
 
-  setResume: (id: number) =>
+  setResume: (id: number | undefined) =>
     set((state) => ({
       interviewState: { ...state.interviewState, resumeId: id }
     })),
@@ -121,6 +122,7 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
       interviewState: {
         company: "",
         jobDescription: "",
+        jobDescriptionId: undefined,
         pdfFile: undefined,
         interviewer: DEFAULT_INTERVIEWER,
         settings: DEFAULT_SETTINGS,
@@ -141,7 +143,7 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
         ...state.interviewState,
         questions: loadedInterview.questions,
         company: loadedInterview.company,
-        jobDescription: loadedInterview.jobDescription,
+        jobDescriptionId: loadedInterview.jobDescriptionId,
         interviewer: {
           name: loadedInterview.interviewer.name,
           role: loadedInterview.interviewer.role

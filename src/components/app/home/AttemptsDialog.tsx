@@ -123,7 +123,7 @@ export default function AttemptsDialog({ open, onClose, interviewId }: AttemptsD
     if (!interviewId) return;
 
     try {
-      const loadedAttempt = await loadAttempt.mutateAsync({ attemptId: parseInt(attemptId) });
+      const loadedAttempt = await loadAttempt.mutateAsync({ attemptId: Number(attemptId) });
 
       // Use the new store method to load the interview state
       loadInterviewState(loadedAttempt);
@@ -154,7 +154,7 @@ export default function AttemptsDialog({ open, onClose, interviewId }: AttemptsD
 
         return (
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", height: "100%" }}>
-            <ScoreProgress score={score} />
+            <ScoreProgress score={Number(((score / 1200) * 100).toFixed(0))} />
           </Box>
         );
       }

@@ -16,7 +16,7 @@ const getQuestionsSchema = z.object({
     difficulty: z.string().optional().default("intermediate"),
     type: z.string().optional().default("mixed")
   }),
-  jobDescription: z.string().min(1, "Job description is required"),
+  jobDescriptionId: z.number().min(1, "Job description is required"),
   resumeId: z.number().or(z.null()).optional(),
   questionAnswers: z.array(
     z.object({
@@ -48,23 +48,9 @@ export const POST = requireAuth(async (req: NextRequest, user: User) => {
       );
     }
 
-    const { jobDescription, resumeId, questionAnswers, questions, interviewer, settings, currentQuestionIndex } = result.data;
+    const { jobDescriptionId, resumeId, questionAnswers, questions, interviewer, settings, currentQuestionIndex } = result.data;
 
-    // Get or create job description
-    const jobDescData = await getOrCreateJobDescription({
-      userId: user.id,
-      jobDescription
-    });
-
-    // Get resume data if resumeId is provided
-    let resumeData = null;
-    if (resumeId) {
-      try {
-        resumeData = await getResume(resumeId, user.id);
-      } catch (error) {
-        console.error("Error fetching resume:", error);
-      }
-    }
+  
 
     // Calculate total score
     const totalScore = questionAnswers.reduce((sum, qa) => sum + (qa.score || 0), 0);
@@ -72,8 +58,8 @@ export const POST = requireAuth(async (req: NextRequest, user: User) => {
     // Check if there's an existing interview that matches the criteria
     const existingInterview = await findExistingInterview({
       userId: user.id,
-      jobDescriptionId: jobDescData.id,
-      resumeId: resumeData?.id || null,
+      jobDescriptionId: jobDescriptionId,
+      resumeId: resumeId || null,
       settings: {
         difficulty: settings.difficulty,
         type: settings.type
@@ -92,8 +78,8 @@ export const POST = requireAuth(async (req: NextRequest, user: User) => {
     } else {
       interview = await createInterview({
         userId: user.id,
-        jobDescriptionId: jobDescData.id,
-        resumeId: resumeData?.id || null,
+        jobDescriptionId: jobDescriptionId,
+        resumeId: resumeId || null,
         settings: {
           difficulty: settings.difficulty,
           type: settings.type

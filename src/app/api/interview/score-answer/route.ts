@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
-import { getResume } from "../../_app";
+import { getJobDescription, getResume } from "../../_app";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -10,7 +10,7 @@ const openai = new OpenAI({
 
 // Define schema for request validation
 const scoreAnswerSchema = z.object({
-  jobDescription: z.string().min(1, "Job description is required"),
+  jobDescriptionId: z.number().min(1, "Job description is required"),
   question: z.string().min(1, "Question is required"),
   answer: z.string().min(1, "Answer is required"),
   type: z.string().optional().default("mixed"),
@@ -35,9 +35,12 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       );
     }
 
-    const { question, answer, jobDescription, type, difficulty, resumeId } = result.data;
+    const { question, answer, jobDescriptionId, type, difficulty, resumeId } = result.data;
 
-    const resume = resumeId ? await getResume(resumeId, user.id) : undefined;
+    const [resume, jobDescription] = await Promise.all([
+      resumeId ? getResume(resumeId, user.id) : undefined,
+      getJobDescription(user.id, jobDescriptionId)
+    ]);
 
     // Process everything in a single API call
     const evaluationPrompt = `

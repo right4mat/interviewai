@@ -170,7 +170,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
       ),
       renderCell: (params: GridRenderCellParams<InterviewListResponse>) => (
         <Box sx={{ position: "relative", display: "flex", width: "100%", height: "100%", alignItems: "center", color: "text.secondary" }}>
-          <ScoreProgress score={Number((params.row?.avg ?? 0).toFixed(0))} />
+          <ScoreProgress score={Number((params.row?.avg/1200*100).toFixed(0))} />
         </Box>
       ),
     },

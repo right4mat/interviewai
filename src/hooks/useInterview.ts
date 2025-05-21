@@ -12,7 +12,7 @@ import { Interviewer, QuestionAnswer } from "@/types/interview";
 interface UseInterviewProps {
   company: string;
   questions: string[];
-  jobDescription: string;
+  jobDescriptionId: number;
   interviewer: Interviewer;
   resumeId?: number;
   difficulty: string;
@@ -30,7 +30,7 @@ interface UseInterviewProps {
 export const useInterview = ({
   company,
   questions,
-  jobDescription,
+  jobDescriptionId,
   interviewer,
   resumeId,
   difficulty,
@@ -202,9 +202,9 @@ export const useInterview = ({
 
     audioContextRef.current.resume().then(() => {
       setIsAISpeaking(true);
+      SpeechRecognition.stopListening();
       audioRef.current?.play().catch((error) => {
         console.error("Error playing audio:", error);
-        setIsAISpeaking(false);
         audioRef.current = null;
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
@@ -226,7 +226,7 @@ export const useInterview = ({
       scoreAnswerAsync({
         question: currentQuestion,
         answer: currentAnswer,
-        jobDescription,
+        jobDescriptionId,
         type,
         difficulty,
         resumeId
@@ -234,7 +234,7 @@ export const useInterview = ({
 
       getReplyAsync({
         company,
-        jobDescription,
+        jobDescriptionId,
         resumeId,
         interviewers: interviewer,
         difficulty,
@@ -268,7 +268,7 @@ export const useInterview = ({
 
     getReplyAsync({
       company,
-      jobDescription,
+      jobDescriptionId,
       resumeId,
       interviewers: interviewer,
       difficulty,
@@ -285,7 +285,7 @@ export const useInterview = ({
   }, [
     currentQuestion,
     isAISpeaking,
-    jobDescription,
+    jobDescriptionId,
     interviewer,
     difficulty,
     resumeId,

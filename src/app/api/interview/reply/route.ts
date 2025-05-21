@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
-import { getResume } from "../../_app";
+import { getJobDescription, getResume } from "../../_app";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -11,7 +11,7 @@ const openai = new OpenAI({
 // Define schema for request validation
 const replySchema = z.object({
   company: z.string(),
-  jobDescription: z.string().min(1, "Job description is required"),
+  jobDescriptionId: z.number().min(1, "Job description is required"),
   resumeId: z.number().or(z.null()).optional(),
   interviewers: z.object({
     name: z.string().min(1, "Interviewer name is required"),
@@ -46,7 +46,7 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
 
     const {
       company,
-      jobDescription,
+      jobDescriptionId,
       resumeId,
       interviewers,
       currentQuestion,
@@ -59,7 +59,10 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       difficulty
     } = result.data;
 
-    const resume = resumeId ? await getResume(resumeId, user.id) : undefined;
+    const [resume, jobDescription] = await Promise.all([
+      resumeId ? getResume(resumeId, user.id) : undefined,
+      getJobDescription(user.id, jobDescriptionId)
+    ]);
 
     let replyPrompt = `
 You are ${interviewers.name}, a ${interviewers.role} conducting an interview.
