@@ -40,7 +40,7 @@ export default function Dashboard({ sideMenu, appNavbar, children }: DashboardPr
             mt: { xs: 8, md: 0 }
           }}
         >
-          <Header />
+          {/*<Header />*/}
           {children}
         </Stack>
       </Box>

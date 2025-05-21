@@ -3,14 +3,18 @@ import * as React from "react";
 import Stack from "@mui/material/Stack";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import CustomDatePicker from "@/components/app/CustomDatePicker";
-import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
+import  { NavbarBreadcrumbs, BreadcrumbItem } from "./NavbarBreadcrumbs";
 import MenuButton from "./MenuButton";
 import ColorModeIconDropdown from "@/components/theme/ColorModeIconDropdown";
 import type {} from "@mui/material/themeCssVarsAugmentation";
 
 import Search from "./Search";
 
-export default function Header() {
+interface HeaderProps {
+  breadcrumbs: BreadcrumbItem[];
+}
+
+export default function Header({ breadcrumbs }: HeaderProps) {
   return (
     <Stack
       direction="row"
@@ -24,7 +28,7 @@ export default function Header() {
       }}
       spacing={2}
     >
-      <NavbarBreadcrumbs />
+      <NavbarBreadcrumbs items={breadcrumbs} />
 
       {/* <Stack direction="row" sx={{ gap: 1 }}>
         <Search />

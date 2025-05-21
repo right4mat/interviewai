@@ -10,8 +10,8 @@ import { useAuth } from "@/utils/auth"; // Assuming you have auth context
 import CustomInput from "@/components/shared/CustomizedInput";
 import FormLabel from "@mui/material/FormLabel";
 import Card from "@mui/material/Card";
-
-
+import useToast from "@/hooks/useToast";
+import { useT } from "@/i18n/client";
 
 type PasswordFormData = {
   currentPassword: string;
@@ -24,87 +24,102 @@ export interface PasswordSettingsConfig {
     password: string;
   };
   labels: {
-    newPassword: string;  
+    newPassword: string;
     confirmPassword: string;
   };
   buttons: {
     updatePassword: string;
   };
-  placeholders: { 
+  placeholders: {
     newPassword: string;
     confirmPassword: string;
   };
   validation: {
     passwordRequired: string;
-    passwordMinLength: string;  
+    passwordMinLength: string;
     confirmPasswordRequired: string;
     passwordsDoNotMatch: string;
   };
 }
 
-export function PasswordSettings({headings, labels, buttons, placeholders, validation}: PasswordSettingsConfig) {
-  const { user } = useAuth();
+export function PasswordSettings({ headings, labels, buttons, placeholders, validation }: PasswordSettingsConfig) {
+  const { user, updatePassword, isPending, error } = useAuth();
+  const { addToast } = useToast();
+  const { t } = useT("settings");
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors }
+    formState: { errors },
+    reset,
+    setError
   } = useForm<PasswordFormData>();
   const newPassword = watch("newPassword");
 
   const onSubmit = async (data: PasswordFormData) => {
-    if (!user || !('id' in user)) return;
+    if (!user || !("id" in user)) return;
     try {
-      // Implement password update logic here
-      // You might want to use your auth service for this
-      console.log("Updating password", data);
-    } catch (error) {
-      console.error("Error updating password:", error);
+      await updatePassword(data.newPassword);
+      // Reset form after successful update
+      reset();
+      addToast("Your password has been updated successfully", "success");
+    } catch (err: any) {
+      // Set form error if auth error occurs
+        setError("newPassword", {
+          type: "manual",
+          message: err.message
+        });
+        addToast(err.message, "error");
+        console.error("Error updating password:", err);
     }
   };
 
   return (
-    <Card sx={{ p: 3, mb: 4 }} >
+    <Card sx={{ p: 3, mb: 4 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <LockIcon sx={{ mr: 1, color: "text.secondary" }} />
-        <Typography variant="h6" color="text.secondary">{headings.password}</Typography>
+        <Typography variant="h6" color="text.secondary">
+          {t(headings.password)}
+        </Typography>
       </Box>
       <Divider sx={{ mb: 3 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
-          <Grid  size={{xs: 12, md: 6}}>
-            <FormLabel sx={{ mb: 1, display: "block", color: "text.secondary" }}>{labels.newPassword}</FormLabel>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <FormLabel sx={{ mb: 1, display: "block", color: "text.secondary" }}>{t(labels.newPassword)}</FormLabel>
             <CustomInput
               fullWidth
-              placeholder={placeholders.newPassword}
+              placeholder={t(placeholders.newPassword)}
               type="password"
               {...register("newPassword", {
-                required: validation.passwordRequired,
+                required: t(validation.passwordRequired),
                 minLength: {
                   value: 8,
-                  message: validation.passwordMinLength
+                  message: t(validation.passwordMinLength)
                 }
               })}
               error={!!errors.newPassword}
+              helperText={errors.newPassword?.message}
             />
           </Grid>
-          <Grid  size={{xs: 12, md: 6}}>
-            <FormLabel sx={{ mb: 1, display: "block", color: "text.secondary" }}>{labels.confirmPassword}</FormLabel>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <FormLabel sx={{ mb: 1, display: "block", color: "text.secondary" }}>{t(labels.confirmPassword)}</FormLabel>
             <CustomInput
               fullWidth
-              placeholder={placeholders.confirmPassword}
+              placeholder={t(placeholders.confirmPassword)}
               type="password"
               {...register("confirmPassword", {
-                required: validation.confirmPasswordRequired,
-                validate: (value) => value === newPassword || validation.passwordsDoNotMatch
+                required: t(validation.confirmPasswordRequired),
+                validate: (value) => value === newPassword || t(validation.passwordsDoNotMatch)
               })}
               error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
             />
           </Grid>
         </Grid>
         <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
-            <Button type="submit" variant="outlined" color="primary" sx={{ color: "text.secondary" }}>
-            {buttons.updatePassword}
+          <Button type="submit" variant="outlined" color="primary" sx={{ color: "text.secondary" }} disabled={isPending}>
+            {t(buttons.updatePassword)}
           </Button>
         </Box>
       </form>

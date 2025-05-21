@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { brand } from '@/theme/themePrimitives';
 
 interface HighlightItem {
   icon: ReactNode;
@@ -22,8 +22,7 @@ export interface HighlightsConfig {
   highlights: HighlightItem[];
 }
 
-
-export function Highlights({title, description, highlights}: HighlightsConfig) {
+export function Highlights({ title, description, highlights }: HighlightsConfig) {
   const { t } = useTranslation('landing');
   return (
     <Box
@@ -31,8 +30,8 @@ export function Highlights({title, description, highlights}: HighlightsConfig) {
       sx={{
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
-        color: 'white',
-        bgcolor: 'grey.900',
+        color: 'text.primary',
+        bgcolor: brand[200],
       }}
     >
       <Container
@@ -50,10 +49,10 @@ export function Highlights({title, description, highlights}: HighlightsConfig) {
             textAlign: { sm: 'left', md: 'center' },
           }}
         >
-          <Typography component="h2" variant="h4" gutterBottom>
+          <Typography component="h2" variant="h4" gutterBottom sx={{ color: 'text.primary' }}>
             {t(title)}
           </Typography>
-          <Typography variant="body1" sx={{ color: 'grey.400' }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             {t(description)}
           </Typography>
         </Box>
@@ -70,15 +69,15 @@ export function Highlights({title, description, highlights}: HighlightsConfig) {
                   p: 3,
                   height: '100%',
                   borderColor: 'hsla(220, 25%, 25%, 0.3)',
-                  backgroundColor: 'grey.800',
+                  backgroundColor: 'grey.100',
                 }}
               >
-                <Box sx={{ opacity: '50%' }}>{item.icon}</Box>
+                <Box sx={{ opacity: '70%' }}>{item.icon}</Box>
                 <div>
-                  <Typography gutterBottom sx={{ fontWeight: 'medium' }}>
+                  <Typography gutterBottom sx={{ fontWeight: 'medium', color: 'text.primary' }}>
                     {t(item.title)}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'grey.400' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {t(item.description)}
                   </Typography>
                 </div>

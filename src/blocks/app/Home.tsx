@@ -11,6 +11,7 @@ import { AverageScoreCard } from "@/components/app/home/AverageScoreCard";
 import { InterviewList } from "@/components/app/home/InterviewList";
 import { TrendType } from "@/components/app/home/types";
 import { UploadResumeCard } from "@/components/app/home/UploadResumeCard";
+import Leaderboard from "@/components/app/home/Leaderboard";
 
 function getDaysInMonth(month: number, year: number) {
   const date = new Date(year, month, 0);
@@ -61,6 +62,11 @@ export default function Home(): React.ReactElement {
 
       {/* Interview List */}
       <InterviewList interviews={interviews} isLoading={isLoading} />
+
+      {/* Leaderboard */}
+      <Box sx={{ mt: 4 }}>
+        <Leaderboard />
+      </Box>
     </Box>
   );
 }

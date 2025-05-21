@@ -1,6 +1,16 @@
 {
   "title": "Crop Nutrition Compass Plans",
-  "description": "Choose the plan that fits your agricultural management needs",
+  "description": "We’ll help you grow — pick your starting point below.",
+  "footer": "You can change your plan anytime from your account settings.",
+  "currentPlan": "Current Plan",
+  "buttons": {
+    "selectPlan": "Select Plan",
+    "upgrade": "Upgrade",
+    "goBack": "Go Back"
+  },
+  "dialog":{
+    "button": "Go Back"
+  },
   "notes": [
     "* All plans include a 14-day free trial. You can cancel anytime.",
     "* For custom enterprise plans, please contact our sales team."
@@ -15,7 +25,7 @@
         "Seasonal Planning",
         "Yield Tracking"
       ],
-      "buttonText": "Current Plan"
+      "buttonText": "Select"
     },
     "pro": {
       "title": "PRO",

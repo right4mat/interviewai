@@ -5,72 +5,71 @@ import { pricing } from "@/pricing";
 // General settings configuration
 export const generalSettings = {
   headings: {
-    accountSettings: "Account Settings",
-    generalInformation: "General Information"
+    accountSettings: "headings.accountSettings",
+    generalInformation: "headings.generalInformation"
   },
   labels: {
-    name: "Name",
-    email: "Email"
+    name: "labels.name",
+    email: "labels.email"
   },
   buttons: {
-    saveChanges: "Save Changes"
+    saveChanges: "buttons.saveChanges"
   },
   validation: {
-    nameRequired: "Name is required",
-    emailRequired: "Email is required",
-    invalidEmail: "Invalid email address"
+    nameRequired: "validation.nameRequired",
+    emailRequired: "validation.emailRequired",
+    invalidEmail: "validation.invalidEmail"
   },
   placeholders: {
-    name: "Name",
-    email: "Email"
+    name: "placeholders.name",
+    email: "placeholders.email"
   }
 };
 
 // Password settings configuration
 export const passwordSettings = {
   headings: {
-    password: "Password"
+    password: "headings.password"
   },
   labels: {
-    newPassword: "New Password",
-    confirmPassword: "Confirm Password"
+    newPassword: "labels.newPassword",
+    confirmPassword: "labels.confirmPassword"
   },
   buttons: {
-    updatePassword: "Update Password"
+    updatePassword: "buttons.updatePassword"
   },
   validation: {
-    passwordRequired: "New password is required",
-    passwordMinLength: "Password must be at least 8 characters",
-    confirmPasswordRequired: "Please confirm your password",
-    passwordsDoNotMatch: "Passwords do not match"
+    passwordRequired: "validation.passwordRequired",
+    passwordMinLength: "validation.passwordMinLength",
+    confirmPasswordRequired: "validation.confirmPasswordRequired",
+    passwordsDoNotMatch: "validation.passwordsDoNotMatch"
   },
   placeholders: {
-    newPassword: "New Password",
-    confirmPassword: "Confirm Password"
+    newPassword: "placeholders.newPassword",
+    confirmPassword: "placeholders.confirmPassword"
   }
 };
 
 // Billing settings configuration
 export const billingSettings = {
   headings: {
-    subscriptionPlans: "Subscription Plans",
-    availablePlans: "Available Plans"
+    subscriptionPlans: "headings.subscriptionPlans",
+    availablePlans: "headings.availablePlans"
   },
   labels: {
-    currentPlan: "Your current plan:"
+    currentPlan: "labels.currentPlan"
   },
   buttons: {
-    upgrade: "Upgrade",
-    selectPlan: "Select Plan",
-    billing: "Billing"
+    upgrade: "buttons.upgrade",
+    selectPlan: "buttons.selectPlan",
+    billing: "buttons.billing"
   },
   pricing: pricing
 };
 
 // Combined settings for backward compatibility
 export const settings: SettingsConfig = {
-  title: "Settings",
-
+  title: "headings.accountSettings",
   generalSettings,
   passwordSettings,
   billingSettings

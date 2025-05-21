@@ -17,6 +17,7 @@ interface StyledChipProps {
   label: string;
   customSx?: SxProps;
   size?: 'small' | 'medium';
+  onClick?: () => void;
 }
 
 // Interview Type Chip
@@ -100,7 +101,8 @@ export const InterviewTypeChip: React.FC<StyledChipProps> = ({
 export const DifficultyChip: React.FC<StyledChipProps> = ({ 
   label, 
   customSx = {},
-  size = 'medium'
+  size = 'medium',
+  onClick
 }) => {
   // Default (beginner) - Bronze
   let chipStyle: any = {
@@ -152,6 +154,7 @@ export const DifficultyChip: React.FC<StyledChipProps> = ({
     <Chip
       label={label}
       icon={icon}
+      onClick={onClick}
       sx={{ 
         textTransform: 'capitalize',
         boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',

@@ -58,42 +58,42 @@ export const gray = {
 };
 
 export const green = {
-  50: "hsl(100, 20%, 98%)",
-  100: "hsl(100, 20%, 94%)",
-  200: "hsl(100, 20%, 87%)",
-  300: "hsl(100, 20%, 75%)",
-  400: "hsl(100, 20%, 60%)",
-  500: "hsl(100, 20%, 45%)", // #5D7761 (sage green)
-  600: "hsl(100, 20%, 35%)",
-  700: "hsl(100, 20%, 25%)",
-  800: "hsl(100, 20%, 15%)",
-  900: "hsl(100, 20%, 10%)"
+  50: "hsl(150, 60%, 97%)",
+  100: "hsl(150, 60%, 94%)",
+  200: "hsl(150, 60%, 87%)",
+  300: "hsl(150, 55%, 75%)",
+  400: "hsl(150, 50%, 60%)",
+  500: "hsl(150, 45%, 45%)", // Teal-leaning green that complements brand blue
+  600: "hsl(150, 45%, 35%)",
+  700: "hsl(150, 45%, 25%)",
+  800: "hsl(150, 45%, 15%)",
+  900: "hsl(150, 45%, 10%)"
 };
 
 export const orange = {
-  50: "hsl(35, 80%, 97%)",
-  100: "hsl(35, 80%, 90%)",
-  200: "hsl(35, 80%, 80%)",
-  300: "hsl(35, 80%, 65%)",
-  400: "hsl(35, 80%, 50%)", // #F7931E (muted orange)
-  500: "hsl(35, 80%, 45%)",
-  600: "hsl(35, 80%, 35%)",
-  700: "hsl(35, 80%, 30%)",
-  800: "hsl(35, 80%, 25%)",
-  900: "hsl(35, 80%, 20%)"
+  50: "hsl(25, 85%, 97%)",
+  100: "hsl(25, 85%, 90%)",
+  200: "hsl(25, 85%, 80%)",
+  300: "hsl(25, 80%, 65%)",
+  400: "hsl(25, 75%, 50%)", // Warm orange that contrasts with brand blue
+  500: "hsl(25, 75%, 45%)",
+  600: "hsl(25, 75%, 35%)",
+  700: "hsl(25, 75%, 30%)",
+  800: "hsl(25, 75%, 25%)",
+  900: "hsl(25, 75%, 20%)"
 };
 
 export const red = {
-  50: "hsl(20, 80%, 97%)",
-  100: "hsl(20, 80%, 90%)",
-  200: "hsl(20, 80%, 80%)",
-  300: "hsl(20, 80%, 65%)",
-  400: "hsl(20, 80%, 50%)", // Softer red
-  500: "hsl(20, 80%, 40%)",
-  600: "hsl(20, 80%, 30%)",
-  700: "hsl(20, 80%, 25%)",
-  800: "hsl(20, 80%, 20%)",
-  900: "hsl(20, 80%, 15%)"
+  50: "hsl(348, 85%, 97%)",
+  100: "hsl(348, 85%, 90%)",
+  200: "hsl(348, 85%, 80%)",
+  300: "hsl(348, 80%, 65%)",
+  400: "hsl(348, 75%, 50%)", // Cool-leaning red that works with brand blue
+  500: "hsl(348, 75%, 40%)",
+  600: "hsl(348, 75%, 30%)",
+  700: "hsl(348, 75%, 25%)",
+  800: "hsl(348, 75%, 20%)",
+  900: "hsl(348, 75%, 15%)"
 };
 
 export const getDesignTokens = (mode: PaletteMode) => {
@@ -120,9 +120,9 @@ export const getDesignTokens = (mode: PaletteMode) => {
         dark: orange[800]
       },
       error: {
-        light: red[300],
-        main: red[400], // Softer red
-        dark: red[800]
+        light: red[200],
+        main: red[200], // Softer red
+        dark: red[200]
       },
       success: {
         light: green[300],
@@ -249,14 +249,14 @@ export const colorSchemes = {
         dark: orange[800]
       },
       error: {
-        light: red[300],
-        main: red[400], // Softer red
-        dark: red[800]
+        light: red[200],
+        main: red[300], // Softer red
+        dark: red[400]
       },
       success: {
-        light: green[300],
-        main: green[500], // #5D7761 (sage green)
-        dark: green[700]
+        light: green[200],
+        main: green[400], // #5D7761 (sage green)
+        dark: green[400]
       },
       grey: {
         ...gray

@@ -14,8 +14,10 @@ import { HeroConfig } from "@/views/landing/data/hero";
 import { TypeAnimation } from "react-type-animation";
 import { useSearchParams, useRouter } from "next/navigation";
 import Badge from "./badge";
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import WireframeSphereLanding from "./WireframeSphereLanding";
+import useToast from "@/hooks/useToast";
+import { DifficultyChip } from "../app/shared/StyledChips";
 
 const interviewQuestionsByIndustry = {
   general: [
@@ -62,6 +64,7 @@ const interviewQuestionsByIndustry = {
 
 export function Hero({ title, subtitle, info, button }: HeroConfig) {
   const { t } = useT("landing");
+  const { addToast } = useToast();
   const [currentVolume, setCurrentVolume] = React.useState(0.5);
   const [isExcited, setIsExcited] = React.useState(false);
   const [isStartingInterview, setIsStartingInterview] = React.useState(false);
@@ -69,16 +72,164 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
   const router = useRouter();
   const industry = searchParams.get("industry") || "general";
 
+  const dummyData = [
+    {
+      firstName: "Sarah",
+      timeAgo: "2 minutes ago",
+      company: "Commonwealth Bank",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Michael",
+      timeAgo: "5 minutes ago",
+      company: "Envato",
+      difficulty: "advanced"
+    },
+    {
+      firstName: "Emma",
+      timeAgo: "7 minutes ago",
+      company: "Aconex",
+      difficulty: "beginner"
+    },
+    {
+      firstName: "James",
+      timeAgo: "10 minutes ago",
+      company: "Culture Amp",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Lisa",
+      timeAgo: "12 minutes ago",
+      company: "NAB",
+      difficulty: "advanced"
+    },
+    {
+      firstName: "David",
+      timeAgo: "15 minutes ago",
+      company: "Buildkite",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Jessica",
+      timeAgo: "18 minutes ago",
+      company: "99designs",
+      difficulty: "beginner"
+    },
+    {
+      firstName: "Alex",
+      timeAgo: "20 minutes ago",
+      company: "SafetyCulture",
+      difficulty: "advanced"
+    },
+    {
+      firstName: "Emily",
+      timeAgo: "23 minutes ago",
+      company: "Coles Group",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Daniel",
+      timeAgo: "25 minutes ago",
+      company: "Octopus Deploy",
+      difficulty: "advanced"
+    },
+    {
+      firstName: "Sophia",
+      timeAgo: "28 minutes ago",
+      company: "Whispir",
+      difficulty: "beginner"
+    },
+    {
+      firstName: "Ryan",
+      timeAgo: "30 minutes ago",
+      company: "Xero",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Olivia",
+      timeAgo: "33 minutes ago",
+      company: "Tyro Payments",
+      difficulty: "advanced"
+    },
+    {
+      firstName: "William",
+      timeAgo: "35 minutes ago",
+      company: "WiseTech Global",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Ava",
+      timeAgo: "38 minutes ago",
+      company: "Optus",
+      difficulty: "beginner"
+    },
+    {
+      firstName: "Thomas",
+      timeAgo: "40 minutes ago",
+      company: "Nearmap",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Isabella",
+      timeAgo: "43 minutes ago",
+      company: "Pushpay",
+      difficulty: "advanced"
+    },
+    {
+      firstName: "John",
+      timeAgo: "45 minutes ago",
+      company: "Wesfarmers",
+      difficulty: "intermediate"
+    },
+    {
+      firstName: "Mia",
+      timeAgo: "48 minutes ago",
+      company: "Appen",
+      difficulty: "beginner"
+    },
+    {
+      firstName: "Lucas",
+      timeAgo: "50 minutes ago",
+      company: "Nitro Software",
+      difficulty: "advanced"
+    }
+  ];
+
+  const showRandomToast = () => {
+    const randomEntry = dummyData[Math.floor(Math.random() * dummyData.length)];
+    addToast(
+      <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-start", gap: 1, flexDirection: "column" }}>
+        <DifficultyChip label={randomEntry.difficulty} size="small" />
+        {`${randomEntry.firstName} started interview ${randomEntry.timeAgo} for ${randomEntry.company}`}
+      </Box>,
+      "brand"
+    );
+  };
+
+  React.useEffect(() => {
+    // Show first toast quickly
+    const initialTimeout = setTimeout(showRandomToast, 10000);
+    return () => clearTimeout(initialTimeout);
+  }, []); // Run only once on mount
+
+  React.useEffect(() => {
+    // Start recurring toasts after a delay
+    const recurringTimeout = setTimeout(() => {
+      const intervalId = setInterval(showRandomToast, 20000);
+      return () => clearInterval(intervalId);
+    }, 30000); // Start recurring after 30s (initial 10s + first interval 20s)
+
+    return () => clearTimeout(recurringTimeout);
+  }, []); // Run only once on mount
+
   const handleButtonClick = () => {
     setIsStartingInterview(true);
-    router.prefetch(PAGE_PATH.appRoot)
+    router.prefetch(PAGE_PATH.appRoot);
     setTimeout(() => {
       router.push(PAGE_PATH.appRoot);
     }, 150);
   };
 
-  
-  
   return (
     <Box
       id="hero"
@@ -135,7 +286,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                 }}
               >
                 <TypeAnimation
-                  sequence={[t("hero.info"),3000, ...interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]]}
+                  sequence={[t("hero.info"), 3000, ...interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]]}
                   wrapper="span"
                   speed={50}
                   repeat={6}
@@ -168,12 +319,12 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                 sx={{ pt: 2, width: { xs: "100%", sm: "350px" } }}
               >
                 <Badge size="small" />
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  size="large" 
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
                   startIcon={<PlayArrowIcon />}
-                  sx={{ minWidth: "fit-content", fontWeight: "bold" }} 
+                  sx={{ minWidth: "fit-content", fontWeight: "bold" }}
                   onClick={handleButtonClick}
                   onMouseEnter={() => setIsExcited(true)}
                   onMouseLeave={() => setIsExcited(false)}
@@ -182,7 +333,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                 </Button>
               </Stack>
             </Stack>
-            <Stack spacing={2} flexDirection="row" justifyContent="flex-start" alignItems="center" sx={{ mt: 4 }} >
+            <Stack spacing={2} flexDirection="row" justifyContent="flex-start" alignItems="center" sx={{ mt: 4 }}>
               <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center" }}>
                 {t("hero.terms")}
                 <Link href={PAGE_PATH.termsConditionPage} style={{ color: "var(--mui-palette-primary-main)" }}>
@@ -193,13 +344,13 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
-            <WireframeSphereLanding 
-              participantName="John Doe" 
-              isAISpeaking={false} 
-              isGettingReply={true} 
-              volumeLevel={currentVolume} 
-              isExcited={isExcited} 
-              isStartingInterview={isStartingInterview} 
+            <WireframeSphereLanding
+              participantName="John Doe"
+              isAISpeaking={false}
+              isGettingReply={true}
+              volumeLevel={currentVolume}
+              isExcited={isExcited}
+              isStartingInterview={isStartingInterview}
               onHover={(bool) => setIsExcited(bool)}
               onClick={handleButtonClick}
             />

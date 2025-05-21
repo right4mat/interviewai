@@ -8,6 +8,7 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { useTranslation } from "react-i18next";
 import { TestimonialsConfig } from "@/views/landing/data/testimonials";
+import Leaderboard from "@/components/app/home/Leaderboard";
 
 export function Testimonials({ testimonials }: TestimonialsConfig) {
   const { t } = useTranslation("landing");
@@ -38,8 +39,18 @@ export function Testimonials({ testimonials }: TestimonialsConfig) {
           {t('testimonials.subtitle')}
         </Typography>
       </Box>
+
+      {/* Leaderboard Section */}
+      <Box sx={{ width: "100%", mb: 6 }}>
+        <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
+          {t('testimonials.leaderboardTitle', 'Top Performers')}
+        </Typography>
+        <Leaderboard />
+      </Box>
+
+      {/* Testimonials Grid */}
       <Grid container spacing={2}>
-        {testimonials.map((testimonial, index) => (
+        {testimonials.slice(0, 3).map((testimonial, index) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index} sx={{ display: "flex" }}>
             <Card
               variant="outlined"
