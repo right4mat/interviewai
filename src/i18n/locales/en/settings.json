@@ -1,0 +1,38 @@
+{
+  "headings": {
+    "accountSettings": "Account Settings",
+    "generalInformation": "General Information",
+    "password": "Password",
+    "subscriptionPlans": "Subscription Plans",
+    "availablePlans": "Available Plans"
+  },
+  "labels": {
+    "name": "Name",
+    "email": "Email",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "currentPlan": "Your current plan:"
+  },
+  "buttons": {
+    "saveChanges": "Save Changes",
+    "updatePassword": "Update Password",
+    "upgrade": "Upgrade",
+    "selectPlan": "Select Plan",
+    "billing": "Billing"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Invalid email address",
+    "passwordRequired": "New password is required",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "confirmPasswordRequired": "Please confirm your password",
+    "passwordsDoNotMatch": "Passwords do not match"
+  },
+  "placeholders": {
+    "name": "Name",
+    "email": "Email",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password"
+  }
+}
