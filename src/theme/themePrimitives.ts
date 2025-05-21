@@ -25,6 +25,11 @@ declare module "@mui/material/styles" {
   interface Palette {
     baseShadow: string;
   }
+
+  interface TypeBackground {
+    card: string;
+    input: string;
+  }
 }
 
 const defaultTheme = createTheme();
@@ -32,16 +37,16 @@ const defaultTheme = createTheme();
 const customShadows: Shadows = [...defaultTheme.shadows];
 
 export const brand = {
-  50: 'hsl(207, 80%, 97%)',
-  100: 'hsl(207, 80%, 92%)',
-  200: 'hsl(207, 80%, 85%)', // Lighter version of #8cc6f0
-  300: 'hsl(207, 78%, 75%)',
-  400: 'hsl(207, 76%, 65%)',
-  500: 'hsl(207, 74%, 55%)', // #8cc6f0 (adjusted)
-  600: 'hsl(207, 72%, 45%)',
-  700: 'hsl(207, 70%, 35%)',
-  800: 'hsl(207, 68%, 25%)', // Darker version of #194f8d
-  900: 'hsl(207, 66%, 15%)',
+  50: "hsl(207, 80%, 97%)",
+  100: "hsl(207, 80%, 92%)",
+  200: "hsl(207, 80%, 85%)", // Lighter version of #8cc6f0
+  300: "hsl(207, 78%, 75%)",
+  400: "hsl(207, 76%, 65%)",
+  500: "hsl(207, 74%, 55%)", // #8cc6f0 (adjusted)
+  600: "hsl(207, 72%, 45%)",
+  700: "hsl(207, 70%, 35%)",
+  800: "hsl(207, 68%, 25%)", // Darker version of #194f8d
+  900: "hsl(207, 66%, 15%)"
 };
 
 export const gray = {
@@ -135,7 +140,9 @@ export const getDesignTokens = (mode: PaletteMode) => {
       divider: alpha(gray[300], 0.4),
       background: {
         default: brand[50], // Using brand lightest color
-        paper: brand[100] // Using brand very light color
+        paper: brand[100], // Using brand very light color
+        card: "#fff",
+        input: "#fff"
       },
       text: {
         primary: brand[700],
@@ -265,7 +272,8 @@ export const colorSchemes = {
       background: {
         default: brand[50], // Using brand lightest color
         paper: brand[100], // Using brand very light color
-        card: '#fff'
+        card: "#fff",
+        input: "#fff"
       },
       text: {
         primary: brand[700],

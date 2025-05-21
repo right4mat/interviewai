@@ -3,6 +3,11 @@
     "title": "Analyzing results...",
     "subtitle": "Please wait while we process your nutrient data"
   },
+  "breadcrumbs": {
+    "home": "Home",
+    "settings": "Settings",
+    "interview": "Interview"
+  },
   "checkInfo": {
     "title": "Check Report Data",
     "subtitle": "Please verify that the data extracted from your report is correct before proceeding with the analysis.",

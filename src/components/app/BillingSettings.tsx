@@ -67,7 +67,7 @@ export function BillingSettings({ headings, labels, buttons, pricing }: BillingS
 
   return (
     <>
-      <Card sx={{ p: 3 }}>
+      <Card sx={{ p: 3, backgroundColor: "background.card" }}>
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <PaymentIcon sx={{ mr: 1, color: "text.secondary" }} />
           <Typography variant="h6" color="text.secondary">
@@ -109,7 +109,7 @@ export function BillingSettings({ headings, labels, buttons, pricing }: BillingS
 
         <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             size="large"
             onClick={async () => {
@@ -118,7 +118,6 @@ export function BillingSettings({ headings, labels, buttons, pricing }: BillingS
               setLoading(false);
             }}
             startIcon={<PaymentIcon />}
-            sx={{ color: "text.secondary" }}
           >
             {t(buttons.billing)}
           </Button>

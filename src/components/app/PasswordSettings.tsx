@@ -65,17 +65,17 @@ export function PasswordSettings({ headings, labels, buttons, placeholders, vali
       addToast("Your password has been updated successfully", "success");
     } catch (err: any) {
       // Set form error if auth error occurs
-        setError("newPassword", {
-          type: "manual",
-          message: err.message
-        });
-        addToast(err.message, "error");
-        console.error("Error updating password:", err);
+      setError("newPassword", {
+        type: "manual",
+        message: err.message
+      });
+      addToast(err.message, "error");
+      console.error("Error updating password:", err);
     }
   };
 
   return (
-    <Card sx={{ p: 3, mb: 4 }}>
+    <Card sx={{ p: 3, mb: 4, backgroundColor: "background.card" }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <LockIcon sx={{ mr: 1, color: "text.secondary" }} />
         <Typography variant="h6" color="text.secondary">
@@ -118,7 +118,7 @@ export function PasswordSettings({ headings, labels, buttons, placeholders, vali
           </Grid>
         </Grid>
         <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
-          <Button type="submit" variant="outlined" color="primary" sx={{ color: "text.secondary" }} disabled={isPending}>
+          <Button type="submit" variant="contained" color="primary" disabled={isPending}>
             {t(buttons.updatePassword)}
           </Button>
         </Box>

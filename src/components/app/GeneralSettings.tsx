@@ -24,7 +24,7 @@ export interface GeneralSettingsConfig {
     generalInformation: string;
   };
   labels: {
-    name: string; 
+    name: string;
     email: string;
   };
   buttons: {
@@ -41,7 +41,7 @@ export interface GeneralSettingsConfig {
   };
 }
 
-export function GeneralSettings({headings, labels, buttons, placeholders, validation}: GeneralSettingsConfig) {
+export function GeneralSettings({ headings, labels, buttons, placeholders, validation }: GeneralSettingsConfig) {
   const { user, updateProfile, isPending } = useAuth();
   const { addToast } = useToast();
   const { t } = useT("settings");
@@ -51,8 +51,8 @@ export function GeneralSettings({headings, labels, buttons, placeholders, valida
     formState: { errors }
   } = useForm<GeneralFormData>({
     defaultValues: {
-      name: user && 'name' in user ? user.name : "",
-      email: user && 'email' in user ? user.email : ""
+      name: user && "name" in user ? user.name : "",
+      email: user && "email" in user ? user.email : ""
     }
   });
 
@@ -67,17 +67,24 @@ export function GeneralSettings({headings, labels, buttons, placeholders, valida
   };
 
   return (
-    <Card sx={{ p: 3, mb: 4 }} >
+    <Card sx={{ p: 3, mb: 4, backgroundColor: "background.card" }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <PersonIcon sx={{ mr: 1, color: "text.secondary" }} />
-        <Typography variant="h6" color="text.secondary">{t(headings.generalInformation)}</Typography>
+        <Typography variant="h6" color="text.secondary">
+          {t(headings.generalInformation)}
+        </Typography>
       </Box>
       <Divider sx={{ mb: 3 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 6 }}>
             <FormLabel sx={{ mb: 1, display: "block", color: "text.secondary" }}>{t(labels.name)}</FormLabel>
-            <CustomInput fullWidth placeholder={t(placeholders.name)} {...register("name", { required: t(validation.nameRequired) })} error={!!errors.name} />
+            <CustomInput
+              fullWidth
+              placeholder={t(placeholders.name)}
+              {...register("name", { required: t(validation.nameRequired) })}
+              error={!!errors.name}
+            />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <FormLabel sx={{ mb: 1, display: "block", color: "text.secondary" }}>{t(labels.email)}</FormLabel>
@@ -97,13 +104,7 @@ export function GeneralSettings({headings, labels, buttons, placeholders, valida
           </Grid>
         </Grid>
         <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
-          <Button 
-            type="submit" 
-            variant="outlined" 
-            startIcon={<SaveIcon />} 
-            sx={{ color: "text.secondary" }}
-            disabled={isPending}
-          >
+          <Button type="submit" variant="contained" color="primary" disabled={isPending}>
             {t(buttons.saveChanges)}
           </Button>
         </Box>
