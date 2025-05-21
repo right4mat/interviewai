@@ -1,0 +1,66 @@
+[
+  {
+    "id": 3,
+    "rank": 1,
+    "name": "Charlie",
+    "averageScore": 95,
+    "totalInterviews": 21,
+    "difficulty": "advanced"
+  },
+  {
+    "id": 6,
+    "rank": 2,
+    "name": "Micheal",
+    "averageScore": 91.1,
+    "totalInterviews": 19,
+    "difficulty": "advanced"
+  },
+  {
+    "id": 2,
+    "rank": 3,
+    "name": "Luke",
+    "averageScore": 90.8,
+    "totalInterviews": 16,
+    "difficulty": "intermediate"
+  },
+  {
+    "id": 8,
+    "rank": 4,
+    "name": "Mitch",
+    "averageScore": 90,
+    "totalInterviews": 16,
+    "difficulty": "intermediate"
+  },
+  {
+    "id": 5,
+    "rank": 5,
+    "name": "Ella",
+    "averageScore": 86.3,
+    "totalInterviews": 12,
+    "difficulty": "intermediate"
+  },
+  {
+    "id": 7,
+    "rank": 6,
+    "name": "Alex",
+    "averageScore": 84.8,
+    "totalInterviews": 16,
+    "difficulty": "beginner"
+  },
+  {
+    "id": 1,
+    "rank": 7,
+    "name": "Alice",
+    "averageScore": 83.8,
+    "totalInterviews": 10,
+    "difficulty": "beginner"
+  },
+  {
+    "id": 4,
+    "rank": 8,
+    "name": "David",
+    "averageScore": 78.3,
+    "totalInterviews": 8,
+    "difficulty": "beginner"
+  }
+]
