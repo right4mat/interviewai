@@ -24,23 +24,23 @@ export function useConfirmMutation<TData = unknown, TVariables = unknown, TConte
 
   const mutation = useMutation<TData, Error, TVariables, TContext>(mutationOptions);
 
-  const mutate = async (variables: TVariables, options?: Parameters<typeof mutation.mutate>[1]) => {
-    if (confirmConfig) {
+  const mutate = async (variables: TVariables, options?: Parameters<typeof mutation.mutate>[1] & { skipConfirm?: boolean }) => {
+    if (confirmConfig && options?.skipConfirm !== true) {
       setPendingVariables(variables);
       setPendingOptions(options);
       setIsConfirmOpen(true);
     } else {
-      mutation.mutate(variables);
+      mutation.mutate(variables, options);
     }
   };
 
-  const mutateAsync = async (variables: TVariables, options?: Parameters<typeof mutation.mutateAsync>[1]) => {
-    if (confirmConfig) {
+  const mutateAsync = async (variables: TVariables, options?: Parameters<typeof mutation.mutateAsync>[1] & { skipConfirm?: boolean }) => {
+    if (confirmConfig && options?.skipConfirm !== true) {
       setPendingVariables(variables);
       setPendingOptions(options);
       setIsConfirmOpen(true);
     } else {
-      await mutation.mutateAsync(variables);
+      await mutation.mutateAsync(variables, options);
     }
   };
 

@@ -11,8 +11,21 @@ import { useReviewInterview } from "@/services/appServices";
 import { Interviewer, QuestionAnswer } from "@/types/interview";
 import { Gauge } from "@mui/x-charts/Gauge";
 import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
 
-
+const getJobProbabilityMessage = (probability: number): { message: string; color: string } => {
+  if (probability < 0.2) {
+    return { message: "You likely didn't get the job. Keep practicing! \u{1F62D}", color: "error.main" };
+  } else if (probability < 0.4) {
+    return { message: "Your chances are low, but don't give up! \u{1F622}", color: "error.main" };
+  } else if (probability < 0.6) {
+    return { message: "It could go either way - good effort! \u{1F615}", color: "warning.main" };
+  } else if (probability < 0.8) {
+    return { message: "You have a good chance of getting the job! \u{1F642}", color: "success.main" };
+  } else {
+    return { message: "Excellent job! You're very likely to get an offer! \u{1F603}", color: "success.main" };
+  }
+};
 
 interface ReviewDialogProps {
   open: boolean;
@@ -24,6 +37,7 @@ interface ReviewDialogProps {
   type: string;
   difficulty: string;
   company: string;
+  isSaving?: boolean;
 }
 
 export default function ReviewDialog({
@@ -35,7 +49,8 @@ export default function ReviewDialog({
   resumeId,
   type,
   difficulty,
-  company
+  company,
+  isSaving
 }: ReviewDialogProps) {
   const { data, isLoading, error } = useReviewInterview({
     company: company,
@@ -88,55 +103,77 @@ export default function ReviewDialog({
         </Typography>
       </DialogTitle>
       <DialogContent>
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 6 }} component="div" container>
+        <Box sx={{ flexGrow: 1 }}>
+          <Grid container spacing={2}>
             <Grid size={{ xs: 12, md: 12 }}>
-              <Box sx={{ height: 300, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                <Gauge
-                  value={data?.totalScore ? (data.totalScore / 1200) * 100 : 0}
-                  text={({ value }) => `${value?.toFixed(0)}%`}
-                  sx={{
-                    "& .MuiGauge-valueText": {
-                      fontSize: "2rem",
-                      fill: getScoreColor(score)
-                    }
-                  }}
-                />
-              </Box>
-            </Grid>
-            <Grid size={{ xs: 12, md: 12 }}>
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                <Typography variant="h6" gutterBottom>
-                  Scores
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Total Score: {data?.totalScore || 0} points
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Average Score: {score}%
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ height: "100%", display: "flex", flexDirection: "column", gap: 3 }}>
-              {data?.review && (
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Overall Review
+              <Box width="100%">
+                <Card variant="outlined" sx={{  p: 2, textAlign: 'center' }}>
+                  <Typography 
+                    variant="h5" 
+                    sx={{ 
+                      color: getJobProbabilityMessage(data?.gotJobProb || 0).color,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {getJobProbabilityMessage(data?.gotJobProb || 0).message}
                   </Typography>
-                  <Box sx={{ overflowY: "scroll", }}>
-                    <Typography variant="body1">{data.review}</Typography>
+                </Card>
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 12 }}>
+                  <Card variant="outlined" sx={{ height: 300, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                    <Gauge
+                      value={data?.totalScore ? (data.totalScore / 1200) * 100 : 0}
+                      text={({ value }) => `${value?.toFixed(0)}%`}
+                      sx={{
+                        "& .MuiGauge-valueText": {
+                          fontSize: "2rem",
+                          fill: getScoreColor(score)
+                        },
+                        "& .MuiGauge-track, & .MuiGauge-progress": {
+                          strokeLinecap: "round"
+                        }
+                      }}
+                    />
+                  </Card>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12 }}>
+                  <Card variant="outlined" sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Scores
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      Total Score: {data?.totalScore || 0} points
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      Average Score: {score}%
+                    </Typography>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card variant="outlined" sx={{ height: "100%", display: "flex", flexDirection: "column", gap: 3 }}>
+                {data?.review && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      Overall Review
+                    </Typography>
+                    <Box sx={{ overflowY: "scroll", }}>
+                      <Typography variant="body1">{data.review}</Typography>
+                    </Box>
                   </Box>
-                </Box>
-              )}
-            </Box>
+                )}
+              </Card>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="contained" color="primary">
-          Close
+        <Button onClick={onClose} variant="contained" color="primary" disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Close'}
         </Button>
       </DialogActions>
     </Dialog>

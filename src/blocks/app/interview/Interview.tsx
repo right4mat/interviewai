@@ -4,20 +4,14 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import Webcam from "react-webcam";
 import { useGetInterviewQuestions, useSaveInterview } from "@/services/appServices";
 import VideoDisplay from "@/components/app/interview/VideoDisplay";
-import Button from "@mui/material/Button";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import StopIcon from "@mui/icons-material/Stop";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SkipNextIcon from "@mui/icons-material/SkipNext";
-import { LinearProgress } from "@mui/material";
+import InterviewControls from "@/components/app/interview/InterviewControls";
+import InterviewProgressBar from "@/components/app/interview/InterviewProgressBar";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useInterview } from "@/hooks/useInterview";
 import InterviewProgress from "@/components/app/interview/InterviewProgress";
-import { brand } from "@/theme/themePrimitives";
 import ReviewDialog from "@/components/app/interview/ReviewDialog";
 import { useRouter } from "next/navigation";
 import { PAGE_PATH } from "@/path";
@@ -27,6 +21,7 @@ export default function Interview(): React.ReactElement {
   const webcamRef = useRef<Webcam>(null);
   const [showEndCallDialog, setShowEndCallDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [isSavingInterview, setIsSavingInterview] = useState(false);
   const { mutate: saveInterview, ConfirmDialog: SaveConfirmDialog } = useSaveInterview();
   const {
     isMuted,
@@ -138,43 +133,46 @@ export default function Interview(): React.ReactElement {
   const handleEndCall = () => {
     setShowEndCallDialog(true);
     clearinterviewState();
-    router.push(PAGE_PATH.appRoot);
+ 
   };
 
   const handleCloseReview = () => {
-    setShowReviewDialog(false);
-    clearinterviewState();
-    router.push(PAGE_PATH.appRoot);
+    setIsSavingInterview(true);
+    saveInterview(
+      {
+        company: details?.company || "",
+        questions: details?.questions || [],
+        currentQuestionIndex,
+        interviewer: interviewState.interviewer,
+        settings: interviewState.settings,
+        jobDescription: interviewState.jobDescription,
+        resumeId: interviewState.resumeId,
+        questionAnswers
+      },
+      {
+        skipConfirm: true,
+        onSuccess: () => {
+          handleSaveSuccess();
+          setShowReviewDialog(false);
+          clearinterviewState();
+          setIsSavingInterview(false);
+          router.push(PAGE_PATH.appRoot);
+        },
+        onError: () => {
+          setIsSavingInterview(false);
+        }
+      }
+    );
   };
 
   // Render the interview interface
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
-      {/* Header with title and back button */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 4 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            Interview Progress
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {currentQuestionIndex} of {details?.questions?.length || 0} questions
-          </Typography>
-        </Box>
-        <LinearProgress
-          variant="determinate"
-          value={isLoadingQuestions ? 0 : (currentQuestionIndex / (details?.questions?.length || 0)) * 100}
-          sx={{
-            width: "100%",
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: brand[100],
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: brand[500],
-              borderRadius: 4
-            }
-          }}
-        />
-      </Box>
+      <InterviewProgressBar
+        currentQuestionIndex={currentQuestionIndex}
+        totalQuestions={details?.questions?.length || 0}
+        isLoadingQuestions={isLoadingQuestions}
+      />
 
       {SaveConfirmDialog}
 
@@ -189,6 +187,7 @@ export default function Interview(): React.ReactElement {
           resumeId={interviewState?.resumeId}
           type={interviewState.settings.type}
           difficulty={interviewState.settings.difficulty}
+          isSaving={isSavingInterview}
         />
       )}
 
@@ -212,33 +211,15 @@ export default function Interview(): React.ReactElement {
             volumeLevel={volumeLevel}
           />
 
-          {/* Interview control buttons */}
-          <Box sx={{ mt: 2, textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center", gap: 2 }}>
-            <Button variant="outlined" size="large" onClick={() => setStage("setup")} startIcon={<ArrowBackIcon />} sx={{ ml: 2 }}>
-              Back to Setup
-            </Button>
-            {!interviewState.interviewStarted ? (
-              <Button
-                component="div"
-                variant="contained"
-                color="primary"
-                onClick={handleStartInterview}
-                disabled={isLoadingQuestions || !details?.questions?.length}
-                startIcon={<PlayArrowIcon />}
-              >
-                {isLoadingQuestions ? "Loading Questions..." : "Start Interview"}
-              </Button>
-            ) : (
-              <>
-                <Button variant="outlined" color="error" size="large" onClick={handleStopInterview} startIcon={<StopIcon />}>
-                  Stop Interview
-                </Button>
-                <Button variant="outlined" size="large" onClick={skipQuestion} startIcon={<SkipNextIcon />}>
-                  Skip Question
-                </Button>
-              </>
-            )}
-          </Box>
+          <InterviewControls
+            isLoadingQuestions={isLoadingQuestions}
+            interviewStarted={!!interviewState.interviewStarted}
+            hasQuestions={!!details?.questions?.length}
+            onStartInterview={handleStartInterview}
+            onStopInterview={handleStopInterview}
+            onBackToSetup={() => setStage("setup")}
+            onSkipQuestion={skipQuestion}
+          />
         </Grid>
 
         {/* Interview progress section */}

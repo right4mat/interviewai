@@ -9,10 +9,10 @@ import { useT } from "@/i18n/client";
 /***************************  PAGE - AUTH  ***************************/
 
 export default function DashboardPage() {
-  const { t: tApp } = useT('app');
+  const { t } = useT('app');
   return (
     <>
-      <Header breadcrumbs={[{ label: tApp.breadcrumbs.home, url: "/app" }]} />
+      <Header breadcrumbs={[{ label: t("breadcrumbs.home"), url: "/app" }]} />
       <Home />
     </>
   );

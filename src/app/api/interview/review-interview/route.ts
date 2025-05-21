@@ -49,56 +49,57 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
     const averageScore = totalScore / questionAnswers.length;
 
     const reviewPrompt = `
-Please provide a critical review of this interview performance. Format your response with clear sections and line breaks between paragraphs.
+You are conducting a review of an interview performance. Please provide a clear, concise, and constructive review that is easy to read.
 
-Job Description: ${jobDescription}
+Context:
+- Job Description: ${jobDescription}
+${resume ? `- Candidate's Resume: ${resume.resume}` : ''}
+- Average Score: ${averageScore}/100
 
-Resume: ${resume?.resume}
-
-Questions and Answers:
+Interview Questions and Responses:
 ${questionAnswers.map(qa => `
-Question: ${qa.question}
-Answer: ${qa.cleanedAnswer || 'No answer provided'}
-Score: ${qa.score || 0}/100
-Feedback: ${qa.reasoning || 'No feedback provided'}`).join('\n')}
+- Question: ${qa.question}
+- Answer: ${qa.cleanedAnswer || 'No answer provided'}
+- Score: ${qa.score}/100
+- Feedback: ${qa.reasoning || 'No feedback provided'}`).join('\n')}
 
-Average Score: ${averageScore}/100
+Please provide:
+1. A probability score between 0 and 1 (e.g., 0.75) representing how likely the candidate is to get this job based on their interview performance
+2. A concise review (maximum 200 words) that covers:
+   - Overall performance assessment
+   - Notable strengths
+   - Key areas for improvement
+   - Specific actionable recommendations
 
-Structure your review with the following sections, using line breaks between each:
+Format your response as a JSON object with two fields:
+{
+  "gotJobProb": "0.XX",
+  "review": "Your concise review here..."
+}
 
-1. Overall Performance Summary
-[Add line break]
-
-2. Key Strengths
-[Add line break]
-
-3. Areas for Improvement
-[Add line break]
-
-4. Alignment with Job Requirements
-[Add line break]
-
-5. Specific Recommendations
-[Add line break]
-
-Please ensure each section is clearly separated by line breaks for readability.`;
+Keep the review professional, constructive, and focused on helping the candidate improve.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are an expert interviewer who provides balanced, constructive interview feedback. Format your responses with clear sections separated by line breaks." },
+        { 
+          role: "system", 
+          content: "You are an expert interviewer providing clear, concise, and constructive feedback. Write in a professional but conversational tone, focusing on actionable insights. Keep responses clear and well-structured without excessive formatting. Always return a valid JSON object with 'gotJobProb' (0-1 value as string) and 'review' (200 words max) fields." 
+        },
         { role: "user", content: reviewPrompt }
       ],
       temperature: 0.7,
-      max_tokens: 200
+      max_tokens: 300,
+      response_format: { type: "json_object" }
     });
 
-    const review = response.choices[0].message.content?.trim() || '';
+    const reviewData = JSON.parse(response.choices[0].message.content?.trim() || '{"gotJobProb": "0", "review": "Failed to generate review"}');
     
     return NextResponse.json({ 
       status: "success",
       data: {
-        review,
+        review: reviewData.review,
+        gotJobProb: parseFloat(reviewData.gotJobProb),
         averageScore: averageScore || 0,
         totalScore: totalScore || 0,
       }

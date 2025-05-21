@@ -67,6 +67,7 @@ interface ReviewInterviewResponse {
   review: string;
   averageScore: number;
   totalScore: number;
+  gotJobProb: number;
 }
 
 interface SaveInterviewRequest {
