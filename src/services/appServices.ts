@@ -133,6 +133,10 @@ interface LoadAttemptRequest {
   attemptId: number;
 }
 
+interface DeleteAttemptRequest {
+  attemptId: number;
+}
+
 export const useExtractResume = () => {
   return useMutation<ExtractResumeResponse, Error, ExtractResumeRequest>({
     mutationFn: async ({ file, filename }: ExtractResumeRequest) => {
@@ -385,6 +389,35 @@ export const useDeleteInterview = () => {
     confirmConfig: {
       title: "Delete Interview",
       content: "Are you sure you want to delete this interview? This action cannot be undone.",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      confirmColor: "error"
+    }
+  });
+};
+
+export const useDeleteAttempt = () => {
+  const { user } = useAuth();
+  return useConfirmMutation({
+    mutationFn: async (variables: DeleteAttemptRequest) => {
+      if (!user) throw new Error("User not found");
+      
+      // Delete the attempt
+      const { error } = await supabase
+        .from("question_answers")
+        .delete()
+        .eq("id", variables.attemptId);
+
+      if (error) throw error;
+      return variables.attemptId;
+    },
+    onSuccess: () => {
+      // Invalidate all interview attempts queries
+      client.invalidateQueries({ queryKey: ["interviewAttempts"] });
+    },
+    confirmConfig: {
+      title: "Delete Attempt",
+      content: "Are you sure you want to delete this interview attempt? This action cannot be undone.",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
       confirmColor: "error"

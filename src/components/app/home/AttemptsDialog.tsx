@@ -9,11 +9,8 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import CustomizedDataGrid from "../../shared/CustomizedDataGrid";
 import { GridColDef } from "@mui/x-data-grid";
-import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
-import LinearProgress from "@mui/material/LinearProgress";
-import { brand } from "@/theme/themePrimitives";
 // Import icons for status chips
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -34,16 +31,12 @@ import { useInterviewStore } from "@/stores/interviewStore";
 import ScoreProgress from "@/components/app/shared/ScoreProgress";
 import QuestionsProgress from "@/components/app/shared/QuestionsProgress";
 // Confirmation dialog imports
-import Button from "@mui/material/Button";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContentText from "@mui/material/DialogContentText";
 import { QuestionAnswer } from "@/types/interview";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Divider from "@mui/material/Divider";
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from '@mui/material/transitions';
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import AttemptDetailsView from "./AttemptDetailsView";
 
 // Transition for fullscreen dialog
 const Transition = React.forwardRef(function Transition(
@@ -56,7 +49,7 @@ const Transition = React.forwardRef(function Transition(
 });
 
 // Interface for interview attempt data
-interface AttemptData {
+export interface AttemptData {
   id: string | number;
   date: string;
   score: number;
@@ -314,84 +307,6 @@ export default function AttemptsDialog({
     }
   ];
 
-  // Render the details view for a specific attempt
-  const renderAttemptDetails = () => {
-    if (!viewingAttempt) return null;
-    
-    return (
-      <Fade in={!!viewingAttempt}>
-        <Box sx={{ height: '100%', overflow: 'auto' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h5" component="h2">
-              Attempt from {viewingAttempt.date}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-              <Chip 
-                icon={viewingAttempt.status === 'Completed' ? <CheckCircleIcon /> : <HourglassEmptyIcon />}
-                label={viewingAttempt.status} 
-                color={viewingAttempt.status === 'Completed' ? 'success' : 'info'}
-                sx={{ fontWeight: 'medium' }}
-              />
-              <ScoreProgress score={viewingAttempt.score} showLabel />
-            </Box>
-          </Box>
-          
-          <Divider sx={{ mb: 3 }} />
-          
-          <Typography variant="h6" component="h3" sx={{ mb: 2 }}>
-            Question Responses ({viewingAttempt.questions}/{viewingAttempt.totalQuestions || 10})
-          </Typography>
-          
-          {viewingAttempt.questionAnswers.map((qa, index) => (
-            <Card key={index} sx={{ mb: 3, boxShadow: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                    Question {index + 1}
-                  </Typography>
-                  <Chip 
-                    label={`Score: ${qa.score}/10`}
-                    color={qa.score >= 8 ? 'success' : qa.score >= 5 ? 'warning' : 'error'}
-                    size="small"
-                  />
-                </Box>
-                
-                <Typography variant="body1" sx={{ mb: 2, fontWeight: 'medium' }}>
-                  {qa.question}
-                </Typography>
-                
-                <Divider sx={{ my: 2 }} />
-                
-                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
-                  Your Answer:
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
-                  {qa.answer}
-                </Typography>
-                
-                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
-                  Feedback:
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
-                  {qa.reasoning}
-                </Typography>
-                
-                <Divider sx={{ my: 2 }} />
-                
-                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
-                  Model Answer:
-                </Typography>
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                  {qa.modelAnswer}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      </Fade>
-    );
-  };
-
   return (
     <>
       <BootstrapDialog
@@ -454,32 +369,18 @@ export default function AttemptsDialog({
               density="comfortable"
               getRowId={(row) => row.id}
             />
-          ) : renderAttemptDetails()}
+          ) : (
+            <AttemptDetailsView viewingAttempt={viewingAttempt} />
+          )}
         </DialogContent>
       </BootstrapDialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
+      <DeleteConfirmationDialog
         open={confirmDeleteOpen}
         onClose={handleDeleteCancel}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          Delete Attempt
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this attempt? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleDeleteConfirm}
+      />
     </>
   );
 } 
