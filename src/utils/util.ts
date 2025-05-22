@@ -1,9 +1,23 @@
+"use client";
 import { useRef, useEffect } from "react";
 import supabase from "./supabase";
-import * as pdfjs from "pdfjs-dist";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+// Remove static import of pdfjs
+let pdfjs: typeof import('pdfjs-dist');
 
+// Initialize PDF.js lazily only on client side
+async function initPdfJs() {
+  if (typeof window === 'undefined') return;
+  
+  if (!pdfjs) {
+    pdfjs = await import('pdfjs-dist');
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      "pdfjs-dist/build/pdf.worker.min.mjs",
+      import.meta.url
+    ).toString();
+  }
+  return pdfjs;
+}
 
 // Make an API request to `/api/{path}`
 export async function apiRequest(path: string, method: string = "GET", data?: any): Promise<any> {
@@ -104,19 +118,25 @@ export const getAudioWaveform = async (base64Audio: string): Promise<{ waveform:
 // Function to convert PDF pages to array of images
 export async function convertPdfToImageArray(file: File): Promise<string[]> {
   try {
+    // Initialize PDF.js if not already initialized
+    const pdf = await initPdfJs();
+    if (!pdf) {
+      throw new Error('PDF.js failed to initialize');
+    }
+
     // Load the PDF file
     const arrayBuffer = await file.arrayBuffer();
     const data = new Uint8Array(arrayBuffer);
 
     // Initialize PDF.js
-    const loadingTask = pdfjs.getDocument({ data });
-    const pdf = await loadingTask.promise;
+    const loadingTask = pdf.getDocument({ data });
+    const pdfDoc = await loadingTask.promise;
 
     const images: string[] = [];
 
     // Convert each page to an image
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      const page = await pdfDoc.getPage(i);
       const viewport = page.getViewport({ scale: 1.5 });
 
       const canvas = document.createElement("canvas");

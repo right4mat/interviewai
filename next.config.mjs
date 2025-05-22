@@ -14,6 +14,9 @@ const cspHeader = `
 `;
 
 const nextConfig = {
+  sassOptions: {
+    legacy: true,
+  },
   modularizeImports: {
     "@mui/material": {
       transform: "@mui/material/{{member}}"
