@@ -41,8 +41,13 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       .maybeSingle()
       .then(handle);
     
-    // If we already have this exact resume, return the existing ID
+    // If we already have this exact resume, set current to true and return the existing ID
     if (existingResume) {
+      await supabase
+        .from("resumes")
+        .update({ current: true })
+        .eq("id", existingResume.id);
+
       return NextResponse.json({
         status: "success",
         data: {

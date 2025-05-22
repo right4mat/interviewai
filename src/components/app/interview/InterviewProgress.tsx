@@ -149,7 +149,7 @@ const QuestionHistory = ({ qa, index }: { qa: QuestionAnswer, index: number }) =
               <Divider sx={{ my: 1.5 }}>
                 <Chip icon={<QuestionAnswerIcon fontSize="small" />} label="Model Answer" size="small" color="success" variant="outlined" />
               </Divider>
-              <Typography variant="body2" sx={{ color: "success.light", pl: 1, borderLeft: "2px solid", borderColor: "success.light", py: 0.5 }}>
+              <Typography variant="body2" sx={{ color: "success.dark", pl: 1, borderLeft: "2px solid", borderColor: "success.light", py: 0.5 }}>
                 {qa.modelAnswer}
               </Typography>
             </motion.div>

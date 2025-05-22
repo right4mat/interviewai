@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import { brand } from "@/theme/themePrimitives";
 import { useReviewInterview } from "@/services/appServices";
 import type { Interviewer, QuestionAnswer } from "@/types/interview";
-import { Gauge } from "@mui/x-charts/Gauge";
+import ScoreProgress from "../shared/ScoreProgress";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
@@ -124,18 +124,12 @@ export default function ReviewDialog({
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 12 }}>
                   <Card variant="outlined" sx={{ height: 300, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                    <Gauge
-                      value={data?.totalScore ? (data.totalScore / 1200) * 100 : 0}
-                      text={({ value }) => `${value?.toFixed(0)}%`}
-                      sx={{
-                        "& .MuiGauge-valueText": {
-                          fontSize: "2rem",
-                          fill: getScoreColor(score)
-                        },
-                        "& .MuiGauge-track, & .MuiGauge-progress": {
-                          strokeLinecap: "round"
-                        }
-                      }}
+                    <ScoreProgress
+                      score={data?.totalScore ? (data.totalScore / 1200) * 100 : 0}
+                      size={200}
+                      thickness={20}
+                      showLabel={false}
+                      fontSize={2}
                     />
                   </Card>
                 </Grid>

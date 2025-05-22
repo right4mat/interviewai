@@ -448,9 +448,10 @@ export const useGetResume = () => {
         .from("resumes")
         .select("id, filename")
         .eq("user_id", user.id)
+        .eq("current", true)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
         // If no rows matched, return null instead of throwing an error
@@ -473,11 +474,15 @@ export const useDeleteResume = () => {
     mutationFn: async (resumeId: number) => {
       if (!user) throw new Error("User not found");
 
-      const { error } = await supabase.from("resumes").delete().eq("id", resumeId).eq("user_id", user.id);
+      const { error } = await supabase
+        .from("resumes")
+        .update({ current: false })
+        .eq("id", resumeId)
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
-      // Return true on successful deletion
+      // Return true on successful update
       return true;
     },
     onSuccess: async () => {
@@ -485,14 +490,14 @@ export const useDeleteResume = () => {
       await client.invalidateQueries({ queryKey: ["userResume"], exact: false });
     },
     onError: (error) => {
-      console.error("Error deleting resume:", error);
-      alert("Failed to delete resume. Please try again.");
+      console.error("Error removing resume:", error);
+      alert("Failed to remove resume. Please try again.");
     },
     confirmConfig: {
-      title: "Delete Resume",
-      content: "Are you sure you want to delete this resume? This will affect your personalized interview questions and responses.",
-      confirmLabel: "Delete",
-      cancelLabel: "Cancel",
+      title: "Remove Resume",
+      content: "Are you sure you want to remove this resume? This will affect your personalized interview questions and responses.",
+      confirmLabel: "Remove",
+      cancelLabel: "Cancel", 
       confirmColor: "error"
     }
   });

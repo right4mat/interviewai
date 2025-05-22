@@ -6,6 +6,7 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import JobDescriptionInput from "@/components/app/setupInterview/JobDescriptionInput";
 import FileUpload from "@/components/app/setupInterview/FileUpload";
 import InterviewerSetup from "@/components/app/setupInterview/InterviewerSetup";
@@ -20,6 +21,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import CheckIcon from "@mui/icons-material/Check";
 import { useInterviewStore } from "@/stores/interviewStore";
 import Fade from "@mui/material/Fade";
+import Collapse from "@mui/material/Collapse";
 import { useJobDescriptionSummary } from "@/services/appServices";
 
 const SetupInterview: React.FC = () => {
@@ -111,8 +113,11 @@ const SetupInterview: React.FC = () => {
             }
           }}
         >
-          <JobDescriptionInput 
-            value={interviewState.jobDescription} 
+          <Typography variant="h6" fontWeight="medium" gutterBottom>
+            Job Description
+          </Typography>
+          <JobDescriptionInput
+            value={interviewState.jobDescription}
             onChange={setJobDescription}
             loading={jobDescriptionSummaryMutation.isPending}
           />
@@ -137,6 +142,9 @@ const SetupInterview: React.FC = () => {
             }
           }}
         >
+          <Typography variant="h6" fontWeight="medium" gutterBottom>
+            Resume
+          </Typography>
           <FileUpload
             resumeId={interviewState.resumeId}
             setResumeId={setResume}
@@ -173,27 +181,27 @@ const SetupInterview: React.FC = () => {
             }}
           >
             <Typography variant="h6" fontWeight="medium">
-              Interviewers
+              Interview Settings (Optional)
             </Typography>
             <Button
-              startIcon={<AddIcon />}
+              startIcon={showInterviewers ? <RemoveIcon /> : <AddIcon />}
               onClick={() => setShowInterviewers(!showInterviewers)}
               color="primary"
               variant="text"
               sx={{ fontWeight: 500 }}
             >
-              {showInterviewers ? "Hide" : "Configure Interviewers"}
+              {showInterviewers ? "Hide" : "Configure Interview Settings"}
             </Button>
           </Box>
 
-          {showInterviewers && (
+          <Collapse in={showInterviewers} timeout={300}>
             <InterviewerSetup
               interviewer={interviewState.interviewer}
               setInterviewer={setInterviewer}
               settings={interviewState.settings}
               setSettings={setSettings}
             />
-          )}
+          </Collapse>
         </Paper>
       ),
       isValid: true // Interviewers are optional

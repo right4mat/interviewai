@@ -152,7 +152,7 @@ export function UploadResumeCard() {
           Resume
         </Typography>
 
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 1, mb: 2, opacity: isExtracting || isDeleting ? 0.5 : 1 }}>
+        <Card  elevation={3} sx={{ p: 2, borderRadius: 1, mb: 2, opacity: isExtracting || isDeleting ? 0.5 : 1 }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <PictureAsPdfIcon color="error" />
             <Box sx={{ flexGrow: 1 }}>
@@ -164,7 +164,7 @@ export function UploadResumeCard() {
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Stack>
-        </Paper>
+        </Card>
 
         {isExtracting && (
           <Box sx={{ width: "100%", mt: 1 }}>
