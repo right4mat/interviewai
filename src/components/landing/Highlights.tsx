@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { brand } from '@/theme/themePrimitives';
 
@@ -70,6 +70,11 @@ export function Highlights({ title, description, highlights }: HighlightsConfig)
                   height: '100%',
                   borderColor: 'hsla(220, 25%, 25%, 0.3)',
                   backgroundColor: 'grey.100',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-10px)',
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+                  },
                 }}
               >
                 <Box sx={{ opacity: '70%' }}>{item.icon}</Box>

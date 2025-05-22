@@ -1,5 +1,5 @@
 "use client";
-import { SettingsConfig } from "@/blocks/app/Settings";
+import { type SettingsConfig } from "@/blocks/app/Settings";
 import { pricing } from "@/pricing";
 
 // General settings configuration

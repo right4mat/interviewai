@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectProps } from '@mui/material/Select';
+import Select, { type SelectProps } from '@mui/material/Select';
 import { useColorScheme } from '@mui/material/styles';
 
 export default function ColorModeSelect(props: SelectProps) {

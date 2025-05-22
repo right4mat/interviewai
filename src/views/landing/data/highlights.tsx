@@ -5,8 +5,7 @@ import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 import TouchAppIcon from '@mui/icons-material/TouchApp';
 import DescriptionIcon from '@mui/icons-material/Description';
-import branding from "@/branding.json"
-import { HighlightsConfig } from "@/components/landing/Highlights";
+import { type HighlightsConfig } from "@/components/landing/Highlights";
 
 
 export const highlights: HighlightsConfig = {

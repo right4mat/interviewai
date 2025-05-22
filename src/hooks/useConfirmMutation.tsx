@@ -1,5 +1,5 @@
 // src/hooks/useConfirmMutation.ts
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
+import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { useState } from "react";
 import CustomizedConfirmDialog from "@/components/shared/CustomizedConfirmDialog";
 

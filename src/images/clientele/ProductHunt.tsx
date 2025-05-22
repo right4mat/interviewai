@@ -33,7 +33,7 @@ export default function GrainCorp({ imageSize }: GrainCorpProps) {
             <path d="M0 640h1425V0H0v640z" />
           </clipPath>
         </defs>
-        <g clip-path="url(#A)" transform="matrix(.249714 0 0 -.249714 -49.942762 109.874083)">
+        <g clipPath="url(#A)" transform="matrix(.249714 0 0 -.249714 -49.942762 109.874083)">
           <path d="M440 320c0-66.274-53.726-120-120-120s-120 53.726-120 120 53.726 120 120 120 120-53.726 120-120" fill={theme.palette.primary.main} />
           <path
             d="M336 320h-34v36h34c9.94 0 18-8.06 18-18s-8.06-18-18-18m0 60h-58V260h24v36h34c23.196 0 42 18.804 42 42s-18.804 42-42 42"

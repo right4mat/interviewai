@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import Script from "next/script";
 import { usePrevious } from "@/utils/util";
 import { useAuth } from "@/utils/auth";

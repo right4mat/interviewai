@@ -77,7 +77,7 @@ Do not include any other text or formatting.
       response_format: { type: "json_object" }
     });
 
-    const responseContent = response.choices[0].message.content?.trim() || '';
+    const responseContent = response?.choices?.[0]?.message?.content?.trim() || '';
     
     // Parse the response string into an object
     const { company, questions } = JSON.parse(responseContent);

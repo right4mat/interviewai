@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect, createElement, useMemo, ReactNode } from 'react';
+import { useState, useRef, useEffect, createElement, useMemo, type ReactNode } from 'react';
 
 // @mui
 import Box from '@mui/material/Box';
@@ -33,7 +33,7 @@ export default function LazySection({
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isVisible) {
+        if (entry?.isIntersecting && !isVisible) {
           setIsVisible(true);
           Promise.all(sectionList.map((section) => 
             section.importFunc().then((module) => module.default)
@@ -53,7 +53,7 @@ export default function LazySection({
   return (
     <Box ref={ref} sx={{ minHeight: placeholderHeight }}>
       {isVisible && loadedComponents.every((component) => component)
-        ? sectionList.map((section, index) => createElement(loadedComponents[index], { key: index, ...section.props }))
+        ? sectionList.map((section, index) => createElement(loadedComponents[index] ?? (() => null), { key: index, ...section.props }))
         : isVisible && fallback}
     </Box>
   );

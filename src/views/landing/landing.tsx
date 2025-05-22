@@ -8,7 +8,6 @@ import { Hero } from "@/components/landing/Hero";
 import { Fade } from "@mui/material";
 import { hero } from "@/views/landing/data/hero";
 import { clientele } from "@/views/landing/data/clientele";
-import { features } from "@/views/landing/data/features";
 import { testimonials } from "@/views/landing/data/testimonials";
 import { highlights } from "@/views/landing/data/highlights";
 import { pricing } from "@/pricing";
@@ -101,7 +100,7 @@ export default function LandingPage() {
 
         <Fade in={visibleSections.features || loadedSections.features} timeout={1000}>
           <div ref={sectionRefs.features} id="features">
-            <Features {...features} />
+            <Features />
           </div>
         </Fade>
 

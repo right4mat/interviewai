@@ -1,5 +1,5 @@
 "use client";
-import { FormControl, Select, MenuItem, SelectChangeEvent, OutlinedInput, FormLabel, SxProps, FormHelperText } from "@mui/material";
+import { FormControl, Select, MenuItem, type SelectChangeEvent, OutlinedInput, FormLabel, type SxProps, FormHelperText } from "@mui/material";
 
 interface CustomSelectProps {
   name: string;

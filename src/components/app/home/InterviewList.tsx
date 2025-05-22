@@ -23,15 +23,15 @@ import {
 import moment from "moment";
 import CustomizedDataGrid from "@/components/shared/CustomizedDataGrid";
 import ActionButton from "@/components/shared/ActionButton";
-import { InterviewListResponse } from "./types";
+import { type InterviewListResponse } from "./types";
 import { useLoadInterview, useDeleteInterview } from "@/services/appServices";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { useRouter } from "next/navigation";
 import AttemptsDialog from "./AttemptsDialog";
 import ScoreProgress from "@/components/app/shared/ScoreProgress";
 import { InterviewTypeChip, DifficultyChip } from "@/components/app/shared/StyledChips";
-import { GridRenderCellParams } from "@mui/x-data-grid";
-import { GridColDef } from "@mui/x-data-grid";
+import { type GridRenderCellParams } from "@mui/x-data-grid";
+import { type GridColDef } from "@mui/x-data-grid";
 
 interface InterviewListProps {
   interviews: InterviewListResponse[];

@@ -2,9 +2,9 @@
 
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { FlatNamespace, KeyPrefix } from 'i18next'
+import { type FlatNamespace, type KeyPrefix } from 'i18next'
 import i18next from './i18next'
-import { useTranslation, UseTranslationOptions, UseTranslationResponse, FallbackNs } from 'react-i18next'
+import { useTranslation, type UseTranslationOptions, type UseTranslationResponse, type FallbackNs } from 'react-i18next'
 
 const runsOnServerSide = typeof window === 'undefined'
 

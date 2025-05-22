@@ -9,8 +9,8 @@ import Typography from '@mui/material/Typography';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import MenuButton from './MenuButton';
-import { MenuContentProps ,MenuContent} from './MenuContent';
-import {CardAlert,  CardAlertProps} from './CardAlert';
+import { type MenuContentProps, MenuContent } from './MenuContent';
+import { CardAlert, type CardAlertProps } from './CardAlert';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import { useAuth } from '@/utils/auth';
 

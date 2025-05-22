@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Avatar from '@mui/material/Avatar';
 import { Card, Collapse } from '@mui/material';
 import CustomInput from '@/components/shared/CustomizedInput';
-import { Interviewer } from '@/types/interview';
+import { type Interviewer } from '@/types/interview';
 
 interface InterviewerCardProps {
   interviewer: Interviewer;

@@ -8,7 +8,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CodeIcon from '@mui/icons-material/Code';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
-import { InterviewSettings } from '@/types/interview';
+import { type InterviewSettings } from '@/types/interview';
 
 interface InterviewSettingsCardProps {
   settings: InterviewSettings;

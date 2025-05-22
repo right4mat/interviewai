@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import LoaderOverlay from "@/components/shared/LoaderOverlay";
 import { useT } from '@/i18n/client';
-import { PricingTier } from "@/types/pricing";
+import { type PricingTier } from "@/types/pricing";
 import { PricingTierCard } from "@/components/shared/PricingTierCard";
 
 export function Pricing({ plans, hideHeader = false }: any) {

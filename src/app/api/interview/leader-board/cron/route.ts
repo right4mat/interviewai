@@ -32,10 +32,14 @@ const candidatePool: Candidate[] = [
 
 function getNewCandidate(currentLeaders: Leader[]): Leader {
   // Find a random candidate that's not currently in the leaderboard
-  let candidate: Candidate;
+  let candidate: Candidate | undefined;
   do {
     candidate = candidatePool[Math.floor(Math.random() * candidatePool.length)];
-  } while (currentLeaders.some(leader => leader.name === candidate.name));
+  } while (candidate && currentLeaders.some(leader => leader.name === candidate?.name));
+
+  if (!candidate) {
+    throw new Error("No available candidates found");
+  }
 
   // Generate realistic starting stats
   const averageScore = Math.floor(70 + Math.random() * 10); // New candidates start with 70-80 score

@@ -13,8 +13,8 @@ import SideMenuMobile from '@/components/app/SideMenuMobile';
 import MenuButton from '@/components/app/MenuButton';
 import ColorModeIconDropdown from '@/components/theme/ColorModeIconDropdown';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import { MenuContentProps } from '@/components/app/MenuContent';
-import { CardAlertProps } from '@/components/app/CardAlert';
+import { type MenuContentProps } from '@/components/app/MenuContent';
+import { type CardAlertProps } from '@/components/app/CardAlert';
 import Logo from '@/icons/LogoDash';
 import LogoIcon from '@/icons/LogoIcon';
 

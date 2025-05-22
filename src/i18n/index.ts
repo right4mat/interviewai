@@ -1,5 +1,5 @@
-import { Namespace, FlatNamespace, KeyPrefix } from 'i18next'
-import { FallbackNs } from 'react-i18next'
+import { type Namespace, type FlatNamespace, type KeyPrefix } from 'i18next'
+import { type FallbackNs } from 'react-i18next'
 import i18next from  './i18next'
 import { headerName } from './settings'
 import { headers } from 'next/headers'

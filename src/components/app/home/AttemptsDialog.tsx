@@ -8,7 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import CustomizedDataGrid from "../../shared/CustomizedDataGrid";
-import { GridColDef } from "@mui/x-data-grid";
+import { type GridColDef } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 // Import icons for status chips
@@ -31,10 +31,10 @@ import { useInterviewStore } from "@/stores/interviewStore";
 import ScoreProgress from "@/components/app/shared/ScoreProgress";
 import QuestionsProgress from "@/components/app/shared/QuestionsProgress";
 // Confirmation dialog imports
-import { QuestionAnswer } from "@/types/interview";
+import type { QuestionAnswer } from "@/types/interview";
+import type { TransitionProps } from "@mui/material/transitions";
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import AttemptDetailsView from "./AttemptDetailsView";
 
@@ -85,7 +85,7 @@ export default function AttemptsDialog({ open, onClose, interviewId }: AttemptsD
   // Use the useInterviewAttempts hook with proper null handling
   const { data: interviewAttempts, isLoading } = useInterviewAttempts(interviewId);
 
-  const { mutate: deleteAttempt, ConfirmDialog } = useDeleteAttempt();
+  const { mutate: deleteAttempt, ConfirmDialog, isPending: isDeleteAttemptPending } = useDeleteAttempt();
 
   // Use useMemo to transform the data from the hook to match our component format
   const attempts = React.useMemo(() => {
@@ -316,7 +316,7 @@ export default function AttemptsDialog({ open, onClose, interviewId }: AttemptsD
         >
           {!isFullscreen ? (
             <CustomizedDataGrid
-              loading={isLoading || loadInterview.isPending || deleteAttempt.isPending}
+              loading={isLoading || loadInterview.isPending || isDeleteAttemptPending}
               rows={attempts}
               columns={columns}
               pageSize={5}

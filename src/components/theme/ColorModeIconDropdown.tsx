@@ -4,7 +4,7 @@ import DarkModeIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeIcon from '@mui/icons-material/LightModeRounded';
 import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
 import Box from '@mui/material/Box';
-import IconButton, { IconButtonOwnProps } from '@mui/material/IconButton';
+import IconButton, { type IconButtonOwnProps } from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useColorScheme } from '@mui/material/styles';

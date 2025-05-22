@@ -1,7 +1,7 @@
 "use client";
 import { AuthProvider } from "@/utils/auth";
 import { QueryClientProvider } from "@/utils/db";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 // @types
 interface ProviderWrapperProps {

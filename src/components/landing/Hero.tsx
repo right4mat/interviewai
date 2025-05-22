@@ -10,7 +10,7 @@ import { styled } from "@mui/material/styles";
 import Link from "next/link";
 import { PAGE_PATH } from "@/path";
 import { useT } from "@/i18n/client";
-import { HeroConfig } from "@/views/landing/data/hero";
+import { type HeroConfig } from "@/views/landing/data/hero";
 import { TypeAnimation } from "react-type-animation";
 import { useSearchParams, useRouter } from "next/navigation";
 import Badge from "./badge";
@@ -197,13 +197,15 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
 
   const showRandomToast = () => {
     const randomEntry = dummyData[Math.floor(Math.random() * dummyData.length)];
-    addToast(
-      <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-start", gap: 1, flexDirection: "column" }}>
-        <DifficultyChip label={randomEntry.difficulty} size="small" />
-        {`${randomEntry.firstName} started interview ${randomEntry.timeAgo} for ${randomEntry.company}`}
-      </Box>,
-      "brand"
-    );
+    if (randomEntry?.difficulty) {
+      addToast(
+        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "flex-start", gap: 1, flexDirection: "column" }}>
+          <DifficultyChip label={randomEntry.difficulty} size="small" />
+          {`${randomEntry?.firstName} started interview ${randomEntry?.timeAgo} for ${randomEntry?.company}`}
+        </Box>,
+        "brand"
+      );
+    }
   };
 
   React.useEffect(() => {

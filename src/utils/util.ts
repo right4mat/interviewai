@@ -75,7 +75,7 @@ export const scrollToSection = (id: string): void => {
 // Get waveform data from base64 audio for visualization
 export const getAudioWaveform = async (base64Audio: string): Promise<{ waveform: number[], duration: number }> => {
   const audioContext = new AudioContext();
-  const audioData = atob(base64Audio.split(',')[1]); // Remove data URL prefix and decode
+  const audioData = atob(base64Audio.split(',')?.[1] ?? ''); // Remove data URL prefix and decode
   const arrayBuffer = new ArrayBuffer(audioData.length);
   const view = new Uint8Array(arrayBuffer);
   

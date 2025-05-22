@@ -1,7 +1,7 @@
 // @next
 import dynamic from 'next/dynamic';
-import { Metadata } from 'next';
-import { ReactNode } from 'react';
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 // @project
 import { SEO_CONTENT } from '@/metadata';

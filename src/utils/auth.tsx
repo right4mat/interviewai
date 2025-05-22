@@ -6,8 +6,8 @@ import { useUser, updateUser } from "./db";
 import { useRouter } from "next/navigation";
 import PageLoader from "@/components/shared/Loader";
 import analytics from "./analytics";
-import { User } from "@supabase/supabase-js";
-import { Provider } from "@supabase/supabase-js";
+import { type User } from "@supabase/supabase-js";
+import { type Provider } from "@supabase/supabase-js";
 import { AFTER_AUTH_PATH } from "@/path";
 
 // Whether to merge extra user data from database into `auth.user`

@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import useScrollPosition from "@/hooks/useScrollPosition";

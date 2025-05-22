@@ -1,5 +1,5 @@
 "use client";
-import { FormControl, FormLabel, OutlinedInput, OutlinedInputProps, FormHelperText } from "@mui/material";
+import { FormControl, FormLabel, OutlinedInput, type OutlinedInputProps, FormHelperText } from "@mui/material";
 
 interface CustomInputProps extends Omit<OutlinedInputProps, "onChange"> {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;

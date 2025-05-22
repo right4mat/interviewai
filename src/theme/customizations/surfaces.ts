@@ -1,5 +1,5 @@
 'use client';
-import { alpha, Theme, Components } from '@mui/material/styles';
+import { alpha, type Theme, type Components } from '@mui/material/styles';
 import { gray } from '../themePrimitives';
 
 /* eslint-disable import/prefer-default-export */

@@ -1,5 +1,5 @@
 import { paperClasses } from "@mui/material/Paper";
-import { alpha, Theme } from "@mui/material/styles";
+import { alpha, type Theme } from "@mui/material/styles";
 import type { GridClassKey } from "@mui/x-data-grid";
 import { menuItemClasses } from "@mui/material/MenuItem";
 import { listItemIconClasses } from "@mui/material/ListItemIcon";

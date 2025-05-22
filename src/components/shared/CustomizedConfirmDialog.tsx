@@ -6,8 +6,8 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  SxProps,
-  Theme,
+  type SxProps,
+  type Theme,
   CircularProgress
 } from "@mui/material";
 

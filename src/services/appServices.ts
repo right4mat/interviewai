@@ -1,12 +1,12 @@
 import { apiRequest } from "@/utils/util";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Interviewer, QuestionAnswer } from "@/types/interview";
+import { type Interviewer, type QuestionAnswer } from "@/types/interview";
 import { convertPdfToImageArray } from "@/utils/util";
 import { useConfirmMutation } from "@/hooks/useConfirmMutation";
 import supabase from "@/utils/supabase";
-import { QueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/utils/auth";
 import { client } from "@/utils/db";
+
 interface ScoreAnswerRequest {
   question: string;
   answer: string;
@@ -344,11 +344,11 @@ export const useInterviewList = () => {
 
       if (statsError) throw statsError;
 
-      // Transform the data to match InterviewListResponse shape
+      // Transform the data to match InterviewListResponse shape and ensure non-null values
       return stats.map((stat) => ({
         ...stat,
-        avg: stat.question_answers?.[0]?.avg,
-        count: stat.question_answers?.[0]?.count
+        avg: stat.question_answers?.[0]?.avg ?? 0,
+        count: stat.question_answers?.[0]?.count ?? 0
       }));
     }
   });

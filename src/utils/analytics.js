@@ -1,6 +1,7 @@
 
 
 import Analytics from "analytics";
+//@ts-ignore
 import googleAnalyticsPlugin from "@analytics/google-analytics";
 import Router from "next/router";
 

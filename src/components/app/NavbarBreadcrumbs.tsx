@@ -1,6 +1,6 @@
 "use client";
 import * as React from 'react';
-import { styled, Theme } from '@mui/material/styles';
+import { styled, type Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs, { breadcrumbsClasses } from '@mui/material/Breadcrumbs';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';

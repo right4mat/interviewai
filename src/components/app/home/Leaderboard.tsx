@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Box, Typography, Card, CardContent, Stack, CircularProgress } from "@mui/material";
 import { EmojiEvents as TrophyIcon } from "@mui/icons-material";
 import ScoreProgress from "@/components/app/shared/ScoreProgress";
-import { DifficultyChip, DifficultyLevel } from "@/components/app/shared/StyledChips";
+import { DifficultyChip, type DifficultyLevel } from "@/components/app/shared/StyledChips";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLeaders } from "@/services/appServices";
 

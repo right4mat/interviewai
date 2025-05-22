@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { DataGrid, GridDensity, GridRowParams, GridSlotsComponent, GridRowSelectionModel, GridCallbackDetails } from "@mui/x-data-grid";
+import { DataGrid, type GridDensity, type GridRowParams, type GridSlotsComponent, type GridRowSelectionModel, type GridCallbackDetails } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";

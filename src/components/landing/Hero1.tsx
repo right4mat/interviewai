@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { PAGE_PATH } from '@/path';
 import { useT } from '@/i18n/client';
-import { HeroConfig } from '@/views/landing/data/hero';
+import { type HeroConfig } from '@/views/landing/data/hero';
 
 const StyledBox = styled('div')(({ theme }) => ({
   alignSelf: 'center',

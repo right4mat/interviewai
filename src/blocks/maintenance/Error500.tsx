@@ -1,5 +1,5 @@
 'use client';
-import { ReactElement } from 'react';
+import { type ReactElement } from 'react';
 
 // @mui
 import Button from '@mui/material/Button';

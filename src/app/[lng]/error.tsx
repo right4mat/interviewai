@@ -2,7 +2,7 @@
 
 // @project
 import Error500Page from '@/blocks/maintenance/Error500';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 /***************************  ERROR 500 - DATA  ***************************/
 

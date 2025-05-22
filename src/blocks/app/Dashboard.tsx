@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import type {} from "@mui/x-date-pickers/themeAugmentation";
 import type {} from "@mui/x-charts/themeAugmentation";
 import type {} from "@mui/x-tree-view/themeAugmentation";
@@ -8,8 +8,8 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Header from "@/components/app/Header";
 import type {} from "@mui/material/themeCssVarsAugmentation";
-import { SideMenuProps, SideMenu } from "@/components/app/SideMenu";
-import { AppNavbar, AppNavbarProps } from "@/components/app/AppNavbar";
+import { SideMenu, type SideMenuProps } from "@/components/app/SideMenu";
+import { AppNavbar, type AppNavbarProps } from "@/components/app/AppNavbar";
 export interface DashboardProps {
   sideMenu: SideMenuProps;
   appNavbar: AppNavbarProps;

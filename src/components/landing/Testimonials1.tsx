@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { useTranslation } from "react-i18next";
-import { TestimonialsConfig } from "@/views/landing/data/testimonials";
+import { type TestimonialsConfig } from "@/views/landing/data/testimonials";
 
 export function Testimonials({ testimonials }: TestimonialsConfig) {
   const { t } = useTranslation("landing");

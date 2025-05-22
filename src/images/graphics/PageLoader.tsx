@@ -3,12 +3,12 @@
 // @mui
 import { keyframes } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
-import CircularProgress, { CircularProgressProps } from '@mui/material/CircularProgress';
+import CircularProgress, { type CircularProgressProps } from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
 
 //@project
 import LogoSection from '@/icons/LogoIcon';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 const rotateAnimation = keyframes`
   0% { transform: rotate(0deg) }

@@ -37,12 +37,12 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
 
   React.useEffect(() => {
     if (isInitializedRef.current) return;
-    
+
     const positions = [];
     const colors = [];
     const lastRadius = [];
     const vertices = 2000;
-    
+
     // Generate points in a sphere pattern
     for (let i = 0; i < vertices; i++) {
       const theta = Math.random() * Math.PI * 2;
@@ -55,7 +55,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
 
       positions.push(x, y, z);
       lastRadius.push(1, 1, 1);
-      
+
       // Initialize with base color
       const baseColor = new THREE.Color(0x4a90e2);
       colors.push(baseColor.r, baseColor.g, baseColor.b);
@@ -70,8 +70,8 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
     originalPositionsRef.current = positionsArray.slice();
 
     if (geometryRef.current) {
-      geometryRef.current.setAttribute('position', new THREE.Float32BufferAttribute(positionsArray, 3));
-      geometryRef.current.setAttribute('color', new THREE.Float32BufferAttribute(colorsArray, 3));
+      geometryRef.current.setAttribute("position", new THREE.Float32BufferAttribute(positionsArray, 3));
+      geometryRef.current.setAttribute("color", new THREE.Float32BufferAttribute(colorsArray, 3));
       geometryRef.current.computeBoundingSphere();
     }
 
@@ -79,7 +79,15 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
   }, []);
 
   useFrame((state, delta) => {
-    if (!pointsRef.current || !positionsRef.current || !originalPositionsRef.current || !geometryRef.current || !colorsRef.current || !lastRadiusRef.current) return;
+    if (
+      !pointsRef.current ||
+      !positionsRef.current ||
+      !originalPositionsRef.current ||
+      !geometryRef.current ||
+      !colorsRef.current ||
+      !lastRadiusRef.current
+    )
+      return;
 
     frameRef.current += 0.01;
     const frame = frameRef.current;
@@ -114,27 +122,27 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
     lastVolumeLevelRef.current = volumeLevel;
 
     // Update and clean up pulse waves
-    pulseWavesRef.current = pulseWavesRef.current.filter(wave => {
+    pulseWavesRef.current = pulseWavesRef.current.filter((wave) => {
       wave.position += 0.15;
       return wave.position < Math.PI;
     });
 
     // Update positions and colors
     for (let i = 0; i < positions.length; i += 3) {
-      const originalX = originalPositions[i];
-      const originalY = originalPositions[i + 1];
-      const originalZ = originalPositions[i + 2];
-      
+      const originalX = originalPositions[i] || 0;
+      const originalY = originalPositions[i + 1] || 0;
+      const originalZ = originalPositions[i + 2] || 0;
+
       // Create a smoother base animation using multiple frequencies
       const distance = Math.sqrt(originalX ** 2 + originalY ** 2 + originalZ ** 2);
       const slowWave = Math.sin(frame * 0.5 + distance * 2) * 0.003;
       const mediumWave = Math.sin(frame * 0.8 + distance * 3) * 0.002;
-      
+
       // Always have a breathing effect
       const breathingAmplitude = isGettingReply ? 0.04 : 0.015; // More pronounced when getting reply
       const breathingFrequency = isGettingReply ? 1.2 : 0.7; // Faster breathing when getting reply
       const breathingEffect = Math.sin(frame * breathingFrequency) * breathingAmplitude;
-      
+
       const baseOffset = slowWave + mediumWave + breathingEffect;
       let targetRadius = 1 + baseOffset;
 
@@ -143,41 +151,39 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
       const colorIndex = Math.floor(((uniqueOffset + 1) / 2) * brandColors.length);
       const nextColorIndex = (colorIndex + 1) % brandColors.length;
       const lerpFactor = ((uniqueOffset + 1) / 2) * brandColors.length - colorIndex;
-      
-      const currentColor = brandColors[colorIndex];
-      const nextColor = brandColors[nextColorIndex];
-      
+
+      const currentColor = brandColors[colorIndex] || brandColors[0] as THREE.Color;
+      const nextColor = brandColors[nextColorIndex] || brandColors[0] as THREE.Color;
+
       // Interpolate between colors
       const finalColor = new THREE.Color().lerpColors(currentColor, nextColor, lerpFactor);
-      
+
       colors[i] = finalColor.r;
       colors[i + 1] = finalColor.g;
       colors[i + 2] = finalColor.b;
-      
+
       if (isGettingReply) {
         // Add more pronounced pulsing when getting reply
         const pulsePhase = Math.sin(frame * 1.5 + distance * 2);
         targetRadius += pulsePhase * 0.02;
       }
-      
+
       if (isAISpeaking) {
         // Add effect from each active pulse wave with smoother transitions
         for (const wave of pulseWavesRef.current) {
-          const waveEffect = Math.sin(distance * 6 - wave.position * 2) * 
-                           Math.exp(-wave.position * 0.5) * 
-                           wave.strength * 0.04;
+          const waveEffect = Math.sin(distance * 6 - wave.position * 2) * Math.exp(-wave.position * 0.5) * wave.strength * 0.04;
           targetRadius += waveEffect;
         }
-        
+
         // Smoother oscillation pattern for volume response
         const fastOsc = Math.sin(frame * 8 + distance * 3) * 0.3;
         const mediumOsc = Math.sin(frame * 5 + distance * 2) * 0.5;
         const slowOsc = Math.sin(frame * 3 + distance * 1.5) * 0.2;
-        
+
         const combinedOsc = (fastOsc + mediumOsc + slowOsc) * 0.15 + 0.1;
-        const volumeResponse = combinedOsc * (volumeLevel/2) * 0.008;
+        const volumeResponse = combinedOsc * (volumeLevel / 2) * 0.008;
         targetRadius += volumeResponse;
-        
+
         // Add vibration effect when speaking, with intensity based on volume
         const vibrationIntensity = volumeLevel * 0.0002; // Dramatically reduced from 0.0008
         const vibrationSpeed = 6 + volumeLevel * 0.5; // Reduced from 8 + volumeLevel * 1
@@ -187,7 +193,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
 
       // Smooth interpolation between current and target radius
       const easing = 0.15; // Adjust this value to control smoothing (0-1)
-      const currentRadius = lastRadius[i];
+      const currentRadius = lastRadius[i] || 1;
       const interpolatedRadius = currentRadius + (targetRadius - currentRadius) * easing;
       lastRadius[i] = interpolatedRadius;
       lastRadius[i + 1] = interpolatedRadius;
@@ -198,10 +204,14 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
       positions[i + 2] = originalZ * interpolatedRadius;
     }
 
-    geometryRef.current.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometryRef.current.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    geometryRef.current.attributes.position.needsUpdate = true;
-    geometryRef.current.attributes.color.needsUpdate = true;
+    if (geometryRef.current.attributes.position) {
+      geometryRef.current.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometryRef.current.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geometryRef.current.attributes.position.needsUpdate = true;
+      if (geometryRef.current.attributes.color) {
+        geometryRef.current.attributes.color.needsUpdate = true;
+      }
+    }
   });
 
   return (
@@ -224,13 +234,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
           args={[new Float32Array(), 3]}
         />
       </bufferGeometry>
-      <pointsMaterial
-        vertexColors={true}
-        size={0.02}
-        sizeAttenuation={true}
-        transparent={true}
-        opacity={0.8}
-      />
+      <pointsMaterial vertexColors={true} size={0.02} sizeAttenuation={true} transparent={true} opacity={0.8} />
     </points>
   );
 }
@@ -238,11 +242,7 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
 export const WireframeSphere = ({ isAISpeaking, isGettingReply, volumeLevel, participantName }: WireframeSphereProps) => {
   return (
     <div style={{ width: "35vw", height: "35vw", opacity: isGettingReply ? 0.9 : 0.8 }}>
-      <Canvas
-        camera={{ position: [0, 0, 2], fov: 75 }}
-        gl={{ antialias: true, alpha: true }}
-        style={{ background: 'transparent' }}
-      >
+      <Canvas camera={{ position: [0, 0, 2], fov: 75 }} gl={{ antialias: true, alpha: true }} style={{ background: "transparent" }}>
         <Points isAISpeaking={isAISpeaking} isGettingReply={isGettingReply} volumeLevel={volumeLevel} />
       </Canvas>
     </div>

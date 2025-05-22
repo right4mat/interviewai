@@ -7,7 +7,7 @@ import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 
 // Types
 export type InterviewType = 'technical' | 'behavioral' | 'mixed' | string;

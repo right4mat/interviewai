@@ -96,7 +96,7 @@ Keep the review professional, constructive, and focused on helping the candidate
       response_format: { type: "json_object" }
     });
 
-    const reviewData = JSON.parse(response.choices[0].message.content?.trim() || '{"gotJobProb": "0", "review": "Failed to generate review"}');
+    const reviewData = JSON.parse(response?.choices?.[0]?.message?.content?.trim() || '{"gotJobProb": "0", "review": "Failed to generate review"}');
     
     return NextResponse.json({ 
       status: "success",

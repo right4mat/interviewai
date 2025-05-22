@@ -3,12 +3,11 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import MuiChip from '@mui/material/Chip';
+import Chip, { type ChipProps } from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { useT } from '@/i18n/client';
-
 
 interface FeatureItem {
   icon: React.ReactNode;
@@ -18,28 +17,24 @@ interface FeatureItem {
   imageDark: string;
 }
 
-interface ChipProps {
+interface CustomChipProps extends ChipProps {
   selected?: boolean;
 }
 
-const Chip = styled(MuiChip)<ChipProps>(({ theme }) => ({
-  variants: [
-    {
-      props: ({ selected }) => selected,
-      style: {
-        background:
-          'linear-gradient(to bottom right, hsl(210, 98%, 48%), hsl(210, 98%, 35%))',
-        color: 'hsl(0, 0%, 100%)',
-        borderColor: (theme.vars || theme).palette.primary.light,
-        '& .MuiChip-label': {
-          color: 'hsl(0, 0%, 100%)',
-        },
-        ...theme.applyStyles('dark', {
-          borderColor: (theme.vars || theme).palette.primary.dark,
-        }),
-      },
+const ChipCustom = styled(Chip, {
+  shouldForwardProp: (prop) => prop !== 'selected',
+})<CustomChipProps>(({ theme, selected }) => ({
+  ...(selected && {
+    background: 'linear-gradient(to bottom right, hsl(210, 98%, 48%), hsl(210, 98%, 35%))',
+    color: 'hsl(0, 0%, 100%)',
+    borderColor: (theme.vars || theme).palette.primary.light,
+    '& .MuiChip-label': {
+      color: 'hsl(0, 0%, 100%)',
     },
-  ],
+    ...theme.applyStyles('dark', {
+      borderColor: (theme.vars || theme).palette.primary.dark,
+    }),
+  })
 }));
 
 interface MobileLayoutProps {
@@ -64,7 +59,7 @@ export function MobileLayout({
     >
       <Box sx={{ display: 'flex', gap: 2, overflow: 'auto' }}>
         {selectedFeature && (
-          <Chip
+          <ChipCustom
             size="medium"
             label={t(selectedFeature.title)}
             onClick={() => handleItemClick(0)}
@@ -87,9 +82,9 @@ export function MobileLayout({
           style={
             selectedFeature
               ? ({
-                  '--items-imageLight': selectedFeature.imageLight,
-                  '--items-imageDark': selectedFeature.imageDark,
-                } as any)
+                  '--items-imageLight': `url(${selectedFeature.imageLight})`,
+                  '--items-imageDark': `url(${selectedFeature.imageDark})`,
+                } as React.CSSProperties)
               : {}
           }
         />
@@ -113,6 +108,8 @@ export interface Feature {
   icon: React.ReactNode;
   imageLight: string;
   imageDark: string;
+  title: string;
+  description: string;
 }
 
 export interface FeaturesConfig {
@@ -215,7 +212,9 @@ export function Features({ features }: FeaturesConfig) {
             selectedItemIndex={selectedItemIndex}
             handleItemClick={handleItemClick}
             selectedFeature={{
-              ...selectedFeature,
+              icon: selectedFeature?.icon,
+              imageLight: selectedFeature?.imageLight ?? '',
+              imageDark: selectedFeature?.imageDark ?? '',
               title: tFeatures(`feature${selectedItemIndex + 1}.title`),
               description: tFeatures(`feature${selectedItemIndex + 1}.description`)
             }}
@@ -251,9 +250,9 @@ export function Features({ features }: FeaturesConfig) {
               style={
                 selectedFeature
                   ? ({
-                      '--items-imageLight': selectedFeature.imageLight,
-                      '--items-imageDark': selectedFeature.imageDark,
-                    } as any)
+                      '--items-imageLight': `url(${selectedFeature.imageLight})`,
+                      '--items-imageDark': `url(${selectedFeature.imageDark})`,
+                    } as React.CSSProperties)
                   : {}
               }
             />

@@ -1,5 +1,5 @@
 "use client";
-import { FAQConfig } from "@/components/landing/FAQ";
+import { type FAQConfig } from "@/components/landing/FAQ";
 
 export const faq: FAQConfig = {
   faqs: [

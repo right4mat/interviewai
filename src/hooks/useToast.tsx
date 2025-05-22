@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import { CSSProperties, ReactElement, ReactNode } from "react";
-import { toast, Slide, ToastIcon } from "react-toastify";
-import { useTheme, Theme } from "@mui/material";
+import { type CSSProperties, type ReactElement, type ReactNode } from "react";
+import { toast, Slide, type ToastIcon } from "react-toastify";
+import { useTheme, type Theme } from "@mui/material";
 import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";

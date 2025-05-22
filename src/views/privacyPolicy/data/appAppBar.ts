@@ -1,6 +1,6 @@
 "use client";
 import { PAGE_PATH } from "@/path";
-import { AppBarConfig } from "@/components/shared/AppAppBar";
+import { type AppBarConfig } from "@/components/shared/AppAppBar";
 
 export const appBar: AppBarConfig = {
   translationKey: "privacyPolicy",

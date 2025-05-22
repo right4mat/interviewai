@@ -10,7 +10,7 @@ import Fade from "@mui/material/Fade";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import ScoreProgress from "@/components/app/shared/ScoreProgress";
-import { AttemptData } from "./AttemptsDialog";
+import { type AttemptData } from "./AttemptsDialog";
 
 interface AttemptDetailsViewProps {
   viewingAttempt: AttemptData | null;

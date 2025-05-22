@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import Dashboard from "@/blocks/app/Dashboard";
 import { requireAuth } from "@/utils/auth";
 import { dashboard } from "@/views/app/data/dashboard";

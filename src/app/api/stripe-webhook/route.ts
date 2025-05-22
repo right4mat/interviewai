@@ -41,7 +41,7 @@ export async function POST(
         await updateCustomerByStripeCid(session.customer as string, {
           stripeSubscriptionId: subscription.id,
           // Store the Price ID for this subscription
-          stripePriceId: subscription.items.data[0].price.id,
+          stripePriceId: subscription?.items?.data[0]?.price?.id,
           // Store the subscription status ("active" or "trialing")
           stripeSubscriptionStatus: subscription.status,
         });
@@ -76,7 +76,7 @@ export async function POST(
       case "customer.subscription.updated": {
         const subscription = object as Stripe.Subscription;
         await updateCustomerByStripeCid(subscription.customer as string, {
-          stripePriceId: subscription.items.data[0].price.id,
+          stripePriceId: subscription?.items?.data[0]?.price?.id,
           stripeSubscriptionStatus: subscription.status,
         });
 

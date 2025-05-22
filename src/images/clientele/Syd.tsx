@@ -1,6 +1,6 @@
 "use client";
 import PropTypes from "prop-types";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 // @mui
 import { useTheme } from "@mui/material/styles";

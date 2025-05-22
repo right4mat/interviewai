@@ -4,7 +4,7 @@ import {
   QueryClientProvider as QueryClientProviderBase,
 } from "@tanstack/react-query";
 import supabase from "./supabase";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export const supabaseClient = supabase
 // React Query client

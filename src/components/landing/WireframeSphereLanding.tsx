@@ -145,7 +145,7 @@ function Points({
         const shrinkFactor = baseScale - ((elapsedTime - 1.5) / 0.5) * (baseScale / 3);
         pointsRef.current.scale.set(shrinkFactor, shrinkFactor, shrinkFactor);
       } else {
-        const finalScale = isExcited ? 2/3 * 1.1 : 2/3; // Final scale is 2/3 of base scale
+        const finalScale = isExcited ? (2 / 3) * 1.1 : 2 / 3; // Final scale is 2/3 of base scale
         pointsRef.current.scale.set(finalScale, finalScale, finalScale);
         interviewStartTimeRef.current = null; // Reset after animation
       }
@@ -183,9 +183,9 @@ function Points({
 
     // Update positions and colors
     for (let i = 0; i < positions.length; i += 3) {
-      const originalX = originalPositions[i];
-      const originalY = originalPositions[i + 1];
-      const originalZ = originalPositions[i + 2];
+      const originalX = originalPositions[i] || 0;
+      const originalY = originalPositions[i + 1] || 0;
+      const originalZ = originalPositions[i + 2] || 0;
 
       // Create a smoother base animation using multiple frequencies
       const distance = Math.sqrt(originalX ** 2 + originalY ** 2 + originalZ ** 2);
@@ -206,8 +206,8 @@ function Points({
         const nextColorIndex = (colorIndex + 1) % brandColors.length;
         const lerpFactor = ((uniqueOffset + 1) / 2) * brandColors.length - colorIndex;
 
-        const currentColor = brandColors[colorIndex];
-        const nextColor = brandColors[nextColorIndex];
+        const currentColor = brandColors[colorIndex] || (brandColors[0] as THREE.Color);
+        const nextColor = brandColors[nextColorIndex] || (brandColors[0] as THREE.Color);
 
         // Interpolate between colors
         const finalColor = new THREE.Color().lerpColors(currentColor, nextColor, lerpFactor);
@@ -246,7 +246,7 @@ function Points({
 
       // Smooth interpolation between current and target radius
       const easing = 0.15; // Adjust this value to control smoothing (0-1)
-      const currentRadius = lastRadius[i];
+      const currentRadius = lastRadius[i] || 1;
       const interpolatedRadius = currentRadius + (targetRadius - currentRadius) * easing;
       lastRadius[i] = interpolatedRadius;
       lastRadius[i + 1] = interpolatedRadius;
@@ -257,10 +257,12 @@ function Points({
       positions[i + 2] = originalZ * interpolatedRadius;
     }
 
-    geometryRef.current.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    geometryRef.current.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
-    geometryRef.current.attributes.position.needsUpdate = true;
-    geometryRef.current.attributes.color.needsUpdate = true;
+    if (geometryRef.current?.attributes?.position && geometryRef.current?.attributes?.color) {
+      geometryRef.current.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometryRef.current.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geometryRef.current.attributes.position.needsUpdate = true;
+      geometryRef.current.attributes.color.needsUpdate = true;
+    }
   });
 
   return (

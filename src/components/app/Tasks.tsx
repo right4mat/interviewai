@@ -10,7 +10,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import  { SelectChangeEvent } from "@mui/material/Select";
+import { type SelectChangeEvent } from "@mui/material/Select";
 
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import CustomSelect from "@/components/shared/CustomizedSelect";

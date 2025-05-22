@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import Script from "next/script";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 // @style
 import "./globals.css";
 

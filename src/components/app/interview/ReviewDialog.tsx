@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { brand } from "@/theme/themePrimitives";
 import { useReviewInterview } from "@/services/appServices";
-import { Interviewer, QuestionAnswer } from "@/types/interview";
+import type { Interviewer, QuestionAnswer } from "@/types/interview";
 import { Gauge } from "@mui/x-charts/Gauge";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";

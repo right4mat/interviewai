@@ -1,7 +1,7 @@
 "use client";
 import { features as featuresConfig } from "@/features";
-import { FeaturesConfig } from "@/components/landing/Features";
-import { ReactNode } from "react";
+import { type FeaturesConfig } from "@/components/landing/Features1";
+import { type ReactNode } from "react";
 
 // Define a type that matches the structure of items in featuresConfig
 interface SourceFeature {

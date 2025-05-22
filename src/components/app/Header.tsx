@@ -3,7 +3,7 @@ import * as React from "react";
 import Stack from "@mui/material/Stack";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import CustomDatePicker from "@/components/app/CustomDatePicker";
-import  { NavbarBreadcrumbs, BreadcrumbItem } from "./NavbarBreadcrumbs";
+import { NavbarBreadcrumbs, type BreadcrumbItem } from "./NavbarBreadcrumbs";
 import MenuButton from "./MenuButton";
 import ColorModeIconDropdown from "@/components/theme/ColorModeIconDropdown";
 import type {} from "@mui/material/themeCssVarsAugmentation";

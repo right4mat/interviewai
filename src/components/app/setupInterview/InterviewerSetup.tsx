@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { InterviewSettings, Interviewer } from '@/types/interview';
+import { type InterviewSettings, type Interviewer } from '@/types/interview';
 import InterviewerCard from './InterviewerCard';
 import InterviewSettingsCard from './InterviewSettingsCard';
 

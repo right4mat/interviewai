@@ -3,15 +3,14 @@ import * as React from "react";
 import { Card, CardContent, Typography, Stack, Box, LinearProgress, CircularProgress } from "@mui/material";
 import BoltIcon from "@mui/icons-material/Bolt";
 import { useTheme } from "@mui/material/styles";
-import { TrendType } from "./types";
+import { type TrendType } from "./types";
 import { useAverageScore } from "@/services/appServices";
 
 interface AverageScoreCardProps {
   interval: string;
-  trend: TrendType;
 }
 
-export function AverageScoreCard({ interval, trend }: AverageScoreCardProps) {
+export function AverageScoreCard({ interval }: AverageScoreCardProps) {
   const theme = useTheme();
   const { data: score, isLoading, error } = useAverageScore();
 

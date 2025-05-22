@@ -2,7 +2,7 @@
 
 // @mui
 import { useTheme } from "@mui/material/styles";
-import { Theme } from "@mui/material/styles";
+import type { Theme } from "@mui/material/styles";
 
 export default function Loader(): string {
   const theme: Theme = useTheme();

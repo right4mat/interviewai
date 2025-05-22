@@ -188,33 +188,42 @@ export default function Footer() {
           useFlexGap
           sx={{ justifyContent: 'left', color: 'text.secondary' }}
         >
-          <IconButton
-            color="inherit"
-            size="small"
-            href={footerContent.socialLinks.github.path}
-            aria-label={t(footerContent.socialLinks.github.label)}
-            sx={{ alignSelf: 'center' }}
-          >
-            <GitHubIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            size="small"
-            href={footerContent.socialLinks.twitter.path}
-            aria-label={t(footerContent.socialLinks.twitter.label)}
-            sx={{ alignSelf: 'center' }}
-          >
-            <TwitterIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            size="small"
-            href={footerContent.socialLinks.linkedin.path}
-            aria-label={t(footerContent.socialLinks.linkedin.label)}
-            sx={{ alignSelf: 'center' }}
-          >
-            <LinkedInIcon />
-          </IconButton>
+          {footerContent?.socialLinks?.github?.path && (
+            <IconButton
+              component="a"
+              color="inherit"
+              size="small"
+              href={footerContent.socialLinks.github.path}
+              aria-label={t(footerContent.socialLinks.github.label || '')}
+              sx={{ alignSelf: 'center' }}
+            >
+              <GitHubIcon />
+            </IconButton>
+          )}
+          {footerContent?.socialLinks?.twitter?.path && (
+            <IconButton
+              component="a"
+              color="inherit"
+              size="small"
+              href={footerContent.socialLinks.twitter.path}
+              aria-label={t(footerContent.socialLinks.twitter.label || '')}
+              sx={{ alignSelf: 'center' }}
+            >
+              <TwitterIcon />
+            </IconButton>
+          )}
+          {footerContent?.socialLinks?.linkedin?.path && (
+            <IconButton
+              component="a"
+              color="inherit"
+              size="small"
+              href={footerContent.socialLinks.linkedin.path}
+              aria-label={t(footerContent.socialLinks.linkedin.label || '')}
+              sx={{ alignSelf: 'center' }}
+            >
+              <LinkedInIcon />
+            </IconButton>
+          )}
         </Stack>
       </Box>
     </Container>

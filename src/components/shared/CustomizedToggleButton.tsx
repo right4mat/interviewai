@@ -1,6 +1,6 @@
 "use client";
 import { FormControl, FormLabel, ToggleButtonGroup, ToggleButton, FormHelperText } from "@mui/material";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface ToggleOption {
   value: boolean;

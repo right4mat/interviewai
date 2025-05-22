@@ -119,7 +119,7 @@ Keep your response conversational and professional. Do not ask any follow-up que
       max_tokens: 150
     });
 
-    const responseContent = textResponse.choices[0].message.content?.trim() || "";
+    const responseContent = textResponse?.choices?.[0]?.message?.content?.trim() || "";
 
     // Generate audio from the text response
     console.time('tts-1-generation');

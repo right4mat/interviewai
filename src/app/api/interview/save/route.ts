@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
-import { User } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 import { getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers, findExistingInterview } from "../../_app";
 
 // Define schema for request validation

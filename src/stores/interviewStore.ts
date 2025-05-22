@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Interviewer, QuestionAnswer } from "@/types/interview";
+import { type Interviewer, type QuestionAnswer } from "@/types/interview";
 
 interface InterviewSettings {
   type: "technical" | "behavioral" | "mixed";

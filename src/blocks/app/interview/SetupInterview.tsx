@@ -239,7 +239,7 @@ const SetupInterview: React.FC = () => {
         <Grid size={{ xs: 12 }}>
           <Fade in key={activeStep} timeout={500}>
             <Box>
-              {currentStep.content}
+              {currentStep?.content}
 
               <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
                 <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack} disabled={activeStep === 0}>
@@ -247,10 +247,10 @@ const SetupInterview: React.FC = () => {
                 </Button>
 
                 <Button
-                  variant={!currentStep.isValid ? "outlined" : "contained"}
+                  variant={!currentStep?.isValid ? "outlined" : "contained"}
                   endIcon={activeStep < steps.length - 1 ? <ArrowForwardIcon /> : undefined}
                   onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
-                  disabled={!currentStep.isValid}
+                  disabled={!currentStep?.isValid}
                 >
                   {activeStep === steps.length - 1 ? "Complete Setup" : "Continue"}
                 </Button>

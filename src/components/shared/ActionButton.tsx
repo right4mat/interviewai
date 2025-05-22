@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import {
   Button,
   ButtonGroup,
-  ButtonProps,
+  type ButtonProps,
   ClickAwayListener,
   MenuList,
   MenuItem,

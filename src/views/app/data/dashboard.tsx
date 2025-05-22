@@ -9,7 +9,7 @@ import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import AgricultureRoundedIcon from "@mui/icons-material/AgricultureRounded";
 import { PAGE_PATH } from "@/path";
 import { logout } from "@/utils/db";
-import { DashboardProps } from "@/blocks/app/Dashboard";
+import { type DashboardProps } from "@/blocks/app/Dashboard";
 
 export const dashboard: DashboardProps = {
   sideMenu: {

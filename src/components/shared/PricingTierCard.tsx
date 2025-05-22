@@ -2,7 +2,7 @@ import { Box, Button, Card, CardActions, CardContent, Chip, Divider, Typography 
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { alpha } from "@mui/material/styles";
-import { PricingTier } from "@/types/pricing";
+import { type PricingTier } from "@/types/pricing";
 import { useT } from '@/i18n/client';
 import { redirectToCheckout } from "@/utils/stripe";
 import { CANCEL_STRIPE_PATH, SUCCESS_STRIPE_PATH } from "@/path";

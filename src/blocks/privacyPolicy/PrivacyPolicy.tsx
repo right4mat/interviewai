@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useT } from '@/i18n/client';
 
 // @mui
@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 // @project
 import { SECTION_COMMON_PY } from '@/utils/constant';
 import Container from '@mui/material/Container';
-import { MenuItem, PrivacyPolicyConfig } from '@/views/privacyPolicy/data/privacyPolicy';
+import { type PrivacyPolicyConfig } from '@/views/privacyPolicy/data/privacyPolicy';
 
 // Helper functions for scrollspy
 const clamp = (value: number): number => Math.max(0, value);

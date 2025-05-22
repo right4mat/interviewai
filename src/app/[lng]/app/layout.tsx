@@ -1,6 +1,4 @@
-import { ReactNode, Suspense } from "react";
-
-// @next
+import { Suspense, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import PageLoader from "@/images/graphics/PageLoader";
 

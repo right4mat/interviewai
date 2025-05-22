@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import useScrollPosition from "@/hooks/useScrollPosition";
 import AppAppBar from "@/components/shared/AppAppBar";

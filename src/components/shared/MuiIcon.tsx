@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, memo, ReactNode } from "react";
+import { useMemo, memo, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 
 interface MuiIconProps {

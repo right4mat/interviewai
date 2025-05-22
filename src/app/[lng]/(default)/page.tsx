@@ -1,6 +1,6 @@
 // @next
 import dynamic from "next/dynamic";
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 // @project
 //const ScrollFab = dynamic(() => import('@/components/ScrollFab'));

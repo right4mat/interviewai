@@ -96,7 +96,7 @@ Do not include any text outside of this JSON object.
     });
 
     const responseContent =
-      response.choices[0].message.content?.trim() ||
+      response?.choices?.[0]?.message?.content?.trim() ||
       '{"cleanedAnswer": "", "questionSummary": "", "score": 0, "reasoning": "Unable to evaluate answer", "modelAnswer": ""}';
 
     let parsedResponse;

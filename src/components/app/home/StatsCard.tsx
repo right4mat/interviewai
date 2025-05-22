@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-import { StatCardProps } from "./types";
+import { type StatCardProps } from "./types";
 
 export function StatsCard({ title, value, interval, trend, color }: StatCardProps) {
   // Calculate the progress value from the data
