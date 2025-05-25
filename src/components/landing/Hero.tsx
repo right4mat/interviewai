@@ -19,6 +19,7 @@ import WireframeSphereLanding from "./WireframeSphereLanding";
 import useToast from "@/hooks/useToast";
 import { DifficultyChip } from "../app/shared/StyledChips";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { motion } from "framer-motion";
 
 const interviewQuestionsByIndustry = {
   general: [
@@ -290,38 +291,33 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   {t(subtitle)}
                 </Typography>
               </Stack>
-              <Box
-                sx={{
-                  transition: "height 1s ease-in-out", // Smooth transition for height changes
-                  display: "flex",
-                  justifyContent: isSmallScreen ? "center" : "flex-start"
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    textAlign: isSmallScreen ? "center" : "left",
-                    color: "text.secondary",
-                    width: { sm: "100%", md: "80%" }
-                  }}
-                >
-                  <TypeAnimation
-                    sequence={[
-                      t("hero.info"),
-                      3000,
-                      ...interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]
-                    ]}
-                    wrapper="span"
-                    speed={50}
-                    repeat={6}
-                    cursor={false}
-                    preRenderFirstString={false}
-                    style={{
+              <Box style={{ position: "relative", width: "100%" }}>
+                <Box sx={{ position: "absolute", top: "0", left: "0", right: 0, bottom: 0, zIndex: 1000 }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
                       textAlign: isSmallScreen ? "center" : "left",
-                      transition: "height 1s ease-in-out" // Smooth transition for height changes
+                      color: "text.secondary",
+                      width: "100%"
                     }}
-                  />
-                </Typography>
+                  >
+                    <TypeAnimation
+                      sequence={[
+                        t("hero.info"),
+                        3000,
+                        ...interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]
+                      ]}
+                      wrapper="span"
+                      speed={50}
+                      repeat={999}
+                      cursor={false}
+                      preRenderFirstString={false}
+                    />
+                  </Typography>
+                </Box>
+                <Box sx={{ opacity: "0", mb:1}} aria-hidden={true}>
+                  {t("hero.info")}
+                </Box>
               </Box>
 
               <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>

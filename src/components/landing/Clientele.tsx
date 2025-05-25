@@ -30,7 +30,7 @@ export function Clientele({ clienteleList}: ClienteleConfig) {
 
       {/* Content */}
       <Box sx={{ position: 'relative', zIndex: 1 }}>
-        <Typography component="p" variant="subtitle2" align="center" sx={{ color: "text.secondary" }}>
+        <Typography component="p" variant="subtitle2" align="center" sx={{ color: "text.secondary", mb: 4 }}>
           {t('clientele.title')}
         </Typography>
         {/* <Typography component="p" variant="subtitle1" align="center" sx={{ color: "text.secondary", mb: 2 }}>

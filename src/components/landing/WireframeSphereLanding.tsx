@@ -326,9 +326,8 @@ export const WireframeSphere = ({
     <>
       <div
         ref={sphereRef}
-        style={{ position: "relative", width: isSmallScreen ? "100%" : "35vw", height: isSmallScreen ? "100%" : "35vw" , zIndex: -1}}
+        style={{ position: "relative", width: isSmallScreen ? "100%" : "35vw", height: isSmallScreen ? "100%" : "35vw" }}
       >
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "transparent", zIndex: 999 }}></div>
 
         <Canvas
           camera={{ position: [0, 0, 2], fov: 75 }}
