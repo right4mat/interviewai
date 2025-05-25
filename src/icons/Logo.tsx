@@ -30,8 +30,8 @@ const Logo: React.FC<LogoProps> = ({
             src="/assets/images/icons/icon.png" 
             alt="Logo Icon"
             style={{ objectFit: "contain" }}
-            width={200}
-            height={150}
+            width={100}
+            height={100}
           />
         </Box>
        
