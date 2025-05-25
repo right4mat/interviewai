@@ -50,7 +50,7 @@ export default function VideoDisplay({
     <Card 
       variant="outlined"
       sx={{ 
-        height: "70vh", 
+        height: "60vh", 
         display: "flex", 
         flexDirection: "column",
         position: "relative",
