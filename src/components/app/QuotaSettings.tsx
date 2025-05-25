@@ -6,6 +6,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
 import { Card, LinearProgress, Stack, Tooltip } from "@mui/material";
 import { useT } from "@/i18n/client";
+import moment from "moment";
 
 interface QuotaInfo {
   resumeUploads: {
@@ -55,16 +56,7 @@ export function QuotaDisplay({ headings, labels }: QuotaDisplayConfig) {
   };
 
   const formatRefreshTime = (utcTime: string) => {
-    const date = new Date(utcTime);
-    return date.toLocaleString('en-US', { 
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'UTC',
-      timeZoneName: 'short'
-    });
+    return moment(utcTime).format('LLLL');
   };
 
   return (
