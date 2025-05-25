@@ -1,6 +1,6 @@
 {
-  "title": "Crop Nutrition Compass Plans",
-  "description": "We’ll help you grow — pick your starting point below.",
+  "title": "Interview AI Plans",
+  "description": "Choose your interview preparation package below.",
   "footer": "You can change your plan anytime from your account settings.",
   "currentPlan": "Current Plan",
   "buttons": {
@@ -17,30 +17,25 @@
   ],
   "plans": {
     "base": {
-      "title": "BASE",
+      "title": "One-time Package",
       "description": [
-        "Number of Fields: 1",
-        "Sap Analysis Reports: 1",
-        "Basic Nutrient Recommendations",
-        "Seasonal Planning",
-        "Yield Tracking"
+        "1 Resume Upload",
+        "20 AI Interviews",
+        "Personalized Feedback",
+        "Progress Tracking",
+        "Interview Performance Analytics"
       ],
       "buttonText": "Select"
     },
     "pro": {
-      "title": "PRO",
+      "title": "Monthly Subscription",
       "subheader": "Recommended",
       "description": [
-        "Number of Fields: Unlimited",
-        "Sap Analysis Reports: Unlimited",
-        "Advanced Nutrient Recommendations",
-        "Seasonal Planning",
-        "Yield Tracking",
-        "Fertilizer Optimization",
-        "Crop Rotation Planner",
-        "Sustainability Metrics",
-        "Historical Data Analysis",
-        "Export Reports",
+        "3 Resume Uploads",
+        "15 AI Interviews per Month",
+        "Personalized Feedback",
+        "Progress Tracking",
+        "Interview Performance Analytics",
         "Priority Support"
       ],
       "buttonText": "Select"
