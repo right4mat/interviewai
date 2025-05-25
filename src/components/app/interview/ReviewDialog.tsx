@@ -12,6 +12,7 @@ import type { Interviewer, QuestionAnswer } from "@/types/interview";
 import ScoreProgress from "../shared/ScoreProgress";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const getJobProbabilityMessage = (probability: number): { message: string; color: string } => {
   if (probability < 0.2) {
@@ -71,8 +72,10 @@ export default function ReviewDialog({
   if (isLoading) {
     return (
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogContent>
-          <Typography>Loading review...</Typography>
+        <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+          <Box sx={{ width: '100%' }}>
+            <LinearProgress />
+          </Box>
         </DialogContent>
       </Dialog>
     );
@@ -99,7 +102,7 @@ export default function ReviewDialog({
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
         <Typography variant="h4" component="div" align="center" gutterBottom>
-          Interview Review
+          {"\u{1F680} Interview Review"}
         </Typography>
       </DialogTitle>
       <DialogContent>
