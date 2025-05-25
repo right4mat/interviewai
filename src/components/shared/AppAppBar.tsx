@@ -16,6 +16,7 @@ import Logo from "@/icons/Logo";
 import { scrollToSection } from "@/utils/util";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { useMediaQuery , useTheme} from "@mui/material";
 
 export interface Logo {
   href?: string;
@@ -62,6 +63,8 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 export default function AppAppBar({ navigationItems, authButtons, logo, translationKey }: AppBarConfig) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation(translationKey);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -76,11 +79,11 @@ export default function AppAppBar({ navigationItems, authButtons, logo, translat
         boxShadow: 0,
         bgcolor: "transparent",
         backgroundImage: "none",
-        mt: "calc(var(--template-frame-height, 0px) + 28px)"
+        mt: isSmallScreen ? 0 : "calc(var(--template-frame-height, 0px) + 28px)"
       }}
     >
-      <Container maxWidth="xl">
-        <StyledToolbar variant="dense" disableGutters>
+      <Container maxWidth="xl" sx={{px: isSmallScreen ? 0 : 2}}>
+        <StyledToolbar variant="dense" disableGutters sx={{borderRadius: isSmallScreen ? 0 : undefined}}>
           <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}>
             {typeof logo?.href === "string" ? (
               <Link href={logo.href} passHref>

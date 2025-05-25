@@ -1,0 +1,11 @@
+.sphere-container {
+  width: 35vw;
+  height: 35vw;
+}
+
+@media (max-width: 768px) {
+  .sphere-container {
+    width: 70vw;
+    height: 70vw;
+  }
+} 

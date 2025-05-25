@@ -10,9 +10,11 @@ import {
   Popover,
   Box,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  IconButton
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 interface ActionItem {
   label: string;
@@ -102,4 +104,75 @@ const ActionButton: React.FC<ActionButtonProps> = ({ label, actions, onClick, ..
   );
 };
 
+interface SmallScreenActionButtonProps {
+  actions: ActionItem[];
+  color?: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning";
+  size?: "small" | "medium" | "large";
+}
+
+const SmallScreenActionButton: React.FC<SmallScreenActionButtonProps> = ({ actions, color = "primary", size = "medium" }) => {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLButtonElement>(null);
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event: Event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const handleMenuItemClick = (onClick: () => void) => {
+    onClick();
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <IconButton
+        ref={anchorRef}
+        size={size}
+        color={color}
+        onClick={handleToggle}
+        aria-controls={open ? "action-menu" : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+      >
+        <MoreVertIcon />
+      </IconButton>
+      <Popover
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right"
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right"
+        }}
+        onClose={handleClose}
+      >
+        <Paper>
+          <ClickAwayListener onClickAway={handleClose}>
+            <MenuList id="action-menu" autoFocusItem>
+              {actions.map((action, index) => (
+                <MenuItem key={index} onClick={() => handleMenuItemClick(action.onClick)}>
+                  {action.icon && <ListItemIcon sx={{ color: action.color }}>{action.icon}</ListItemIcon>}
+                  <ListItemText sx={{ color: action.color }}>{action.label}</ListItemText>
+                </MenuItem>
+              ))}
+            </MenuList>
+          </ClickAwayListener>
+        </Paper>
+      </Popover>
+    </>
+  );
+};
+
+export { SmallScreenActionButton };
 export default ActionButton;

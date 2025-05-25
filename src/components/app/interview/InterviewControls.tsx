@@ -29,9 +29,9 @@ export default function InterviewControls({
   onSkipQuestion,
 }: InterviewControlsProps): React.ReactElement {
   return (
-    <Box sx={{ mt: 2, textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center", gap: 2 }}>
+    <Box sx={{ mt: 2, textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center", gap: 2, flexWrap: 'wrap'  }}>
       {isLoadingQuestions ? (
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center'}}>
           <Typography variant="body1" color="text.secondary">
             Fetching interview questions...
           </Typography>
@@ -54,23 +54,24 @@ export default function InterviewControls({
       ) : (
         <>
           <Button variant="outlined" size="large" onClick={onBackToSetup} startIcon={<ArrowBackIcon />} sx={{ ml: 2 }}>
-            Back to Setup
+            Back to Home
           </Button>
           {!interviewStarted ? (
             <Button
               component="div"
               variant="contained"
               color="primary"
+              size="large"
               onClick={onStartInterview}
               disabled={!hasQuestions}
               startIcon={<PlayArrowIcon />}
             >
-              Start Interview
+              Start
             </Button>
           ) : (
             <>
               <Button variant="outlined" color="error" size="large" onClick={onStopInterview} startIcon={<StopIcon />}>
-                Stop Interview
+                Stop
               </Button>
               <Button variant="outlined" size="large" onClick={onSkipQuestion} startIcon={<SkipNextIcon />}>
                 Skip Question

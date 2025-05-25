@@ -45,25 +45,30 @@ export default function Leaderboard() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-        <DifficultyChip 
-          label="All" 
+      <Stack direction="row" flexWrap="wrap" justifyContent="center" spacing={1} sx={{ mb: 3 }}>
+        <Box key="all" pt={1}>
+          <DifficultyChip 
+            label="All" 
           customSx={{ 
+            mt: 1,
             background: selectedDifficulty === 'all' ? 'primary.main' : undefined,
             color: selectedDifficulty === 'all' ? 'white' : undefined
           }}
           onClick={() => setSelectedDifficulty('all')}
         />
+        </Box>
         {difficulties.map((difficulty) => (
-          <DifficultyChip
-            key={difficulty}
-            label={difficulty}
-            onClick={() => setSelectedDifficulty(difficulty)}
-            customSx={{ 
+          <Box key={difficulty} pt={1}>
+            <DifficultyChip
+              label={difficulty}
+              onClick={() => setSelectedDifficulty(difficulty)}
+              customSx={{ 
+              mt: 1,
               background: selectedDifficulty === difficulty ? 'primary.main' : undefined,
               color: selectedDifficulty === difficulty ? 'white' : undefined
             }}
-          />
+            />
+          </Box>
         ))}
       </Stack>
 

@@ -2,12 +2,14 @@ import * as React from 'react';
 import Stack from '@mui/material/Stack';
 import SignInCard from '@/components/auth/SignInCard';
 import Content from '@/components/auth/Content';
-
+import { useTheme, useMediaQuery, Box } from '@mui/material';
 interface SignInProps {
   // Define any props here if needed
 }
 
 export default function SignIn(props: SignInProps) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   return (<>
       <Stack
         direction="column"
@@ -15,8 +17,8 @@ export default function SignIn(props: SignInProps) {
         sx={[
           {
             justifyContent: 'center',
-            height: 'calc((1 - var(--template-frame-height, 0)) * 100%)',
-            marginTop: 'max(40px - var(--template-frame-height, 0px), 0px)',
+            height: {xs: '100%', sm: '100%', md: 'calc((1 - var(--template-frame-height, 0)) * 100%)'},
+            marginTop: {xs: 0, sm: 0, md: 'max(40px - var(--template-frame-height, 0px), 0px)'},
             minHeight: '100%',
           },
           (theme) => ({
@@ -24,6 +26,7 @@ export default function SignIn(props: SignInProps) {
               content: '""',
               display: 'block',
               position: 'absolute',
+              top: 0,
               zIndex: -1,
               inset: 0,
               backgroundImage:
@@ -40,22 +43,26 @@ export default function SignIn(props: SignInProps) {
         <Stack
           direction={{ xs: 'column-reverse', md: 'row' }}
           sx={{
+            height:"100%",
             justifyContent: 'center',
-            gap: { xs: 6, sm: 12 },
-            p: 2,
-            mx: 'auto',
+            gap: { xs: 0, sm: 12 },
+            p:  {xs: 0, sm: 0, md: 2},
+            mx: {xs: 0, sm: 0, md: 'auto'},
+     
           }}
         >
           <Stack
             direction={{ xs: 'column-reverse', md: 'row' }}
             sx={{
               justifyContent: 'center',
-              gap: { xs: 6, sm: 12 },
-              p: { xs: 2, sm: 4 },
-              m: 'auto',
+              gap: { xs: 0, sm: 12 },
+              p: { xs: 0, sm: 4 },
+              m: {xs: 0, sm: 'auto', md: 'auto'},
             }}
           >
-            <Content />
+            <Box sx={{p:4}}>
+             <Content />
+             </Box>
             <SignInCard />
           </Stack>
         </Stack>

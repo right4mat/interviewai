@@ -19,7 +19,7 @@ export default function Home(): React.ReactElement {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
+    <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" }, pt: {xs: 4, md: 0} }}>
       {/* Stats Row */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -39,9 +39,9 @@ export default function Home(): React.ReactElement {
       <InterviewList interviews={interviews as InterviewListResponse[]} isLoading={isLoading} />
 
       {/* Leaderboard */}
-      <Box sx={{ mt: 4 }}>
+      {/* <Box sx={{ mt: 4 }}>
         <Leaderboard />
-      </Box>
+      </Box> */}
     </Box>
   );
 }

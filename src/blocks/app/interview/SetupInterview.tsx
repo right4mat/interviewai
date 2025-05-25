@@ -23,9 +23,12 @@ import { useInterviewStore } from "@/stores/interviewStore";
 import Fade from "@mui/material/Fade";
 import Collapse from "@mui/material/Collapse";
 import { useJobDescriptionSummary } from "@/services/appServices";
+import { useRouter } from "next/navigation";
+import { PAGE_PATH } from "@/path";
 
 const SetupInterview: React.FC = () => {
   const { interviewState, setJobDescription, setResume, setInterviewer, setSettings, setStage, updateInterviewState } = useInterviewStore();
+  const router = useRouter();
 
   const [showInterviewers, setShowInterviewers] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -59,7 +62,11 @@ const SetupInterview: React.FC = () => {
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep: number) => prevActiveStep - 1);
+    if (activeStep === 0) {
+      router.push(PAGE_PATH.appRoot);
+    } else {
+      setActiveStep((prevActiveStep: number) => prevActiveStep - 1);
+    }
   };
 
   // Custom StepIcon component to render icons in primary color and inside a circle
@@ -190,7 +197,7 @@ const SetupInterview: React.FC = () => {
               variant="text"
               sx={{ fontWeight: 500 }}
             >
-              {showInterviewers ? "Hide" : "Configure Interview Settings"}
+              {showInterviewers ? "Hide" : "Show"}
             </Button>
           </Box>
 
@@ -211,7 +218,7 @@ const SetupInterview: React.FC = () => {
   const currentStep = steps[activeStep];
 
   return (
-    <Container maxWidth="md" sx={{ width: "100%" }}>
+    <Container maxWidth="lg" sx={{ width: "100%" , pt: 1, boxSizing: "border-box"}} disableGutters>
       <Grid container spacing={4} sx={{ minWidth: "100%" }}>
         <Grid size={{ xs: 12 }}>
           <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom textAlign="center">
@@ -250,7 +257,7 @@ const SetupInterview: React.FC = () => {
               {currentStep?.content}
 
               <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-                <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack} disabled={activeStep === 0}>
+                <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack}>
                   Back
                 </Button>
 

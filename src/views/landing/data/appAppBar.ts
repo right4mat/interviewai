@@ -29,10 +29,7 @@ export const appBar: AppBarConfig = {
       label: "navigation.faq",
       onClick: () => scrollToSection("faq"),
     },
-    {
-      label: "navigation.blog",
-      onClick: () => scrollToSection("blog"),
-    },
+
   ],
   authButtons: {
     signIn: {

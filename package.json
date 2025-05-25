@@ -1,10 +1,10 @@
 {
-  "name": "m7x-ui",
+  "name": "IntervueAI",
   "version": "1.0.0",
   "private": true,
   "author": {
-    "email": "phoenixcoded@gmail.com",
-    "name": "phoenixcoded"
+    "email": "intervueai@gmail.com",
+    "name": "IntervueAI"
   },
   "scripts": {
     "dev": "next dev",

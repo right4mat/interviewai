@@ -59,8 +59,8 @@ export default function SideMenuMobile({ open, toggleDrawer, menuContent, cardAl
               {user && 'name' in user ? user.name : "User"}
             </Typography>
           </Stack>
-          <MenuButton showBadge>
-            <NotificationsRoundedIcon />
+          <MenuButton >
+            {/* <NotificationsRoundedIcon /> */}
           </MenuButton>
         </Stack>
         <Divider />
@@ -68,9 +68,7 @@ export default function SideMenuMobile({ open, toggleDrawer, menuContent, cardAl
           <MenuContent {...menuContent} />
           <Divider />
         </Stack>
-        <CardAlert {...cardAlert} onClick={() => {
-          console.log("Upgrade Now");
-        }}/>
+    
         <Stack sx={{ p: 2 }}>
           <Button 
             variant="outlined" 

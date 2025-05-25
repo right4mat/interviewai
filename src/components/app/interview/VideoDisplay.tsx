@@ -6,6 +6,7 @@ import Webcam from "react-webcam";
 import VideoControls from "./VideoControls";
 import { WireframeSphere } from "../../landing/WireframeSphere";
 import { useColorScheme, useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 
 interface VideoDisplayProps {
   isMuted: boolean;
@@ -40,28 +41,31 @@ export default function VideoDisplay({
   onToggleChat,
   onEndCall,
 }: VideoDisplayProps): React.ReactElement {
+  const theme = useTheme();
   const { mode } = useColorScheme();
   const isDarkMode = mode === 'dark';
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Card 
       variant="outlined"
       sx={{ 
-        height: "70vh", 
+        height: "60vh", 
         display: "flex", 
         flexDirection: "column",
         position: "relative",
+        p: 0,
         //bgcolor: isDarkMode ? "#000" : "#f5f5f5"
       }}
     >
       {/* Main AI Avatar */}
-      <Box sx={{ position: "relative", width: "100%", height: "100%", bgcolor: isDarkMode ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.6)" }}>
+      <Box sx={{ position: "relative", width: "100%", height: "100%",  }}>
         <Box sx={{ 
           position: "absolute",
           top: 0,
           left: 0,
           width: "100%",
-          height: "100%",
+          height: isSmallScreen ? "50%" : "100%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center"
@@ -78,13 +82,14 @@ export default function VideoDisplay({
         <Box
           sx={{
             position: "absolute",
-            bottom: 20,
-            right: 20,
-            width: "200px",
-            height: "150px",
+            bottom: isSmallScreen ? 0 : 20,
+            right: isSmallScreen ? 0 : 20,
+            width: isSmallScreen ? "100%" : "200px",
+            height: isSmallScreen ? "50%" : "150px",
             borderRadius: 2,
             overflow: "hidden",
-            border: `2px solid ${isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`
+            border: `2px solid ${isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
+            borderBottom: isSmallScreen ? 'none' : undefined
           }}
         >
           {isVideoOn ? (
