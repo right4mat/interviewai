@@ -220,9 +220,9 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
   React.useEffect(() => {
     // Start recurring toasts after a delay
     const recurringTimeout = setTimeout(() => {
-      const intervalId = setInterval(showRandomToast, 40000);
+      const intervalId = setInterval(showRandomToast, 50000);
       return () => clearInterval(intervalId);
-    }, 50000); // Start recurring after 30s (initial 10s + first interval 20s)
+    }, 60000); // Start recurring after 30s (initial 10s + first interval 20s)
 
     return () => clearTimeout(recurringTimeout);
   }, []); // Run only once on mount
