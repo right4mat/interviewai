@@ -4,14 +4,19 @@
     "generalInformation": "General Information",
     "password": "Password",
     "subscriptionPlans": "Subscription Plans",
-    "availablePlans": "Available Plans"
+    "availablePlans": "Available Plans",
+    "quotaInformation": "Usage Quotas"
   },
   "labels": {
     "name": "Name",
     "email": "Email",
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
-    "currentPlan": "Your current plan:"
+    "currentPlan": "Your current plan:",
+    "resumeQuota": "Resume Upload Quota",
+    "interviewQuota": "Mock Interview Quota",
+    "remaining": "Remaining",
+    "quotaRefreshes": "Quotas refresh on"
   },
   "buttons": {
     "saveChanges": "Save Changes",
