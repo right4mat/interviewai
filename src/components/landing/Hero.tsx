@@ -18,6 +18,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import WireframeSphereLanding from "./WireframeSphereLanding";
 import useToast from "@/hooks/useToast";
 import { DifficultyChip } from "../app/shared/StyledChips";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 const interviewQuestionsByIndustry = {
   general: [
@@ -64,6 +65,7 @@ const interviewQuestionsByIndustry = {
 
 export function Hero({ title, subtitle, info, button }: HeroConfig) {
   const { t } = useT("landing");
+  const theme = useTheme();
   const { addToast } = useToast();
   const [currentVolume, setCurrentVolume] = React.useState(0.5);
   const [isExcited, setIsExcited] = React.useState(false);
@@ -71,7 +73,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const industry = searchParams.get("industry") || "general";
-
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const dummyData = [
     {
       firstName: "Sarah",
@@ -241,7 +243,8 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
         backgroundImage: "radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)",
         ...theme.applyStyles("dark", {
           backgroundImage: "radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 16%), transparent)"
-        })
+        }),
+        transition: "height 1s ease-in-out" // Smooth transition for height changes
       })}
     >
       <Container
@@ -252,50 +255,74 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
       >
         <Grid container spacing={4} alignItems="center">
           <Grid size={{ xs: 12, md: 6 }}>
-            <Stack spacing={2} useFlexGap sx={{ alignItems: "flex-start" }}>
-              <Typography
-                variant="h1"
+            <Stack
+              spacing={2}
+              useFlexGap
+              sx={{
+                alignItems: "flex-start",
+                transition: "height 1s ease-in-out" // Smooth transition for height changes
+              }}
+            >
+              <Stack alignItems="flex-start" sx={{ width: "100%", position: "relative" }}>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: "flex-start",
+                    fontSize: "clamp(3rem, 10vw, 3.5rem)",
+                    textAlign: isSmallScreen ? "center" : "left"
+                  }}
+                >
+                  {t(title)}
+                </Typography>
+                <Typography
+                  variant="h1"
+                  sx={(theme) => ({
+                    textAlign: isSmallScreen ? "center" : "left",
+                    fontSize: "clamp(3rem, 10vw, 3.5rem)",
+                    color: "primary.main",
+                    ...theme.applyStyles("dark", {
+                      color: "primary.light"
+                    })
+                  })}
+                >
+                  {t(subtitle)}
+                </Typography>
+              </Stack>
+              <Box
                 sx={{
+                  transition: "height 1s ease-in-out", // Smooth transition for height changes
                   display: "flex",
-                  flexDirection: { xs: "column", sm: "row" },
-                  alignItems: "flex-start",
-                  fontSize: "clamp(3rem, 10vw, 3.5rem)",
-                  textAlign: "left"
+                  justifyContent: isSmallScreen ? "center" : "flex-start"
                 }}
               >
-                {t(title)}
-              </Typography>
-              <Typography
-                variant="h1"
-                sx={(theme) => ({
-                  textAlign: "left",
-                  fontSize: "clamp(3rem, 10vw, 3.5rem)",
-                  color: "primary.main",
-                  ...theme.applyStyles("dark", {
-                    color: "primary.light"
-                  })
-                })}
-              >
-                {t(subtitle)}
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  textAlign: "left",
-                  color: "text.secondary",
-                  width: { sm: "100%", md: "80%" },
-                  minHeight: "5em" // Add minimum height to prevent layout shifts
-                }}
-              >
-                <TypeAnimation
-                  sequence={[t("hero.info"), 3000, ...interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]]}
-                  wrapper="span"
-                  speed={50}
-                  repeat={6}
-                  cursor={false}
-                  preRenderFirstString={false}
-                />
-              </Typography>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    textAlign: isSmallScreen ? "center" : "left",
+                    color: "text.secondary",
+                    width: { sm: "100%", md: "80%" }
+                  }}
+                >
+                  <TypeAnimation
+                    sequence={[
+                      t("hero.info"),
+                      3000,
+                      ...interviewQuestionsByIndustry[industry as keyof typeof interviewQuestionsByIndustry]
+                    ]}
+                    wrapper="span"
+                    speed={50}
+                    repeat={6}
+                    cursor={false}
+                    preRenderFirstString={false}
+                    style={{
+                      textAlign: isSmallScreen ? "center" : "left",
+                      transition: "height 1s ease-in-out" // Smooth transition for height changes
+                    }}
+                  />
+                </Typography>
+              </Box>
 
               <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
                 <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: "bold" }}>
@@ -345,18 +372,20 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
               </Typography>
             </Stack>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <WireframeSphereLanding
-              participantName="John Doe"
-              isAISpeaking={false}
-              isGettingReply={true}
-              volumeLevel={currentVolume}
-              isExcited={isExcited}
-              isStartingInterview={isStartingInterview}
-              onHover={(bool) => setIsExcited(bool)}
-              onClick={handleButtonClick}
-            />
-          </Grid>
+          {!isSmallScreen && (
+            <Grid size={{ xs: 12, md: 6 }}>
+              <WireframeSphereLanding
+                participantName="John Doe"
+                isAISpeaking={false}
+                isGettingReply={true}
+                volumeLevel={currentVolume}
+                isExcited={isExcited}
+                isStartingInterview={isStartingInterview}
+                onHover={(bool) => setIsExcited(bool)}
+                onClick={handleButtonClick}
+              />
+            </Grid>
+          )}
         </Grid>
       </Container>
     </Box>

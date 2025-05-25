@@ -5,7 +5,7 @@ import { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { brand } from "@/theme/themePrimitives";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Button } from "@mui/material";
+import { Button, useMediaQuery, useTheme } from "@mui/material";
 
 interface WireframeSphereProps {
   participantName: string;
@@ -300,6 +300,8 @@ export const WireframeSphere = ({
   onHover,
   onClick
 }: WireframeSphereProps) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [showPlayButton, setShowPlayButton] = useState(false);
   const [buttonNoOpacity, setButtonNoOpacity] = useState(false);
   const sphereRef = useRef<HTMLDivElement>(null);
@@ -321,55 +323,62 @@ export const WireframeSphere = ({
   }, []);
 
   return (
-    <div ref={sphereRef} style={{ position: "relative", width: "35vw", height: "35vw" }}>
-      <Canvas
-        camera={{ position: [0, 0, 2], fov: 75 }}
-        gl={{ antialias: true, alpha: true }}
-        style={{ background: "transparent", zIndex: -1 }}
+    <>
+      <div
+        ref={sphereRef}
+        style={{ position: "relative", width: isSmallScreen ? "100%" : "35vw", height: isSmallScreen ? "100%" : "35vw" , zIndex: -1}}
       >
-        <Points
-          isAISpeaking={isAISpeaking}
-          isGettingReply={isGettingReply}
-          volumeLevel={volumeLevel}
-          isExcited={isExcited}
-          isStartingInterview={isStartingInterview}
-        />
-      </Canvas>
+        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "transparent", zIndex: 999 }}></div>
 
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{
-          zIndex: 1000,
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "auto", // Changed from "none" to "auto" to enable hover events
-          width: "5rem",
-          height: "5rem",
-          borderRadius: "50%",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          opacity: showPlayButton ? 0.5 : 0,
-          transition: "opacity 0.3s",
-          "&:hover": {
-            opacity: 1
-          }
-        }}
-        onMouseEnter={() => {
-          onHover?.(true);
-        }}
-        onMouseLeave={() => {
-          onHover?.(false);
-        }}
-        onClick={onClick}
-      >
-        <PlayArrowIcon style={{ fontSize: "4rem", color: "white" }} />
-      </Button>
-    </div>
+        <Canvas
+          camera={{ position: [0, 0, 2], fov: 75 }}
+          gl={{ antialias: true, alpha: true }}
+          style={{ background: "transparent", zIndex: -1 }}
+        >
+          <Points
+            isAISpeaking={isAISpeaking}
+            isGettingReply={isGettingReply}
+            volumeLevel={volumeLevel}
+            isExcited={isExcited}
+            isStartingInterview={isStartingInterview}
+          />
+        </Canvas>
+
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{
+            zIndex: 1000,
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "auto", // Changed from "none" to "auto" to enable hover events
+            width: "5rem",
+            height: "5rem",
+            borderRadius: "50%",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity: showPlayButton ? 0.5 : 0,
+            transition: "opacity 0.3s",
+            "&:hover": {
+              opacity: 1
+            }
+          }}
+          onMouseEnter={() => {
+            onHover?.(true);
+          }}
+          onMouseLeave={() => {
+            onHover?.(false);
+          }}
+          onClick={onClick}
+        >
+          <PlayArrowIcon style={{ fontSize: "4rem", color: "white" }} />
+        </Button>
+      </div>
+    </>
   );
 };
 

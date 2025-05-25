@@ -6,7 +6,7 @@ import ToolifyAI from "@/images/clientele/ToolifyAI";
 
 export const clientele: ClienteleConfig = {
   clienteleList: [
-    <ProductHunt  imageSize={{width: 350, height: 200}}  />,
-    <ToolifyAI   imageSize={{width: 350, height: 200}} />
+    <ProductHunt  imageSize={{width: 350, height: 100}}  />,
+    <ToolifyAI   imageSize={{width: 350, height: 100}} />
   ]
 };
