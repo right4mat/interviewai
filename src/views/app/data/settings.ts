@@ -67,10 +67,25 @@ export const billingSettings = {
   pricing: pricing
 };
 
+export const quotaSettings = {
+  headings: {
+    quotaInformation: "headings.quotaInformation"
+  },
+  labels: {
+    resumeQuota: "labels.resumeQuota",
+    interviewQuota: "labels.interviewQuota",
+    remaining: "labels.remaining",
+    quotaRefreshes: "labels.quotaRefreshes"
+  },
+  buttons: {
+    saveChanges: "buttons.saveChanges"
+  }
+};
 // Combined settings for backward compatibility
 export const settings: SettingsConfig = {
   title: "headings.accountSettings",
   generalSettings,
   passwordSettings,
-  billingSettings
+  billingSettings,
+  quotaSettings
 };
