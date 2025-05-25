@@ -326,7 +326,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   color="primary"
                   size="large"
                   startIcon={<PlayArrowIcon />}
-                  sx={{ minWidth: "fit-content", fontWeight: "bold" }}
+                  sx={{ minWidth: "fit-content", fontWeight: "bold",my:2 }}
                   onClick={handleButtonClick}
                   onMouseEnter={() => setIsExcited(true)}
                   onMouseLeave={() => setIsExcited(false)}

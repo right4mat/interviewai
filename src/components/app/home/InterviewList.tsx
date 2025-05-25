@@ -75,7 +75,7 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
   };
 
   const getColumns = (): GridColDef<InterviewListResponse>[] => {
-    const baseColumns = [
+    const baseColumns: GridColDef<InterviewListResponse>[] = [
       {
         field: "company",
         headerName: "Company",
@@ -91,7 +91,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
             </Typography>
           </Box>
         ),
-        renderCell: (params: GridRenderCellParams<InterviewListResponse>) => params.row?.company || "Not mentioned",
+        renderCell: (params: GridRenderCellParams<InterviewListResponse>) => (
+          <Typography>{params.row?.company || "Not mentioned"}</Typography>
+        ),
       },
       {
         field: "settings.type",
@@ -251,7 +253,9 @@ export function InterviewList({ interviews, isLoading }: InterviewListProps) {
               </Typography>
             </Box>
           ),
-          renderCell: (params: GridRenderCellParams<InterviewListResponse>) => moment(params.row.created_at).format("MMM DD, YYYY"),
+          renderCell: (params: GridRenderCellParams<InterviewListResponse>) => (
+            <Typography>{moment(params.row.created_at).format("MMM DD, YYYY")}</Typography>
+          ),
         },
       ]);
     }
