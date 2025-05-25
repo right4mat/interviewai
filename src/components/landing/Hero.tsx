@@ -321,6 +321,18 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
               </Box>
 
               <Stack spacing={2} sx={{ width: "100%", mt: 2 }}>
+              { isSmallScreen && <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  startIcon={<PlayArrowIcon />}
+                  sx={{ minWidth: "fit-content", fontWeight: "bold" }}
+                  onClick={handleButtonClick}
+                  onMouseEnter={() => setIsExcited(true)}
+                  onMouseLeave={() => setIsExcited(false)}
+                >
+                  {t("hero.button.text")}
+                </Button>}
                 <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: "bold" }}>
                   <span style={{ fontSize: "1.2em" }}>🚀</span> Upload your resume & job description for tailored interviews
                 </Typography>
@@ -344,7 +356,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                 sx={{ pt: 2, width: { xs: "100%", sm: "350px" } }}
               >
                 <Badge size="small" />
-                <Button
+                { !isSmallScreen && <Button
                   variant="contained"
                   color="primary"
                   size="large"
@@ -355,7 +367,7 @@ export function Hero({ title, subtitle, info, button }: HeroConfig) {
                   onMouseLeave={() => setIsExcited(false)}
                 >
                   {t("hero.button.text")}
-                </Button>
+                </Button>}
               </Stack>
             </Stack>
             <Stack spacing={2} flexDirection="row" justifyContent="flex-start" alignItems="center" sx={{ mt: 4 }}>
