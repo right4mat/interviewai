@@ -112,11 +112,7 @@ const useToast: () => UseCustomToastRes = () => {
       position: "bottom-right",
       closeOnClick: true,
       transition: Slide,
-      closeButton: () => (
-        <>
-          <CloseOutlinedIcon sx={{ color: theme.palette.grey[500], fontSize: "16px" }} />
-        </>
-      )
+    
     });
   };
 

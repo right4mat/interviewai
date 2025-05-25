@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 interface Step {
-  image: string;
+  emoji: string;
   title: string;
   description: string;
 }
@@ -48,22 +48,22 @@ export function Features() {
 
   const steps: Step[] = [
     {
-      image: '/assets/images/graphics/resumeUpload.png',
+      emoji: '📄',
       title: 'Upload Your Resume (Optional)',
       description: 'Optionally upload your resume to provide us with more context about your background and experience.'
     },
     {
-      image: '/assets/images/graphics/pasteJob.png',
+      emoji: '📋',
       title: 'Paste Job Description',
       description: 'Paste the job description to tailor your interview experience to the specific role you are targeting.'
     },
     {
-      image: '/assets/images/graphics/startInterview.png',
+      emoji: '🤖',
       title: 'Conversational AI Interview',
       description: 'Engage in a conversational AI interview and receive textual feedback along the way to improve your responses.'
     },
     {
-      image: '/assets/images/graphics/track.png',
+      emoji: '📈',
       title: 'Track Your Results',
       description: 'Track your results as you practice and monitor your progress over time.'
     }
@@ -139,16 +139,18 @@ export function Features() {
                   width: '100%',
                   height: '200px',
                   mb: 3,
-                  backgroundImage: `url(${step.image})`,
-                  backgroundSize: 'contain',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: '130px',
                   transition: 'transform 0.3s ease-in-out',
                   '&:hover': {
                     transform: 'scale(1.05)'
                   }
                 }}
-              />
+              >
+                {step.emoji}
+              </Box>
                  <Typography
                 variant="h6"
                 sx={{
