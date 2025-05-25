@@ -141,8 +141,8 @@ const InterviewerCard: React.FC<InterviewerCardProps> = ({
         </Box>
       </Collapse>
       <Collapse in={isEditing}>
-        <Box sx={{ mt: 1, p: 2, bgcolor: 'background.neutral', borderRadius: 2 }}>
-          <Grid container spacing={3}>
+        <Box sx={{ mt: 1, p: 0, bgcolor: 'background.neutral', borderRadius: 2 }}>
+          <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomInput
                 fullWidth

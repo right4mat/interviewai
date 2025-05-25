@@ -190,7 +190,7 @@ const SetupInterview: React.FC = () => {
               variant="text"
               sx={{ fontWeight: 500 }}
             >
-              {showInterviewers ? "Hide" : "Configure Interview Settings"}
+              {showInterviewers ? "Hide" : "Show"}
             </Button>
           </Box>
 
@@ -211,7 +211,7 @@ const SetupInterview: React.FC = () => {
   const currentStep = steps[activeStep];
 
   return (
-    <Container maxWidth="md" sx={{ width: "100%" }}>
+    <Container maxWidth="lg" sx={{ width: "100%" , }} disableGutters>
       <Grid container spacing={4} sx={{ minWidth: "100%" }}>
         <Grid size={{ xs: 12 }}>
           <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom textAlign="center">

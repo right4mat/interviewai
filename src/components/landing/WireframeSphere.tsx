@@ -4,6 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
 import { brand } from "@/theme/themePrimitives";
+import styles from "./WireframeSphere.module.css";
 
 interface WireframeSphereProps {
   participantName: string;
@@ -241,7 +242,10 @@ function Points({ isAISpeaking, isGettingReply, volumeLevel }: Omit<WireframeSph
 
 export const WireframeSphere = ({ isAISpeaking, isGettingReply, volumeLevel, participantName }: WireframeSphereProps) => {
   return (
-    <div style={{ width: "35vw", height: "35vw", opacity: isGettingReply ? 0.9 : 0.8 }}>
+    <div 
+      className={styles["sphere-container"]}
+      style={{ opacity: isGettingReply ? 0.9 : 0.8 }}
+    >
       <Canvas camera={{ position: [0, 0, 2], fov: 75 }} gl={{ antialias: true, alpha: true }} style={{ background: "transparent" }}>
         <Points isAISpeaking={isAISpeaking} isGettingReply={isGettingReply} volumeLevel={volumeLevel} />
       </Canvas>

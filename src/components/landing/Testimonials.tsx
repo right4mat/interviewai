@@ -33,19 +33,11 @@ export function Testimonials({ testimonials }: TestimonialsConfig) {
         }}
       >
         <Typography component="h2" variant="h4" gutterBottom sx={{ color: "text.primary" }}>
-          {t('testimonials.title')}
+          {t("testimonials.title")}
         </Typography>
         <Typography variant="body1" sx={{ color: "text.secondary" }}>
-          {t('testimonials.subtitle')}
+          {t("testimonials.subtitle")}
         </Typography>
-      </Box>
-
-      {/* Leaderboard Section */}
-      <Box sx={{ width: "100%", mb: 6 }}>
-        <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
-          {t('testimonials.leaderboardTitle', 'Top Performers')}
-        </Typography>
-        <Leaderboard />
       </Box>
 
       {/* Testimonials Grid */}
@@ -73,17 +65,20 @@ export function Testimonials({ testimonials }: TestimonialsConfig) {
                   justifyContent: "space-between"
                 }}
               >
-                <CardHeader 
-                  avatar={testimonial.avatar} 
-                  title={t(testimonial.name)}
-                  subheader={t(testimonial.occupation)}
-                />
+                <CardHeader avatar={testimonial.avatar} title={t(testimonial.name)} subheader={t(testimonial.occupation)} />
                 <Box sx={{ opacity: 0.5 }}>{testimonial.brandIcon}</Box>
               </Box>
             </Card>
           </Grid>
         ))}
       </Grid>
+      {/* Leaderboard Section */}
+      <Box sx={{ width: "100%", mb: 6 }}>
+        <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
+          {t("testimonials.leaderboardTitle", "Top Performers")}
+        </Typography>
+        <Leaderboard />
+      </Box>
     </Container>
   );
 }
