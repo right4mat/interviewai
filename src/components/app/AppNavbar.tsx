@@ -78,7 +78,7 @@ export function AppNavbar({ title = 'Dashboard', menuContent, cardAlert }: AppNa
             <LogoIcon  width={50} height={50}/>
       
           </Stack>
-          {<ColorModeIconDropdown />}
+          {/* <ColorModeIconDropdown /> */}
           <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
           </MenuButton>

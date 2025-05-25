@@ -82,7 +82,7 @@ export default function VideoDisplay({
         <Box
           sx={{
             position: "absolute",
-            bottom: 0,
+            bottom: isSmallScreen ? 0 : 20,
             right: isSmallScreen ? 0 : 20,
             width: isSmallScreen ? "100%" : "200px",
             height: isSmallScreen ? "50%" : "150px",
