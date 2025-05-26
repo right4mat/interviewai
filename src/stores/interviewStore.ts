@@ -45,6 +45,14 @@ interface InterviewStore {
   isVideoOn: boolean;
   isChatOpen: boolean;
 
+  //need for appbar in mobile
+  isGettingReply: boolean;
+  answerWillCompleteIn: number;
+  buildingAnswer: boolean;
+  setIsGettingReply: (isGettingReply: boolean) => void;
+  setAnswerWillCompleteIn: (answerWillCompleteIn: number) => void;
+  setBuildingAnswer: (buildingAnswer: boolean) => void;
+
   setJobDescription: (description: string) => void;
   setPdfFile: (file: File | undefined) => void;
   setResume: (id: number | undefined) => void;
@@ -96,6 +104,14 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
   isMuted: false,
   isVideoOn: true,
   isChatOpen: true,
+
+  isGettingReply: false,
+  answerWillCompleteIn: 0,
+  buildingAnswer: false,
+
+  setIsGettingReply: (isGettingReply: boolean) => set((state) => ({ isGettingReply })),
+  setAnswerWillCompleteIn: (answerWillCompleteIn: number) => set((state) => ({ answerWillCompleteIn })),
+  setBuildingAnswer: (buildingAnswer: boolean) => set((state) => ({ buildingAnswer })),
 
   setResume: (id: number | undefined) =>
     set((state) => ({
