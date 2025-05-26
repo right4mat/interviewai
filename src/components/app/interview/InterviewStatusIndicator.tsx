@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface InterviewStatusIndicatorProps {
   isGettingReply: boolean;
   answerWillCompleteIn: number;
-  buildingAnswer?: boolean;
+  buildingAnswer?: string;
   size?: number;
 }
 
