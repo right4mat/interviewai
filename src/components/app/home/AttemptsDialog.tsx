@@ -8,7 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import CustomizedDataGrid from "../../shared/CustomizedDataGrid";
-import { type GridColDef } from "@mui/x-data-grid";
+import { type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 // Import icons for status chips
@@ -37,6 +37,9 @@ import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import AttemptDetailsView from "./AttemptDetailsView";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { SmallScreenActionButton } from "@/components/shared/ActionButton";
 
 // Transition for fullscreen dialog
 const Transition = React.forwardRef(function Transition(
@@ -81,6 +84,8 @@ export default function AttemptsDialog({ open, onClose, interviewId }: AttemptsD
   const { loadInterview: loadInterviewState } = useInterviewStore();
   const [viewingAttempt, setViewingAttempt] = React.useState<AttemptData | null>(null);
   const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   // Use the useInterviewAttempts hook with proper null handling
   const { data: interviewAttempts, isLoading } = useInterviewAttempts(interviewId);
@@ -137,131 +142,128 @@ export default function AttemptsDialog({ open, onClose, interviewId }: AttemptsD
   };
 
   // Define columns for the data grid
-  const columns: GridColDef[] = [
-    {
-      field: "date",
-      headerName: "Attempt Date",
-      flex: 1,
-      minWidth: 150
-    },
-    {
-      field: "score",
-      headerName: "Score",
-      flex: 1,
-      minWidth: 120,
-      renderCell: (params) => {
-        const score = params.value as number;
+  const columns: GridColDef[] = React.useMemo(() => {
+    const baseColumns = [
+      {
+        field: "date",
+        headerName: "Attempt Date",
+        flex: 1,
+        minWidth: 150
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        flex: 0.8,
+        minWidth: 120,
+        renderCell: (params: GridRenderCellParams<AttemptData>) => {
+          const status = params.value as string;
+          const color = status === "Completed" ? "success" : status === "In Progress" ? "info" : "default";
 
-        return (
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", height: "100%" }}>
-            <ScoreProgress score={Number(((score / 1200) * 100).toFixed(0))} />
-          </Box>
-        );
+          // Select icon based on status
+          const getStatusIcon = (status: string) => {
+            switch (status) {
+              case "Completed":
+                return <CheckCircleIcon fontSize="small" />;
+              case "In Progress":
+                return <HourglassEmptyIcon fontSize="small" />;
+              case "Incomplete":
+                return <CancelIcon fontSize="small" />;
+              default:
+                return <PendingIcon fontSize="small" />;
+            }
+          };
+
+          return <Chip icon={getStatusIcon(status)} label={status} color={color} size="medium" sx={{ fontWeight: "medium" }} />;
+        }
       }
-    },
-    {
-      field: "questions",
-      headerName: "Questions",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => {
-        const answered = params.value as number;
-        const total = (params.row as AttemptData).totalQuestions || 10;
+    ];
 
-        return <QuestionsProgress answered={answered} total={total} />;
-      }
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 0.8,
-      minWidth: 120,
-      renderCell: (params) => {
-        const status = params.value as string;
-        const color = status === "Completed" ? "success" : status === "In Progress" ? "info" : "default";
+    if (!isSmallScreen) {
+      baseColumns.push(
+        {
+          field: "score",
+          headerName: "Score",
+          flex: 1,
+          minWidth: 120,
+          renderCell: (params) => {
+            const score = params.value as number;
 
-        // Select icon based on status
-        const getStatusIcon = (status: string) => {
-          switch (status) {
-            case "Completed":
-              return <CheckCircleIcon fontSize="small" />;
-            case "In Progress":
-              return <HourglassEmptyIcon fontSize="small" />;
-            case "Incomplete":
-              return <CancelIcon fontSize="small" />;
-            default:
-              return <PendingIcon fontSize="small" />;
+            return (
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start", height: "100%" }}>
+                <ScoreProgress score={Number(((score / 1200) * 100).toFixed(0))} />
+              </Box>
+            );
           }
-        };
+        },
+        {
+          field: "questions",
+          headerName: "Questions",
+          flex: 1,
+          minWidth: 150,
+          renderCell: (params) => {
+            const answered = params.value as number;
+            const total = (params.row as AttemptData).totalQuestions || 10;
 
-        return <Chip icon={getStatusIcon(status)} label={status} color={color} size="medium" sx={{ fontWeight: "medium" }} />;
-      }
-    },
-    {
+            return <QuestionsProgress answered={answered} total={total} />;
+          }
+        }
+      );
+    }
+
+    baseColumns.push({
       field: "actions",
       headerName: "Actions",
       flex: 1,
-      minWidth: 180,
-      sortable: false,
-      renderCell: (params) => {
+      minWidth: isSmallScreen ? 100 : 180,
+      renderCell: (params: GridRenderCellParams<AttemptData>) => {
         const status = params.row.status;
         const attemptId = params.row.id;
         const questionAnswers = params.row.questionAnswers;
 
-        if (status === "Completed") {
-          return (
-            <ActionButton
-              label="View"
-              variant="contained"
-              color="primary"
-              size="medium"
-              startIcon={<VisibilityIcon />}
-              onClick={() => handleViewAttempt(attemptId)}
-              actions={[
-                {
-                  label: "View Attempt Details",
-                  icon: <VisibilityIcon />,
-                  onClick: () => handleViewAttempt(attemptId),
-                  color: "primary"
-                },
-                {
-                  label: "Delete Attempt",
-                  icon: <DeleteIcon />,
-                  onClick: () => deleteAttempt({ attemptId: parseInt(attemptId) }),
-                  color: "error"
-                }
-              ]}
-            />
-          );
-        } else {
-          return (
-            <ActionButton
-              label="Continue"
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<PlayArrowIcon />}
-              onClick={() => handleContinueAttempt(questionAnswers, attemptId)}
-              actions={[
-                {
-                  label: "View Attempt Details",
-                  icon: <VisibilityIcon />,
-                  onClick: () => handleViewAttempt(attemptId),
-                  color: "primary"
-                },
-                {
-                  label: "Delete Attempt",
-                  icon: <DeleteIcon />,
-                  onClick: () => deleteAttempt({ attemptId: parseInt(attemptId) }),
-                  color: "error"
-                }
-              ]}
-            />
-          );
+        const actions = [
+          {
+            label: "View Attempt Details",
+            icon: <VisibilityIcon />,
+            onClick: () => handleViewAttempt(attemptId.toString()),
+            color: "primary" as const
+          },
+          {
+            label: "Delete Attempt",
+            icon: <DeleteIcon />,
+            onClick: () => deleteAttempt({ attemptId: Number(attemptId) }),
+            color: "error" as const
+          }
+        ];
+
+        if (status !== "Completed") {
+          actions.unshift({
+            label: "Continue",
+            icon: <PlayArrowIcon />,
+            onClick: () => handleContinueAttempt(questionAnswers, attemptId.toString()),
+            color: "primary" as const
+          });
         }
+
+        if (isSmallScreen) {
+          return <SmallScreenActionButton actions={actions} />;
+        }
+
+        return (
+          <ActionButton
+            label={status === "Completed" ? "View" : "Continue"}
+            variant="contained"
+            color="primary"
+            size="medium"
+            startIcon={status === "Completed" ? <VisibilityIcon /> : <PlayArrowIcon />}
+            onClick={status === "Completed" ? () => handleViewAttempt(attemptId.toString()) : () => handleContinueAttempt(questionAnswers, attemptId.toString())}
+            actions={actions.filter((_, index) => index !== 0)}
+          />
+        );
       }
-    }
-  ];
+    });
+
+    return baseColumns;
+  }, [isSmallScreen]);
 
   return (
     <>
@@ -269,9 +271,9 @@ export default function AttemptsDialog({ open, onClose, interviewId }: AttemptsD
         onClose={!isFullscreen ? onClose : undefined}
         aria-labelledby="customized-dialog-title"
         open={open}
-        maxWidth={isFullscreen ? "xl" : "md"}
+        maxWidth={isSmallScreen || isFullscreen ? "xl" : "md"}
         fullWidth
-        fullScreen={isFullscreen}
+        fullScreen={isFullscreen || isSmallScreen}
         TransitionComponent={isFullscreen ? Transition : undefined}
       >
         <DialogTitle id="customized-dialog-title">
