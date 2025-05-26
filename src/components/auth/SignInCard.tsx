@@ -23,6 +23,7 @@ import { useEffect } from "react";
 import Alert from "@mui/material/Alert";
 import Collapse from "@mui/material/Collapse";
 import { useT } from "@/i18n/client";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 // Define form data type
 interface FormData {
@@ -57,6 +58,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 export default function SignInCard() {
   const { t } = useT("auth");
   const [open, setOpen] = React.useState(false);
+  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   const [alertInfo, setAlertInfo] = React.useState<AlertInfo>({
     show: false,
     message: "",
@@ -90,7 +92,7 @@ export default function SignInCard() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await auth.signin(data.email, data.password);
+      await auth.signin(data.email, data.password, captchaToken || "");
       setAlertInfo({
         show: true,
         message: t("signin.success"),
@@ -199,7 +201,11 @@ export default function SignInCard() {
         <FormControl>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <FormLabel htmlFor="password">Password</FormLabel>
-            <button type="button" onClick={handleClickOpen} style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>
+            <button
+              type="button"
+              onClick={handleClickOpen}
+              style={{ background: "none", border: "none", color: "inherit", textDecoration: "underline", cursor: "pointer" }}
+            >
               {t("signin.forgotPassAction")}
             </button>
           </Box>
@@ -229,6 +235,12 @@ export default function SignInCard() {
             )}
           />
         </FormControl>
+        <HCaptcha
+          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY as string}
+          onVerify={(token: string) => {
+            setCaptchaToken(token);
+          }}
+        />
         {/*<Controller
           name="remember"
           control={control}
@@ -238,7 +250,7 @@ export default function SignInCard() {
               label={t("signin.rememberMe")} 
             />
           )}
-        />*/ }
+        />*/}
         <ForgotPassword open={open} handleClose={handleClose} />
         <Button type="submit" fullWidth variant="contained" disabled={auth.isPending} sx={{ mt: 2 }}>
           {t("signin.buttonAction")}
@@ -246,7 +258,7 @@ export default function SignInCard() {
         <Typography sx={{ textAlign: "center" }}>
           {t("signin.signupText")}{" "}
           <span>
-            <Link href={PAGE_PATH.signUp} style={{ textDecoration: 'underline' }}>
+            <Link href={PAGE_PATH.signUp} style={{ textDecoration: "underline" }}>
               {t("signin.signupAction")}
             </Link>
           </span>

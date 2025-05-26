@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import LogoIcon from "@/icons/LogoIcon";
 import { useEffect } from "react";
 import { useT } from "@/i18n/client";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 // Define form data type
 interface FormData {
@@ -60,6 +61,8 @@ export default function SignUpCard(): React.ReactElement {
   const auth = useAuth();
   const router = useRouter();
   const [open, setOpen] = React.useState<boolean>(false);
+  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
+
   const [alertInfo, setAlertInfo] = React.useState<AlertInfo>({
     show: false,
     message: "",
@@ -95,7 +98,7 @@ export default function SignUpCard(): React.ReactElement {
 
   const onSubmit = async (data: FormData): Promise<void> => {
     try {
-      await auth.signup(data.email, data.password);
+      await auth.signup(data.email, data.password, captchaToken || "");
       setAlertInfo({
         show: true,
         message: t("signup.success"),
@@ -246,6 +249,12 @@ export default function SignUpCard(): React.ReactElement {
             )}
           />
         </FormControl>
+        <HCaptcha
+          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY as string}
+          onVerify={(token: string) => {
+            setCaptchaToken(token);
+          }}
+        />
         {/*<Controller
           name="allowExtraEmails"
           control={control}
@@ -263,7 +272,7 @@ export default function SignUpCard(): React.ReactElement {
         <Typography sx={{ textAlign: "center" }}>
           {t("signup.signinText")}{" "}
           <span>
-            <Link href={PAGE_PATH.signIn} style={{ textDecoration: 'underline' }}>
+            <Link href={PAGE_PATH.signIn} style={{ textDecoration: "underline" }}>
               {t("signup.signinAction")}
             </Link>
           </span>
