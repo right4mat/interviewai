@@ -21,8 +21,8 @@ interface AuthContextType {
   user: UserWithCustomData | null | false;
   isPending: boolean;
   error: Error | null;
-  signup: (email: string, password: string) => Promise<User>;
-  signin: (email: string, password: string) => Promise<User>;
+  signup: (email: string, password: string, captchaToken: string) => Promise<User>;
+  signin: (email: string, password: string, captchaToken: string) => Promise<User>;
   signinWithProvider: (name: Provider) => Promise<any>;
   signinWithMagicLink: (email: string) => Promise<any>;
   signout: () => Promise<any>;
@@ -97,11 +97,11 @@ function useAuthProvider(): AuthContextType {
     return user;
   };
 
-  const signup = async (email: string, password: string) => {
+  const signup = async (email: string, password: string, captchaToken: string) => {
     setIsPending(true);
     setError(null);
     try {
-      const user = await supabase.auth.signUp({ email, password }).then(handleError).then(handleAuth);
+      const user = await supabase.auth.signUp({ email, password, options: { captchaToken } }).then(handleError).then(handleAuth);
       return user;
     } catch (err) {
       setError(err as Error);
@@ -111,11 +111,11 @@ function useAuthProvider(): AuthContextType {
     }
   };
 
-  const signin = async (email: string, password: string) => {
+  const signin = async (email: string, password: string, captchaToken: string) => {
     setIsPending(true);
     setError(null);
     try {
-      const user = await supabase.auth.signInWithPassword({ email, password }).then(handleError).then(handleAuth);
+      const user = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } }).then(handleError).then(handleAuth);
       return user;
     } catch (err) {
       setError(err as Error);
