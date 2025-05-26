@@ -92,7 +92,7 @@ export default function SignInCard() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await auth.signin(data.email, data.password, captchaToken);
+      await auth.signin(data.email, data.password, captchaToken || "");
       setAlertInfo({
         show: true,
         message: t("signin.success"),

@@ -98,7 +98,7 @@ export default function SignUpCard(): React.ReactElement {
 
   const onSubmit = async (data: FormData): Promise<void> => {
     try {
-      await auth.signup(data.email, data.password, captchaToken);
+      await auth.signup(data.email, data.password, captchaToken || "");
       setAlertInfo({
         show: true,
         message: t("signup.success"),
