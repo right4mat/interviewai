@@ -35,6 +35,7 @@ export default function Interview(): React.ReactElement {
     stopInterview,
     setIsGettingReply,
     setAnswerWillCompleteIn,
+    setBuildingAnswer,
     setStage,
     clearinterviewState,
   } = useInterviewStore();
@@ -88,7 +89,8 @@ export default function Interview(): React.ReactElement {
   React.useEffect(() => {
     setIsGettingReply(isGettingReply || isLoadingQuestions);
     setAnswerWillCompleteIn(answerWillCompleteIn);
-  }, [isGettingReply, answerWillCompleteIn, isLoadingQuestions]);
+    setBuildingAnswer(buildingAnswer);
+  }, [isGettingReply, answerWillCompleteIn, isLoadingQuestions, buildingAnswer]);
 
   // Effect to show review dialog when interview finishes this is messy but it works can fix later
   React.useEffect(() => {

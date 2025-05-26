@@ -44,7 +44,7 @@ export interface AppNavbarProps {
 
 export function AppNavbar({ title = "Dashboard", menuContent, cardAlert }: AppNavbarProps) {
   const [open, setOpen] = React.useState(false);
-  const { isGettingReply, answerWillCompleteIn } = useInterviewStore();
+  const { isGettingReply, answerWillCompleteIn, buildingAnswer } = useInterviewStore();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const toggleDrawer = (newOpen: boolean) => () => {
@@ -77,7 +77,7 @@ export function AppNavbar({ title = "Dashboard", menuContent, cardAlert }: AppNa
           <Stack direction="row" spacing={1} sx={{ justifyContent: "center", mr: "auto" }}>
             <LogoIcon width={50} height={50} />
           </Stack>
-          {isSmallScreen && <InterviewStatusIndicator isGettingReply={isGettingReply} answerWillCompleteIn={answerWillCompleteIn} />}
+          {isSmallScreen && <InterviewStatusIndicator isGettingReply={isGettingReply} answerWillCompleteIn={answerWillCompleteIn} buildingAnswer={buildingAnswer} />}
           {/* <ColorModeIconDropdown /> */}
           <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
