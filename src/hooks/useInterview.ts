@@ -3,6 +3,7 @@ import { useGetInterviewReply, useScoreAnswer } from "@/services/appServices";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useDebounce } from "@/hooks/useDebounce";
 import { type Interviewer, type QuestionAnswer } from "@/types/interview";
+import { Howl } from "howler";
 
 
 
@@ -57,15 +58,8 @@ export const useInterview = ({
   const [volumeLevel, setVolumeLevel] = useState<number>(0);
 
   // Persistent refs
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const firstReplyHasStarted = useRef<boolean>(false);
   const lastQuestionIndex = useRef<number>(-1);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const volumeLevelRef = useRef<number>(0);
-  const lastVolumeUpdateRef = useRef<number>(0);
 
   // Speech recognition configuration
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
@@ -76,6 +70,13 @@ export const useInterview = ({
 
   // Debounced answer to prevent rapid API calls
   const currentAnswer = useDebounce(buildingAnswer, 5000);
+
+  // New refs for Howler
+  const howlRef = useRef<Howl | null>(null);
+  const volumeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Add back answerTimeoutRef
+  const answerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Reset countdown timer when building answer changes
   useEffect(() => {
@@ -147,73 +148,68 @@ export const useInterview = ({
    * Handles audio playback of AI responses
    */
   const handleReplySuccess = async (response: { audio?: string }) => {
-    //if use skips to next question the past audio should be stopped if its still playing
-    if (audioRef.current) {
-      audioRef.current.pause();
+    // Stop any previous audio
+    if (howlRef.current) {
+      howlRef.current.stop();
+      howlRef.current.unload();
+      howlRef.current = null;
     }
-
+    if (volumeIntervalRef.current) {
+      clearInterval(volumeIntervalRef.current);
+      volumeIntervalRef.current = null;
+    }
     if (!response?.audio) return;
-
-    // Ensure speech recognition is stopped before AI starts speaking
     SpeechRecognition.stopListening();
     setIsAISpeaking(true);
-
-    audioRef.current = new Audio(response.audio);
-    audioRef.current.onended = () => {
-      audioRef.current = null;
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-        audioContextRef.current = null;
-      }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      volumeLevelRef.current = 0;
-      setVolumeLevel(0);
-      setIsAISpeaking(false);
-    };
-
-    // Set up audio analysis
-    audioContextRef.current = new window.AudioContext();
-    analyserRef.current = audioContextRef.current.createAnalyser();
-    analyserRef.current.fftSize = 256;
-
-    const source = audioContextRef.current.createMediaElementSource(audioRef.current);
-    source.connect(analyserRef.current);
-    analyserRef.current.connect(audioContextRef.current.destination);
-
-    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-
-    const updateVolume = () => {
-      if (analyserRef.current) {
-        analyserRef.current.getByteFrequencyData(dataArray);
-        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-        volumeLevelRef.current = avg;
-        
-        const now = Date.now();
-        if (now - lastVolumeUpdateRef.current >= 300) { // Only update every 300ms
-          setVolumeLevel(volumeLevelRef.current);
-          lastVolumeUpdateRef.current = now;
-        }
-        
-        animationFrameRef.current = requestAnimationFrame(updateVolume);
-      }
-    };
-
-    audioContextRef.current.resume().then(() => {
-      setIsAISpeaking(true);
-      SpeechRecognition.stopListening();
-      audioRef.current?.play().catch((error) => {
-        console.error("Error playing audio:", error);
-        audioRef.current = null;
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-        volumeLevelRef.current = 0;
+    // Howler expects a URL or base64 data URI
+    howlRef.current = new Howl({
+      src: [response.audio],
+      html5: true,
+      onend: () => {
+        setIsAISpeaking(false);
         setVolumeLevel(0);
-      });
-      updateVolume();
+        if (volumeIntervalRef.current) {
+          clearInterval(volumeIntervalRef.current);
+          volumeIntervalRef.current = null;
+        }
+      },
+      onplay: () => {
+        setIsAISpeaking(true);
+        // Simulate volume visualization (Howler does not provide direct volume data)
+        // We'll just animate a fake volume for now, or you can integrate a waveform util if needed
+        volumeIntervalRef.current = setInterval(() => {
+          // Simulate volume: randomize for effect, or use a util for real waveform
+          setVolumeLevel(Math.floor(Math.random() * 100));
+        }, 300);
+      },
+      onstop: () => {
+        setIsAISpeaking(false);
+        setVolumeLevel(0);
+        if (volumeIntervalRef.current) {
+          clearInterval(volumeIntervalRef.current);
+          volumeIntervalRef.current = null;
+        }
+      },
+      onpause: () => {
+        setIsAISpeaking(false);
+        setVolumeLevel(0);
+        if (volumeIntervalRef.current) {
+          clearInterval(volumeIntervalRef.current);
+          volumeIntervalRef.current = null;
+        }
+      },
+      onloaderror: () => {
+        setIsAISpeaking(false);
+        setVolumeLevel(0);
+        setError("Failed to load audio");
+      },
+      onplayerror: () => {
+        setIsAISpeaking(false);
+        setVolumeLevel(0);
+        setError("Failed to play audio");
+      }
     });
+    howlRef.current.play();
   };
 
   // Main interview flow effect - handles scoring and AI replies
@@ -334,11 +330,17 @@ export const useInterview = ({
     }
   }, [browserSupportsSpeechRecognition, isAISpeaking, currentQuestion, interviewStarted, stopListening]);
 
-  // Cleanup animation frame on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (howlRef.current) {
+        howlRef.current.stop();
+        howlRef.current.unload();
+        howlRef.current = null;
+      }
+      if (volumeIntervalRef.current) {
+        clearInterval(volumeIntervalRef.current);
+        volumeIntervalRef.current = null;
       }
     };
   }, []);
@@ -347,19 +349,16 @@ export const useInterview = ({
    * Stops current audio playback and resets speaking state
    */
   const stopAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+    if (howlRef.current) {
+      howlRef.current.stop();
+      howlRef.current.unload();
+      howlRef.current = null;
     }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
+    if (volumeIntervalRef.current) {
+      clearInterval(volumeIntervalRef.current);
+      volumeIntervalRef.current = null;
     }
     setIsAISpeaking(false);
-    volumeLevelRef.current = 0;
     setVolumeLevel(0);
   };
 
