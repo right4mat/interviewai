@@ -1,44 +1,26 @@
 "use client";
 import * as React from "react";
-import { useForm, Controller } from "react-hook-form";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import MuiCard from "@mui/material/Card";
-import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Link from "next/link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import Collapse from "@mui/material/Collapse";
 import { styled } from "@mui/material/styles";
-import ForgotPassword from "./ForgotPassword";
-import GoogleIcon from "@/images/brandIcons/Google";
-import { AFTER_AUTH_PATH, PAGE_PATH } from "@/path";
-import { useAuth } from "@/utils/auth";
+import { PAGE_PATH } from "@/path";
 import { useRouter } from "next/navigation";
 import LogoIcon from "@/icons/LogoIcon";
-import { useEffect } from "react";
 import { useT } from "@/i18n/client";
+import { Controller } from "react-hook-form";
+import { useSignUpForm } from "@/hooks/useSignUpForm";
+import { useAlert } from "@/hooks/useAlert";
+import SocialLoginButtons from "./SocialLoginButtons";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-
-// Define form data type
-interface FormData {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  allowExtraEmails: boolean;
-}
-
-// Define alert info type
-interface AlertInfo {
-  show: boolean;
-  message: string;
-  severity: "success" | "error" | "warning" | "info";
-}
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -58,93 +40,27 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 export default function SignUpCard(): React.ReactElement {
   const { t } = useT("auth");
-  const auth = useAuth();
   const router = useRouter();
-  const [open, setOpen] = React.useState<boolean>(false);
-  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
-
-  const [alertInfo, setAlertInfo] = React.useState<AlertInfo>({
-    show: false,
-    message: "",
-    severity: "success"
-  });
+  const { alertInfo, showAlert, hideAlert } = useAlert();
+  const captchaRef = React.useRef<HCaptcha>(null);
+  
   const {
     control,
-    handleSubmit,
-    formState: { errors },
-    watch
-  } = useForm<FormData>({
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      allowExtraEmails: false
-    }
-  });
+    errors,
+    validationRules,
+    handleSignUp,
+    handleSocialSignUp,
+    onVerifyCaptcha,
+    isPending
+  } = useSignUpForm(
+    (message) => showAlert(message, "success"),
+    (error) => showAlert(error, "error"),
+    captchaRef
+  );
 
-  useEffect(() => {
+  React.useEffect(() => {
     router.prefetch(PAGE_PATH.dashboardPage);
-  }, []);
-
-  const password = watch("password");
-
-  const handleClickOpen = (): void => {
-    setOpen(true);
-  };
-
-  const handleClose = (): void => {
-    setOpen(false);
-  };
-
-  const onSubmit = async (data: FormData): Promise<void> => {
-    try {
-      await auth.signup(data.email, data.password, captchaToken || "");
-      setAlertInfo({
-        show: true,
-        message: t("signup.success"),
-        severity: "success"
-      });
-      setTimeout(() => {
-        router.push(AFTER_AUTH_PATH);
-      }, 500);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setAlertInfo({
-        show: true,
-        message: t("signup.error.default", { message: errorMessage }),
-        severity: "error"
-      });
-      console.error("Error signing up:", errorMessage);
-    }
-  };
-
-  const handleGoogleSignUp = async (): Promise<void> => {
-    try {
-      await auth.signinWithProvider("google");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setAlertInfo({
-        show: true,
-        message: t("signup.error.google", { message: errorMessage }),
-        severity: "error"
-      });
-      console.error("Error signing up with Google:", errorMessage);
-    }
-  };
-
-  const handleFacebookSignUp = async (): Promise<void> => {
-    try {
-      await auth.signinWithProvider("facebook");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setAlertInfo({
-        show: true,
-        message: t("signup.error.facebook", { message: errorMessage }),
-        severity: "error"
-      });
-      console.error("Error signing up with Facebook:", errorMessage);
-    }
-  };
+  }, [router]);
 
   return (
     <Card variant="outlined">
@@ -156,14 +72,14 @@ export default function SignUpCard(): React.ReactElement {
       </Typography>
 
       <Collapse in={alertInfo.show}>
-        <Alert severity={alertInfo.severity} onClose={() => setAlertInfo({ ...alertInfo, show: false })} sx={{ mb: 2 }}>
+        <Alert severity={alertInfo.severity} onClose={hideAlert} sx={{ mb: 2 }}>
           {alertInfo.message}
         </Alert>
       </Collapse>
 
       <Box
         component="form"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSignUp}
         noValidate
         sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 2 }}
       >
@@ -172,13 +88,7 @@ export default function SignUpCard(): React.ReactElement {
           <Controller
             name="email"
             control={control}
-            rules={{
-              required: t("signup.validation.email.required"),
-              pattern: {
-                value: /\S+@\S+\.\S+/,
-                message: t("signup.validation.email.invalid")
-              }
-            }}
+            rules={validationRules.email}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -201,13 +111,7 @@ export default function SignUpCard(): React.ReactElement {
           <Controller
             name="password"
             control={control}
-            rules={{
-              required: t("signup.validation.password.required"),
-              minLength: {
-                value: 6,
-                message: t("signup.validation.password.minLength")
-              }
-            }}
+            rules={validationRules.password}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -229,10 +133,7 @@ export default function SignUpCard(): React.ReactElement {
           <Controller
             name="confirmPassword"
             control={control}
-            rules={{
-              required: t("signup.validation.confirmPassword.required"),
-              validate: (value) => value === password || t("signup.validation.confirmPassword.mismatch")
-            }}
+            rules={validationRules.confirmPassword}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -249,24 +150,19 @@ export default function SignUpCard(): React.ReactElement {
             )}
           />
         </FormControl>
-        <HCaptcha
-          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY as string}
-          onVerify={(token: string) => {
-            setCaptchaToken(token);
-          }}
-        />
-        {/*<Controller
-          name="allowExtraEmails"
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={<Checkbox {...field} checked={field.value} color="primary" />}
-              label={t("signup.allowExtraEmails")}
-            />
-          )}
-        />*/}
-        <ForgotPassword open={open} handleClose={handleClose} />
-        <Button type="submit" fullWidth variant="contained" disabled={auth.isPending} sx={{ mt: 2 }}>
+        <Box>
+          <HCaptcha
+            ref={captchaRef}
+            size="invisible"
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY as string}
+            onVerify={onVerifyCaptcha}
+            onExpire={() => {
+              captchaRef.current?.resetCaptcha();
+            }}
+          />
+        </Box>
+        
+        <Button type="submit" fullWidth variant="contained" disabled={isPending} sx={{ mt: 2 }}>
           {t("signup.buttonAction")}
         </Button>
         <Typography sx={{ textAlign: "center" }}>
@@ -279,20 +175,10 @@ export default function SignUpCard(): React.ReactElement {
         </Typography>
       </Box>
       <Divider>{t("signup.or")}</Divider>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Button fullWidth variant="outlined" onClick={handleGoogleSignUp} startIcon={<GoogleIcon />} disabled={auth.isPending}>
-          {t("signup.withGoogle")}
-        </Button>
-        {/* <Button
-          fullWidth
-          variant="outlined"
-          onClick={handleFacebookSignUp}
-          startIcon={<FacebookIcon />}
-          disabled={auth.isPending}
-        >
-          {t("signup.withFacebook")}
-        </Button>*/}
-      </Box>
+      <SocialLoginButtons
+        onGoogleSignIn={() => handleSocialSignUp("google")}
+        disabled={isPending}
+      />
     </Card>
   );
 }
