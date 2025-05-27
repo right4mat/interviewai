@@ -17,24 +17,27 @@ const getQuestionsSchema = z.object({
     role: z.string().min(1, "Interviewer role is required")
   }),
   difficulty: z.string().optional().default("intermediate"),
-  type: z.string().optional().default("mixed"),
+  type: z.string().optional().default("mixed")
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {
   try {
     const body = await req.json();
-    
+
     // Validate request body
     const result = getQuestionsSchema.safeParse(body);
-    
+
     if (!result.success) {
-      return NextResponse.json({ 
-        error: "Validation failed", 
-        details: result.error.format() 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Validation failed",
+          details: result.error.format()
+        },
+        { status: 400 }
+      );
     }
 
-    const { jobDescriptionId, resumeId, interviewers, difficulty, type} = result.data;
+    const { jobDescriptionId, resumeId, interviewers, difficulty, type } = result.data;
 
     const [resume, jobDescription] = await Promise.all([
       resumeId ? getResume(resumeId, user.id) : undefined,
@@ -44,7 +47,9 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
     const questionsPrompt = `
 Generate a list of interview questions for a 30-minute interview.
 
-Job Description: ${jobDescription}
+Company Name: ${jobDescription.company}
+
+Job Description: ${jobDescription.job_description}
 
 ${resume ? `Candidate's Resume: ${resume}` : ""}
 
@@ -69,7 +74,11 @@ Do not include any other text or formatting.
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: "You are an expert interview question generator who creates tailored questions based on job descriptions and candidate resumes." },
+        {
+          role: "system",
+          content:
+            "You are an expert interview question generator who creates tailored questions based on job descriptions and candidate resumes."
+        },
         { role: "user", content: questionsPrompt }
       ],
       temperature: 0.7,
@@ -77,15 +86,14 @@ Do not include any other text or formatting.
       response_format: { type: "json_object" }
     });
 
-    const responseContent = response?.choices?.[0]?.message?.content?.trim() || '';
-    
+    const responseContent = response?.choices?.[0]?.message?.content?.trim() || "";
+
     // Parse the response string into an object
-    const { company, questions } = JSON.parse(responseContent);
-    
-    return NextResponse.json({ 
-      status: "success", 
+    const { questions } = JSON.parse(responseContent);
+
+    return NextResponse.json({
+      status: "success",
       data: {
-        company,
         questions
       }
     });

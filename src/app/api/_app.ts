@@ -47,6 +47,11 @@ interface QuestionAnswerData {
   currentQuestionIndex: number;
 }
 
+interface JobDescriptionAnalysis {
+  company: string;
+  summary: string;
+}
+
 async function upsertResume(data: ResumeData) {
   const { userId, resumeContent, filename, hash } = data;
   
@@ -80,26 +85,7 @@ async function getResume(id: number, userId: string) {
   return await supabase.from("resumes").select("*").eq("id", id).eq("user_id", userId).single().then(handle);
 }
 
-async function getOrCreateJobDescription(data: JobDescriptionData) {
-  const { userId, jobDescription } = data;
-
-  // Generate hash for job description from the unsummarized version
-  const jobDescriptionHash = crypto.createHash("sha256").update(jobDescription).digest("hex");
-
-  // Get or create job description record
-  let jobDescData = await supabase
-    .from("job_descriptions")
-    .select("*")
-    .eq("hash", jobDescriptionHash)
-    .eq("user_id", userId)
-    .maybeSingle()
-    .then(handle);
-
-  if (jobDescData) {
-    return jobDescData;
-  }
-
-  // If no existing summary, generate one using OpenAI
+async function analyzeJobDescription(jobDescription: string): Promise<JobDescriptionAnalysis> {
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     temperature: 0.3,
@@ -107,35 +93,62 @@ async function getOrCreateJobDescription(data: JobDescriptionData) {
     messages: [
       {
         role: "system",
-        content: "You are a specialized assistant that summarizes job descriptions concisely."
+        content: "You are a specialized assistant that analyzes job descriptions. You must return your response in the following JSON format: { company: string, summary: string }. The summary should be a 200-word summary of the job description, and company should be the name of the company posting the job."
       },
       {
         role: "user",
-        content: `Please summarize this job description in 200 words or less, focusing on the key requirements, responsibilities, and qualifications the employer is looking for. Emphasize the most important skills and experiences needed for this role:\n\n${jobDescription}`
+        content: `Analyze this job description and return a JSON object in the format { company: string, summary: string }. The summary should focus on key requirements, responsibilities, and qualifications. If the company name is not explicitly stated, try to infer it from the context. Response format must be valid JSON:\n\n${jobDescription}`
       }
-    ]
+    ],
+    response_format: { type: "json_object" }
   });
 
-  const summary = response?.choices[0]?.message?.content?.trim();
-  if (!summary) {
-    throw new Error("Failed to summarize the job description");
+  const content = response?.choices[0]?.message?.content?.trim();
+  if (!content) {
+    throw new Error("Failed to analyze the job description");
   }
 
-  // Create new job description record with the summary
-  jobDescData = await supabase
+  let parsedContent;
+  try {
+    parsedContent = JSON.parse(content);
+  } catch (e) {
+    throw new Error("Failed to parse AI response as JSON");
+  }
+
+  if (!parsedContent.summary || !parsedContent.company) {
+    throw new Error("AI response missing required fields");
+  }
+
+  return {
+    company: parsedContent.company,
+    summary: parsedContent.summary
+  };
+}
+
+async function findExistingJobDescription(userId: string, hash: string) {
+  return await supabase
+    .from("job_descriptions")
+    .select("*")
+    .eq("hash", hash)
+    .eq("user_id", userId)
+    .maybeSingle()
+    .then(handle);
+}
+
+async function createJobDescription(userId: string, hash: string, summary: string, company: string) {
+  return await supabase
     .from("job_descriptions")
     .insert([
       {
         user_id: userId,
         job_description: summary,
-        hash: jobDescriptionHash
+        hash: hash,
+        company: company
       }
     ])
     .select("*")
     .single()
     .then(handle);
-
-  return jobDescData;
 }
 
 async function findExistingInterview(data: {
@@ -236,4 +249,26 @@ async function getJobDescription(userId: string, jobDescriptionId: number) {
     .then(handle);
 }
 
-export { upsertResume, getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers, findExistingInterview, getJobDescription };
+async function updateInterview(interviewId: number, userId: string, company: string) {
+  return await supabase
+    .from("interviews")
+    .update({ company_name: company })
+    .eq("id", interviewId)
+    .eq("user_id", userId)
+    .select()
+    .single()
+    .then(handle);
+}
+
+export { 
+  upsertResume, 
+  getResume, 
+  analyzeJobDescription,
+  findExistingJobDescription,
+  createJobDescription,
+  createInterview, 
+  saveQuestionAnswers, 
+  findExistingInterview, 
+  getJobDescription,
+  updateInterview 
+};

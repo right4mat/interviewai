@@ -43,7 +43,7 @@ export interface GetInterviewReplyRequest {
 
 type GetInterviewReplyResponse = { text: string; audio: string };
 
-type GetQuestionsResponse = { questions: string[]; company: string };
+type GetQuestionsResponse = { questions: string[]};
 
 type ExtractResumeResponse = { resumeId: number };
 
@@ -142,6 +142,7 @@ interface JobDescriptionSummaryRequest {
 
 interface JobDescriptionSummaryResponse {
   id: number;
+  company: string;
 }
 
 interface LeaderboardEntry {
@@ -193,7 +194,7 @@ export const useGetInterviewQuestions = (params: GetQuestionsRequest) => {
     queryFn: async () => {
       if (params.questions) {
         // if questions are already loaded from save state return them
-        return { questions: params.questions, company: params.company || "" };
+        return { questions: params.questions};
       }
       const response = await apiRequest("interview/get-questions", "POST", params);
       return response;
@@ -328,8 +329,8 @@ export const useInterviewList = () => {
         .from("interviews")
         .select(
           `id,
-          company,
           job_description_id,
+          job_descriptions(company),
           resume_id,
           settings,
           interviewer,
@@ -347,6 +348,8 @@ export const useInterviewList = () => {
       // Transform the data to match InterviewListResponse shape and ensure non-null values
       return stats.map((stat) => ({
         ...stat,
+        // @ts-ignore
+        company: stat.job_descriptions?.company || "",
         avg: stat.question_answers?.[0]?.avg ?? 0,
         count: stat.question_answers?.[0]?.count ?? 0
       }));

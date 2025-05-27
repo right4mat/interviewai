@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
 import type { User } from "@supabase/supabase-js";
-import { getResume, getOrCreateJobDescription, createInterview, saveQuestionAnswers, findExistingInterview } from "../../_app";
+import {createInterview, saveQuestionAnswers, findExistingInterview } from "../../_app";
 
 // Define schema for request validation
 const getQuestionsSchema = z.object({

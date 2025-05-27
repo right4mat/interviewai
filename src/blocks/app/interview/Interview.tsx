@@ -73,7 +73,7 @@ export default function Interview(): React.ReactElement {
     currentQuestionIndex,
     answerWillCompleteIn
   } = useInterview({
-    company: details?.company || "",
+    company: interviewState.company,
     questions: details?.questions || [],
     jobDescriptionId: interviewState.jobDescriptionId,
     interviewer: interviewState.interviewer,
