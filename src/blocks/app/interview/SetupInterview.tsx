@@ -51,7 +51,7 @@ const SetupInterview: React.FC = () => {
         const response = await jobDescriptionSummaryMutation.mutateAsync({
           jobDescription: interviewState.jobDescription
         });
-        updateInterviewState({ jobDescriptionId: response.id });
+        updateInterviewState({ jobDescriptionId: response.id, company: response.company });
       } catch (error) {
         console.error("Failed to get job description summary:", error);
         alert("Failed to process job description. Please try again.");

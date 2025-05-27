@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import requireAuth from "../../_require-auth";
 import { z } from "zod";
-import { getOrCreateJobDescription } from "../../_app";
+import { analyzeJobDescription, findExistingJobDescription, createJobDescription, updateInterview } from "../../_app";
+const crypto = require("crypto");
 
 export const maxDuration = 60; // This function can run for a maximum of 60 seconds
 
 // Define schema for request validation
 const JobDescriptionRequestSchema = z.object({
-  jobDescription: z.string()
+  jobDescription: z.string(),
 });
 
 export const POST = requireAuth(async (req: NextRequest, user: any) => {
@@ -23,19 +24,37 @@ export const POST = requireAuth(async (req: NextRequest, user: any) => {
       );
     }
 
-    const jobDescriptionContent = validatedBody.data.jobDescription;
+    const { jobDescription: jobDescriptionContent } = validatedBody.data;
     
-    // Get or create job description
-    const jobDescData = await getOrCreateJobDescription({
-      userId: user.id,
-      jobDescription: jobDescriptionContent,
-    });
+    // Generate hash for job description
+    const jobDescriptionHash = crypto.createHash("sha256").update(jobDescriptionContent).digest("hex");
+
+    // Check for existing job description
+    const existingJobDesc = await findExistingJobDescription(user.id, jobDescriptionHash);
+    if (existingJobDesc) {
+      return NextResponse.json({
+        status: "success",
+        data: {
+          id: existingJobDesc.id,
+          company: existingJobDesc.company
+        }
+      });
+    }
+
+    // Analyze job description using AI
+    const analysis = await analyzeJobDescription(jobDescriptionContent);
+
+    // Create new job description record
+    const jobDescData = await createJobDescription(user.id, jobDescriptionHash, analysis.summary, analysis.company);
+
+   
 
     // Return just the ID
     return NextResponse.json({
       status: "success",
       data: {
-        id: jobDescData.id
+        id: jobDescData.id,
+        company: analysis.company
       }
     });
 

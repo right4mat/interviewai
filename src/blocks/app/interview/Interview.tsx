@@ -73,7 +73,7 @@ export default function Interview(): React.ReactElement {
     currentQuestionIndex,
     answerWillCompleteIn
   } = useInterview({
-    company: details?.company || "",
+    company: interviewState.company,
     questions: details?.questions || [],
     jobDescriptionId: interviewState.jobDescriptionId,
     interviewer: interviewState.interviewer,
@@ -100,7 +100,7 @@ export default function Interview(): React.ReactElement {
     if (currentQuestionIndex >= (details?.questions?.length || 999) && !!interviewState.interviewStarted && !isAISpeaking) {
       // finished so lets save the interview
       saveInterview({
-        company: details?.company || "",
+        company: interviewState.company,
         questions: details?.questions || [],
         currentQuestionIndex,
         interviewer: interviewState.interviewer,
@@ -133,7 +133,7 @@ export default function Interview(): React.ReactElement {
     }
     saveInterview(
       {
-        company: details?.company || "",
+        company: interviewState.company,
         questions: details?.questions || [],
         currentQuestionIndex,
         interviewer: interviewState.interviewer,
@@ -161,7 +161,7 @@ export default function Interview(): React.ReactElement {
     setIsSavingInterview(true);
     saveInterview(
       {
-        company: details?.company || "",
+        company: interviewState.company,
         questions: details?.questions || [],
         currentQuestionIndex,
         interviewer: interviewState.interviewer,
@@ -199,7 +199,7 @@ export default function Interview(): React.ReactElement {
 
       {currentQuestionIndex >= (details?.questions?.length || 999) && (
         <ReviewDialog
-          company={details?.company || ""}
+          company={interviewState.company}
           open={showReviewDialog}
           onClose={handleCloseReview}
           questionAnswers={questionAnswers}
